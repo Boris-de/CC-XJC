@@ -208,7 +208,7 @@ public final class PluginImpl extends Plugin
     {
         final JMethod ctor = clazz.implClass.constructor( JMod.PUBLIC );
         ctor.body().invoke( "super" );
-        ctor.javadoc().add( "Creates a new {@code " + clazz.implClass.binaryName() + "} instance." );
+        ctor.javadoc().add( "Creates a new {@code " + clazz.implClass.fullName() + "} instance." );
         return ctor;
     }
 
@@ -217,7 +217,7 @@ public final class PluginImpl extends Plugin
         final JMethod ctor = clazz.implClass.constructor( JMod.PUBLIC );
         final JVar o = ctor.param( clazz.implClass, "o" );
 
-        ctor.javadoc().add( "Creates a new {@code " + clazz.implClass.binaryName() +
+        ctor.javadoc().add( "Creates a new {@code " + clazz.implClass.fullName() +
                             "} instance by copying a given instance." );
 
         ctor.javadoc().addParam( o ).add( "The instance to copy or {@code null}." );
