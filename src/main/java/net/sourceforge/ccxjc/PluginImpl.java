@@ -302,7 +302,7 @@ public final class PluginImpl extends Plugin
                         }
                         else
                         {
-                            block.invoke( getter ).invoke( "addAll" ).arg( JExpr.invoke( o, getter ) );
+                            block.invoke( JExpr.invoke( getter ), "addAll" ).arg( JExpr.invoke( o, getter ) );
                         }
                     }
                     else
