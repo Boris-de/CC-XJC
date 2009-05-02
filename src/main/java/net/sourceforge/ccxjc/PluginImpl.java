@@ -75,7 +75,7 @@ public final class PluginImpl extends Plugin
     @Override
     public String getUsage()
     {
-        return "-copy-constructor\t:\tenable generation of copy constructors";
+        return this.getMessage( "usage", null );
     }
 
     @Override
@@ -403,12 +403,15 @@ public final class PluginImpl extends Plugin
         return false;
     }
 
-    private void log( final Level level, final String key, final Object args )
+    private String getMessage( final String key, final Object args )
     {
         final ResourceBundle bundle = ResourceBundle.getBundle( "net/sourceforge/ccxjc/PluginImpl" );
-        System.err.println( '[' + level.toString() + "] " +
-                            new MessageFormat( bundle.getString( key ) ).format( args ) );
+        return new MessageFormat( bundle.getString( key ) ).format( args );
+    }
 
+    private void log( final Level level, final String key, final Object args )
+    {
+        System.err.println( '[' + level.toString() + "] " + this.getMessage( key, args ) );
     }
 
 }
