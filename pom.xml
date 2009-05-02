@@ -388,7 +388,7 @@
   </distributionManagement>
   <profiles>
     <profile>
-      <id>create-sourceforge-shell</id>
+      <id>sourceforge-shell</id>
       <activation>
         <activeByDefault>false</activeByDefault>
       </activation>
@@ -415,6 +415,19 @@
                 <configuration>
                   <tasks>
                     <sshexec host="shell.sourceforge.net" username="${ccxjc.ssh.username},ccxjc" password="${ccxjc.ssh.password}" command="create" timeout="300000" />
+
+                  </tasks>
+                </configuration>
+              </execution>
+              <execution>
+                <id>shutdown-sourceforge-shell</id>
+                <phase>deploy</phase>
+                <goals>
+                  <goal>run</goal>
+                </goals>
+                <configuration>
+                  <tasks>
+                    <sshexec host="shell.sourceforge.net" username="${ccxjc.ssh.username},ccxjc" password="${ccxjc.ssh.password}" command="shutdown" timeout="300000" />
 
                   </tasks>
                 </configuration>
