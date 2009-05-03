@@ -30,6 +30,7 @@
 package net.sourceforge.ccxjc;
 
 import com.sun.codemodel.JBlock;
+import com.sun.codemodel.JCatchBlock;
 import com.sun.codemodel.JConditional;
 import com.sun.codemodel.JDefinedClass;
 import com.sun.codemodel.JExpr;
@@ -37,6 +38,7 @@ import com.sun.codemodel.JFieldVar;
 import com.sun.codemodel.JForEach;
 import com.sun.codemodel.JMethod;
 import com.sun.codemodel.JMod;
+import com.sun.codemodel.JTryBlock;
 import com.sun.codemodel.JType;
 import com.sun.codemodel.JVar;
 import com.sun.tools.xjc.Options;
@@ -47,6 +49,7 @@ import com.sun.tools.xjc.outline.ClassOutline;
 import com.sun.tools.xjc.outline.EnumOutline;
 import com.sun.tools.xjc.outline.FieldOutline;
 import com.sun.tools.xjc.outline.Outline;
+import java.lang.reflect.Method;
 import java.text.MessageFormat;
 import java.util.Collection;
 import java.util.ResourceBundle;
@@ -63,6 +66,8 @@ public final class PluginImpl extends Plugin
 {
 
     private static final JType[] NO_ARGS = new JType[ 0 ];
+
+    private static final Class[] NO_PARAMS = new Class[ 0 ];
 
     private boolean success;
 
@@ -243,8 +248,22 @@ public final class PluginImpl extends Plugin
             {
                 if ( !field.type().isPrimitive() && this.isCloneable( field.type() ) )
                 {
-                    final JConditional refNotNull =
-                        paramNotNull._then()._if( JExpr.ref( o, field ).ne( JExpr._null() ) );
+                    JConditional refNotNull = null;
+                    if ( this.isThrowingCloneNotSupportedException( field.type() ) )
+                    {
+                        final JTryBlock tryClone = paramNotNull._then()._try();
+                        final JCatchBlock cloneNotSupported = tryClone._catch( clazz.parent().getCodeModel().ref(
+                            CloneNotSupportedException.class ) );
+
+                        cloneNotSupported.body()._throw( JExpr._new( clazz.parent().getCodeModel().ref(
+                            AssertionError.class ) ).arg( cloneNotSupported.param( "e" ) ) );
+
+                        refNotNull = tryClone.body()._if( JExpr.ref( o, field ).ne( JExpr._null() ) );
+                    }
+                    else
+                    {
+                        refNotNull = paramNotNull._then()._if( JExpr.ref( o, field ).ne( JExpr._null() ) );
+                    }
 
                     refNotNull._then().assign( JExpr.refthis( field.name() ),
                                                JExpr.cast( field.type(), JExpr.ref( o, field ).invoke( "clone" ) ) );
@@ -355,7 +374,24 @@ public final class PluginImpl extends Plugin
                     }
                     else
                     {
-                        final JConditional notnull = block._if( JExpr.invoke( o, getter ).ne( JExpr._null() ) );
+                        JConditional notnull = null;
+                        if ( this.isThrowingCloneNotSupportedException( field.getRawType() ) )
+                        {
+                            final JTryBlock tryCloneable = block._try();
+                            final JCatchBlock catchCloneNotSupported =
+                                tryCloneable._catch( field.parent().parent().getCodeModel().ref(
+                                CloneNotSupportedException.class ) );
+
+                            catchCloneNotSupported.body()._throw( JExpr._new( field.parent().parent().getCodeModel().
+                                _ref( AssertionError.class ) ).arg( catchCloneNotSupported.param( "e" ) ) );
+
+                            notnull = tryCloneable.body()._if( JExpr.invoke( o, getter ).ne( JExpr._null() ) );
+                        }
+                        else
+                        {
+                            notnull = block._if( JExpr.invoke( o, getter ).ne( JExpr._null() ) );
+                        }
+
                         notnull._then().assign( JExpr.refthis( field.getPropertyInfo().getName( false ) ),
                                                 JExpr.cast( field.getRawType(),
                                                             JExpr.invoke( o, getter ).invoke( "clone" ) ) );
@@ -379,23 +415,62 @@ public final class PluginImpl extends Plugin
         }
     }
 
+    private ClassLoader getClassLoader()
+    {
+        ClassLoader cl = this.getClass().getClassLoader();
+        if ( cl == null )
+        {
+            cl = ClassLoader.getSystemClassLoader();
+        }
+
+        return cl;
+    }
+
     private boolean isCloneable( final JType type )
     {
         try
         {
-            ClassLoader cl = this.getClass().getClassLoader();
-            if ( cl == null )
-            {
-                cl = ClassLoader.getSystemClassLoader();
-            }
-
-            return Cloneable.class.isAssignableFrom( Class.forName( type.binaryName(), false, cl ) );
+            return Cloneable.class.isAssignableFrom( Class.forName( type.binaryName(), false, this.getClassLoader() ) );
         }
         catch ( ClassNotFoundException e )
         {
             this.log( Level.WARNING, "classNotFound", new Object[]
                 {
-                    type.binaryName()
+                    e.getMessage()
+                } );
+
+        }
+
+        return false;
+    }
+
+    private boolean isThrowingCloneNotSupportedException( final JType type )
+    {
+        try
+        {
+            final Class clazz = Class.forName( type.binaryName(), false, this.getClassLoader() );
+            final Method clone = clazz.getMethod( "clone", NO_PARAMS );
+            for ( Class e : clone.getExceptionTypes() )
+            {
+                if ( CloneNotSupportedException.class.isAssignableFrom( e ) )
+                {
+                    return true;
+                }
+            }
+        }
+        catch ( NoSuchMethodException e )
+        {
+            this.log( Level.WARNING, "methodNotFound", new Object[]
+                {
+                    e.getMessage()
+                } );
+
+        }
+        catch ( ClassNotFoundException e )
+        {
+            this.log( Level.WARNING, "classNotFound", new Object[]
+                {
+                    e.getMessage()
                 } );
 
         }
