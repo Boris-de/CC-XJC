@@ -57,7 +57,6 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import org.xml.sax.ErrorHandler;
@@ -757,22 +756,6 @@ public final class PluginImpl extends Plugin
                     System.err.println( b.toString() );
                 }
             }
-        }
-    }
-
-    private void addCloneMethodComment( final Map<ClassOutline, List<FieldOutline>> map, final ClassOutline clazz,
-                                        final FieldOutline field )
-    {
-        List<FieldOutline> report = map.get( clazz );
-        if ( report == null )
-        {
-            report = new LinkedList<FieldOutline>();
-            map.put( clazz, report );
-        }
-
-        if ( !report.contains( field ) )
-        {
-            report.add( field );
         }
     }
 
