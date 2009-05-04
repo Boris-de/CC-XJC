@@ -39,16 +39,22 @@
   </properties>
   <body>
     <!-- ******************************************************************* -->
-    <release version="1.0-beta-1" date="2009-05-02"
-             description="First release."/>
+    <release version="1.0-beta-1" date="2009-05-02"/>
 
     <!-- ******************************************************************* -->
-    <release version="1.0-beta-2" date="2009-05-03"
-             description="Bugfix release.">
-
+    <release version="1.0-beta-2" date="2009-05-03">
       <action dev="schulte2005" type="fix" issue="0000001" system="MantisBT">
         Incorrect code generated for collection valued properties referencing
         non schema derived classes.
+      </action>
+    </release>
+
+    <!-- ******************************************************************* -->
+    <release version="1.0-beta-3" date="2009-05-04">
+      <action dev="schulte2005" type="update">
+        Added support for multi-valued collection properties. Updated to add
+        a clone method and the the Cloneable interface to all schema derived
+        classes.
       </action>
     </release>
   </body>
