@@ -58,6 +58,7 @@
       <item name="Project Summary" href="http://sourceforge.net/projects/ccxjc/"/>
       <item name="MantisBT" href="http://apps.sourceforge.net/mantisbt/ccxjc/"/>
       <item name="IdeaTorrent" href="http://apps.sourceforge.net/ideatorrent/ccxjc/"/>
+      <item name="MediaWiki" href="https://apps.sourceforge.net/mediawiki/ccxjc/index.php?title=Main_Page"/>
     </menu>
 
     <menu ref="reports" />
