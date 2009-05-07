@@ -76,6 +76,22 @@ public final class PluginImpl extends Plugin
 
     private static final String MESSAGE_PREFIX = "CC-XJC";
 
+    private static final String[] IMMUTABLE_NAMES =
+    {
+        "java.lang.Boolean",
+        "java.lang.Byte",
+        "java.lang.Character",
+        "java.lang.Double",
+        "java.lang.Float",
+        "java.lang.Integer",
+        "java.lang.Long",
+        "java.lang.Short",
+        "java.lang.String",
+        "java.math.BigDecimal",
+        "java.math.BigInteger",
+        "java.util.UUID"
+    };
+
     private boolean success;
 
     private Options options;
@@ -230,6 +246,19 @@ public final class PluginImpl extends Plugin
         for ( FieldOutline f : clazz.getDeclaredFields() )
         {
             if ( f.getPropertyInfo().getName( false ).equals( fieldName ) )
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private boolean isImmutableType( final JType type )
+    {
+        for ( String s : IMMUTABLE_NAMES )
+        {
+            if ( type.binaryName().equals( s ) )
             {
                 return true;
             }
@@ -494,6 +523,11 @@ public final class PluginImpl extends Plugin
                                 arg( JExpr.cast( refType, next ) );
 
                             ifInstance._then()._continue();
+
+                            if ( this.isImmutableType( refType ) )
+                            {
+                                t.remove();
+                            }
                         }
                         else
                         {
@@ -568,8 +602,10 @@ public final class PluginImpl extends Plugin
                 }
                 else
                 {
-                    if ( field.getRawType().isPrimitive() ||
-                         this.getEnumOutline( field.parent().parent(), field.getRawType().binaryName() ) != null ||
+                    final EnumOutline enumOutline =
+                        this.getEnumOutline( field.parent().parent(), field.getRawType().binaryName() );
+
+                    if ( field.getRawType().isPrimitive() || enumOutline != null ||
                          !this.isCloneable( field.getRawType() ) )
                     {
                         block.directStatement( "// Immutable property '" + field.getPropertyInfo().getName( true ) +
@@ -578,6 +614,16 @@ public final class PluginImpl extends Plugin
                         block.assign( JExpr.refthis( field.getPropertyInfo().getName( false ) ),
                                       JExpr.invoke( o, getter ) );
 
+                        if ( !field.getRawType().isPrimitive() && enumOutline == null &&
+                             !this.isImmutableType( field.getRawType() ) )
+                        {
+                            this.log( Level.WARNING, "cannotCopyProperty", new Object[]
+                                {
+                                    field.getPropertyInfo().getName( true ),
+                                    field.parent().implClass.binaryName()
+                                } );
+
+                        }
                     }
                     else
                     {
@@ -657,12 +703,18 @@ public final class PluginImpl extends Plugin
         {
             block.directStatement( "// Immutable field '" + field.name() + "'." );
             block.assign( JExpr.refthis( field.name() ), JExpr.ref( o, field ) );
-            this.log( Level.WARNING, "cannotCopyField", new Object[]
-                {
-                    field.name(),
-                    clazz.implClass.binaryName()
-                } );
 
+            if ( !field.type().isPrimitive() &&
+                 !this.isImmutableType( field.type() ) &&
+                 this.getEnumOutline( clazz.parent(), field.type().binaryName() ) == null )
+            {
+                this.log( Level.WARNING, "cannotCopyField", new Object[]
+                    {
+                        field.name(),
+                        clazz.implClass.binaryName()
+                    } );
+
+            }
         }
     }
 

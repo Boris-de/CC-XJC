@@ -57,5 +57,14 @@
         classes.
       </action>
     </release>
+
+    <!-- ******************************************************************* -->
+    <release version="1.0-beta-4" date="2009-05-07">
+      <action dev="schulte2005" type="update">
+        Updated to suppress warnings for known immutable types and to warn
+        about copying references of schema derived classes.
+      </action>
+    </release>
+
   </body>
 </document>
