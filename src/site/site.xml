@@ -36,6 +36,13 @@
     <artifactId>maven-classic-skin</artifactId>
     <version>1.0</version>
   </skin>
+
+  <bannerRight>
+    <name>Sourceforge.net</name>
+    <src>http://sflogo.sourceforge.net/sflogo.php?group_id=260900&amp;type=11</src>
+    <href>http://sourceforge.net/projects/ccxjc</href>
+  </bannerRight>
+
   <body>
     <head>
       <meta name="keywords" content="xjc, jaxb, plugin, schema, java, xml, xsd, constructor, copy, copy-constructor, ctor, copy-ctor,"/>
@@ -43,12 +50,14 @@
 
     <menu name="CC-XJC">
       <item name="About" href="index.html"/>
-      <item name="Maven Information" href="maven.html"/>
+      <item name="Examples" href="examples.html"/>
+      <item name="Download" href="download.html"/>
     </menu>
 
     <menu name="Sourceforge">
-      <item name="Project Summary" href="https://sourceforge.net/projects/ccxjc/"/>
-      <item name="Download" href="https://sourceforge.net/project/showfiles.php?group_id=260900"/>
+      <item name="Project Summary" href="http://sourceforge.net/projects/ccxjc/"/>
+      <item name="MantisBT" href="http://apps.sourceforge.net/mantisbt/ccxjc/"/>
+      <item name="IdeaTorrent" href="http://apps.sourceforge.net/ideatorrent/ccxjc/"/>
     </menu>
 
     <menu ref="reports" />

@@ -32,32 +32,23 @@
 -->
 <book xmlns="http://maven.apache.org/BOOK/1.0.0"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xsi:schemaLocation="http://maven.apache.org/BOOK/1.0.0 ../../../doxia/doxia-book/target/generated-site/xsd/book-1.0.0.xsd">
-  <id>cc-xjc-manual</id>
-  <title>CC-XJC Manual</title>
+      xsi:schemaLocation="http://maven.apache.org/BOOK/1.0.0 http://maven.apache.org/xsd/book-1.0.0.xsd">
+  <id>cc-xjc</id>
+  <title>CC-XJC</title>
   <chapters>
     <chapter>
-      <id>index</id>
-      <title>Introduction</title>
+      <id>cc-xjc</id>
+      <title>CC-XJC</title>
       <sections>
         <section>
           <id>index</id>
         </section>
-      </sections>
-    </chapter>
-    <chapter>
-      <id>maven</id>
-      <title>Maven</title>
-      <sections>
         <section>
-          <id>maven</id>
+          <id>examples</id>
         </section>
-      </sections>
-    </chapter>
-    <chapter>
-      <id>license-info</id>
-      <title>License</title>
-      <sections>
+        <section>
+          <id>download</id>
+        </section>
         <section>
           <id>license-info</id>
         </section>

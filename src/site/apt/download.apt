@@ -1,5 +1,5 @@
   -----
-License
+Download
   -----
 Christian Schulte
   -----
@@ -35,32 +35,15 @@ May 2009
 ~~ $Id$
 ~~
 
-License
+Download
 
-* The CC-XJC Project Copyright
+* Releases
 
-  Copyright (c) 2009 The CC-XJC Project. All rights reserved.
+  Releases are deployed to the Sourceforge file release system. Please see the
+  {{{https://sourceforge.net/project/showfiles.php?group_id=260900}Sourceforge FRS}}.
 
-  Redistribution and use in source and binary forms, with or without
-  modification, are permitted provided that the following conditions
-  are met:
+* Snapshots
 
-    * Redistributions of source code must retain the above copyright
-      notice, this  list of conditions and the following disclaimer.
-
-    * Redistributions in binary form must reproduce the above copyright
-      notice, this list of conditions and the following disclaimer in
-      the documentation and/or other materials provided with the
-      distribution.
-
-  THIS SOFTWARE IS PROVIDED BY THE CC-XJC PROJECT AND CONTRIBUTORS "AS IS"
-  AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
-  THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
-  PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE CC-XJC PROJECT OR
-  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
-  EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
-  PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
-  OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
-  WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
-  OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
-  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+  Development snapshots are deployed to the CC-XJC snapshot repository and
+  are available for downloaded from there. Please see group
+  {{{http://ccxjc.sourceforge.net/maven2/snapshots/net/sourceforge/ccxjc/}net.sourceforge.ccxjc}}.

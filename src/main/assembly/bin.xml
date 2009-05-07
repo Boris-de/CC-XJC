@@ -39,8 +39,8 @@
   </formats>
   <files>
     <file>
-      <source>${project.build.directory}/generated-site/xhtml/cc-xjc-manual/cc-xjc-manual.xhtml</source>
-      <destName>CC-XJC ${pom.version}.html</destName>
+      <source>${project.build.directory}/generated-site/xhtml/cc-xjc/cc-xjc.xhtml</source>
+      <destName>README.html</destName>
       <outputDirectory>/</outputDirectory>
       <fileMode>0644</fileMode>
       <filtered>false</filtered>
