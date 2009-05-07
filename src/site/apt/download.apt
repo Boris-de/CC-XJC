@@ -45,5 +45,5 @@ Download
 * Snapshots
 
   Development snapshots are deployed to the CC-XJC snapshot repository and
-  are available for downloaded from there. Please see group
+  are available for download from there. Please see group
   {{{http://ccxjc.sourceforge.net/maven2/snapshots/net/sourceforge/ccxjc/}net.sourceforge.ccxjc}}.
