@@ -369,7 +369,7 @@ public final class PluginImpl extends Plugin
     private JMethod generateCopyConstructor( final ClassOutline clazz )
     {
         final JMethod ctor = clazz.implClass.constructor( JMod.PUBLIC );
-        final JVar o = ctor.param( clazz.implClass, "o" );
+        final JVar o = ctor.param( JMod.FINAL, clazz.implClass, "o" );
 
         ctor.javadoc().add( "Creates a new {@code " + clazz.implClass.fullName() +
                             "} instance by copying a given instance." );
@@ -395,7 +395,9 @@ public final class PluginImpl extends Plugin
 
         for ( JFieldVar field : clazz.implClass.fields().values() )
         {
-            if ( !this.isPropertyField( clazz, field.name() ) )
+            if ( !this.isPropertyField( clazz, field.name() ) &&
+                 ( field.mods().getValue() & JMod.STATIC ) != JMod.STATIC &&
+                 ( field.mods().getValue() & JMod.FINAL ) != JMod.FINAL )
             {
                 this.generateCopyField( clazz, field, o, paramNotNull._then() );
             }

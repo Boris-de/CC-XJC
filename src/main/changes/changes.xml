@@ -66,5 +66,13 @@
       </action>
     </release>
 
+    <!-- ******************************************************************* -->
+    <release version="1.0-beta-5" date="2009-06-26">
+      <action dev="schulte2005" type="fix" issue="2"><![CDATA[
+        Updated to ignore any fields with a <code>static</code> or
+        <code>final</code> modifier.]]>
+      </action>
+    </release>
+
   </body>
 </document>
