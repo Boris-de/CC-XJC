@@ -68,7 +68,7 @@ Examples
     <dependency>
       <groupId>net.sourceforge.ccxjc</groupId>
       <artifactId>cc-xjc-plugin</artifactId>
-      <version>1.0-beta-4</version>
+      <version>1.0-beta-5</version>
     </dependency>
   </dependencies>
   <executions>
