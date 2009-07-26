@@ -507,6 +507,5 @@
   <properties>
     <jaxbApiVersion>2.0</jaxbApiVersion>
     <jaxbImplVersion>2.0.5</jaxbImplVersion>
-    <currentVersion>${pom.version}</currentVersion>
   </properties>
 </project>
