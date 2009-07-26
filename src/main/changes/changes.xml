@@ -74,5 +74,13 @@
       </action>
     </release>
 
+    <!-- ******************************************************************* -->
+    <release version="1.0-beta-6" date="2009-07-26">
+      <action dev="schulte2005" type="update"><![CDATA[
+      Updated the return type of generated <code>clone()</code> methods from
+      <code>java.lang.Object</code> to the type of the declaring class.]]>
+      </action>
+    </release>
+
   </body>
 </document>

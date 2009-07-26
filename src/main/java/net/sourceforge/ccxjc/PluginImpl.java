@@ -334,26 +334,19 @@ public final class PluginImpl extends Plugin
 
         if ( clazz.implClass.isAbstract() )
         {
-            cloneMethod = clazz.implClass.method( JMod.ABSTRACT | JMod.PUBLIC, clazz.parent().getCodeModel().
-                ref( Object.class ), "clone" );
-
+            cloneMethod = clazz.implClass.method( JMod.ABSTRACT | JMod.PUBLIC, clazz.implClass, "clone" );
         }
         else
         {
-            cloneMethod = clazz.implClass.method( JMod.PUBLIC, clazz.parent().getCodeModel().
-                ref( Object.class ), "clone" );
-
+            cloneMethod = clazz.implClass.method( JMod.PUBLIC, clazz.implClass, "clone" );
             cloneMethod.body().directStatement( " // " + this.getMessage( "title", null ) );
             cloneMethod.body()._return( JExpr._new( clazz.implClass ).arg( JExpr._this() ) );
         }
 
         cloneMethod.annotate( Override.class );
         clazz.implClass._implements( clazz.parent().getCodeModel().ref( Cloneable.class ) );
-
         cloneMethod.javadoc().append( "Creates and returns a copy of this object.\n" );
-
         cloneMethod.javadoc().addReturn().append( "A clone of this instance." );
-
         return cloneMethod;
     }
 
@@ -396,8 +389,7 @@ public final class PluginImpl extends Plugin
         for ( JFieldVar field : clazz.implClass.fields().values() )
         {
             if ( !this.isPropertyField( clazz, field.name() ) &&
-                 ( field.mods().getValue() & JMod.STATIC ) != JMod.STATIC &&
-                 ( field.mods().getValue() & JMod.FINAL ) != JMod.FINAL )
+                 ( field.mods().getValue() & JMod.STATIC ) != JMod.STATIC )
             {
                 this.generateCopyField( clazz, field, o, paramNotNull._then() );
             }
