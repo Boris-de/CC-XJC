@@ -206,6 +206,7 @@
                 <Maven-Version>${maven.version}</Maven-Version>
               </manifestEntries>
             </archive>
+            <additionalJOption>-J-Xmx1024m</additionalJOption>
           </configuration>
         </plugin>
         <plugin>
@@ -253,9 +254,39 @@
             </dependency>
           </dependencies>
         </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-enforcer-plugin</artifactId>
+          <version>1.0-beta-1</version>
+          <executions>
+            <execution>
+              <id>enforce</id>
+              <goals>
+                <goal>enforce</goal>
+              </goals>
+              <configuration>
+                <rules>
+                  <requireProperty>
+                    <property>project.build.sourceEncoding</property>
+                    <message>Must set 'project.build.sourceEncoding'.</message>
+                  </requireProperty>
+                  <requireProperty>
+                    <property>project.reporting.outputEncoding</property>
+                    <message>Must set 'project.reporting.outputEncoding'.</message>
+                  </requireProperty>
+                </rules>
+                <fail>true</fail>
+              </configuration>
+            </execution>
+          </executions>
+        </plugin>
       </plugins>
     </pluginManagement>
     <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-enforcer-plugin</artifactId>
+      </plugin>
       <plugin>
         <artifactId>buildnumber-maven-plugin</artifactId>
         <groupId>org.codehaus.mojo</groupId>
