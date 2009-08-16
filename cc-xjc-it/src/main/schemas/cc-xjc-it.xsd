@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+  Copyright (c) 2009 The CC-XJC Project. All rights reserved.
+
+  Redistribution and use in source and binary forms, with or without
+  modification, are permitted provided that the following conditions
+  are met:
+
+    * Redistributions of source code must retain the above copyright
+      notice, this  list of conditions and the following disclaimer.
+
+    * Redistributions in binary form must reproduce the above copyright
+      notice, this list of conditions and the following disclaimer in
+      the documentation and/or other materials provided with the
+      distribution.
+
+  THIS SOFTWARE IS PROVIDED BY THE CC-XJC PROJECT AND CONTRIBUTORS "AS IS"
+  AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+  THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+  PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE CC-XJC PROJECT OR
+  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+  EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+  PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+  OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+  WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+  OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+  $Id: pom.xml 51 2009-07-26 05:33:33Z schulte2005 $
+
+-->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            targetNamespace="http://sourceforge.net/ccxjc/it"
+            xmlns:ccxjcit="http://sourceforge.net/ccxjc/it"
+            elementFormDefault="qualified"
+            attributeFormDefault="unqualified">
+  <xsd:annotation>
+    <xsd:documentation xml:lang="en"><![CDATA[
+
+  Copyright (c) 2009 The CC-XJC Project. All rights reserved.
+
+  Redistribution and use in source and binary forms, with or without
+  modification, are permitted provided that the following conditions
+  are met:
+
+    * Redistributions of source code must retain the above copyright
+      notice, this  list of conditions and the following disclaimer.
+
+    * Redistributions in binary form must reproduce the above copyright
+      notice, this list of conditions and the following disclaimer in
+      the documentation and/or other materials provided with the
+      distribution.
+
+  THIS SOFTWARE IS PROVIDED BY THE CC-XJC PROJECT AND CONTRIBUTORS "AS IS"
+  AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+  THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+  PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE CC-XJC PROJECT OR
+  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+  EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+  PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+  OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+  WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+  OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+  $Id: pom.xml 51 2009-07-26 05:33:33Z schulte2005 $
+
+]]>
+    </xsd:documentation>
+  </xsd:annotation>
+  <!--                                                                       -->
+  <!-- SimpleTypeAttributes                                                  -->
+  <!--                                                                       -->
+  <xsd:complexType name="SimpleTypeAttributes">
+    <xsd:annotation>
+      <xsd:documentation><![CDATA[
+        XML Schema Part 2: Datatypes Second Edition
+        3 Built-in datatypes]]>
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:attribute name="anySimpleType" type="xsd:anySimpleType" use="required"/>
+    <xsd:attribute name="duration" type="xsd:duration" use="required"/>
+    <xsd:attribute name="dateTime" type="xsd:dateTime" use="required"/>
+    <xsd:attribute name="time" type="xsd:dateTime" use="required"/>
+    <xsd:attribute name="date" type="xsd:dateTime" use="required"/>
+    <xsd:attribute name="gYearMonth" type="xsd:gYearMonth" use="required"/>
+    <xsd:attribute name="gYear" type="xsd:gYear" use="required"/>
+    <xsd:attribute name="gMonthDay" type="xsd:gMonthDay" use="required"/>
+    <xsd:attribute name="gDay" type="xsd:gDay" use="required"/>
+    <xsd:attribute name="gMonth" type="xsd:gMonth" use="required"/>
+    <xsd:attribute name="boolean" type="xsd:boolean" use="required"/>
+    <xsd:attribute name="base64Binary" type="xsd:base64Binary" use="required"/>
+    <xsd:attribute name="hexBinary" type="xsd:hexBinary" use="required"/>
+    <xsd:attribute name="float" type="xsd:float" use="required"/>
+    <xsd:attribute name="decimal" type="xsd:decimal" use="required"/>
+    <xsd:attribute name="integer" type="xsd:integer" use="required"/>
+    <xsd:attribute name="nonPositiveInteger" type="xsd:nonPositiveInteger" use="required"/>
+    <xsd:attribute name="negativeInteger" type="xsd:negativeInteger" use="required"/>
+    <xsd:attribute name="nonNegativeInteger" type="xsd:nonNegativeInteger" use="required"/>
+    <xsd:attribute name="positiveInteger" type="xsd:positiveInteger" use="required"/>
+    <xsd:attribute name="unsignedLong" type="xsd:unsignedLong" use="required"/>
+    <xsd:attribute name="unsignedInt" type="xsd:unsignedInt" use="required"/>
+    <xsd:attribute name="unsignedShort" type="xsd:unsignedShort" use="required"/>
+    <xsd:attribute name="unsignedByte" type="xsd:unsignedByte" use="required"/>
+    <xsd:attribute name="long" type="xsd:long" use="required"/>
+    <xsd:attribute name="int" type="xsd:int" use="required"/>
+    <xsd:attribute name="short" type="xsd:short" use="required"/>
+    <xsd:attribute name="byte" type="xsd:byte" use="required"/>
+    <xsd:attribute name="double" type="xsd:double" use="required"/>
+    <xsd:attribute name="anyURI" type="xsd:anyURI" use="required"/>
+    <xsd:attribute name="QName" type="xsd:QName" use="required"/>
+    <xsd:attribute name="NOTATION" type="ccxjcit:testNotation" use="required"/>
+    <xsd:attribute name="string" type="xsd:string" use="required"/>
+    <xsd:attribute name="normalizedString" type="xsd:normalizedString" use="required"/>
+    <xsd:attribute name="token" type="xsd:token" use="required"/>
+    <xsd:attribute name="language" type="xsd:language" use="required"/>
+    <xsd:attribute name="Name" type="xsd:Name" use="required"/>
+    <xsd:attribute name="NCName" type="xsd:NCName" use="required"/>
+    <xsd:attribute name="ID" type="xsd:ID" use="required"/>
+    <xsd:attribute name="IDREF" type="xsd:IDREF" use="required"/>
+    <xsd:attribute name="IDREFS" type="xsd:IDREFS" use="required"/>
+    <xsd:attribute name="ENTITY" type="xsd:ENTITY" use="required"/>
+    <xsd:attribute name="ENTITIES" type="xsd:ENTITIES" use="required"/>
+    <xsd:attribute name="NMTOKEN" type="xsd:NMTOKEN" use="required"/>
+    <xsd:attribute name="NMTOKENS" type="xsd:NMTOKENS" use="required"/>
+  </xsd:complexType>
+  <!--                                                                       -->
+  <!-- ChoiceComplexType                                                     -->
+  <!--                                                                       -->
+  <xsd:complexType name="ChoiceComplexType">
+    <xsd:choice>
+      <xsd:element name="string" type="xsd:string" minOccurs="0" maxOccurs="1"/>
+      <xsd:any namespace="##other" minOccurs="0" maxOccurs="1" processContents="lax"/>
+      <xsd:element name="int" type="xsd:int" minOccurs="0" maxOccurs="1"/>
+    </xsd:choice>
+  </xsd:complexType>
+  <!--                                                                       -->
+  <!-- Test simple types.                                                    -->
+  <!--                                                                       -->
+  <xsd:notation name="gif" public="image/gif" system="test"/>
+  <xsd:notation name="jpeg" public="image/jpeg" system="test"/>
+  <xsd:simpleType name="testNotation">
+    <xsd:restriction base="xsd:NOTATION">
+      <xsd:enumeration value="ccxjcit:gif"/>
+      <xsd:enumeration value="ccxjcit:jpeg"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+</xsd:schema>

@@ -1,0 +1,1582 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+  Copyright (c) 2009 The JOMC Project
+  Copyright (c) 2005 Christian Schulte <schulte2005@users.sourceforge.net>
+  All rights reserved.
+
+  Redistribution and use in source and binary forms, with or without
+  modification, are permitted provided that the following conditions
+  are met:
+
+    * Redistributions of source code must retain the above copyright
+      notice, this list of conditions and the following disclaimer.
+
+    * Redistributions in binary form must reproduce the above copyright
+      notice, this list of conditions and the following disclaimer in
+      the documentation and/or other materials provided with the
+      distribution.
+
+  THIS SOFTWARE IS PROVIDED BY THE JOMC PROJECT AND CONTRIBUTORS "AS IS"
+  AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+  THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+  PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE JOMC PROJECT OR
+  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+  EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+  PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+  OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+  WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+  OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+  $Id: jomc-1.0.xsd 363 2009-08-01 00:25:34Z schulte2005 $
+
+-->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            xmlns:jomc="http://jomc.org/model"
+            xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+            jaxb:version="2.0"
+            targetNamespace="http://jomc.org/model"
+            elementFormDefault="qualified"
+            attributeFormDefault="unqualified">
+  <xsd:annotation>
+    <xsd:documentation xml:lang="en"><![CDATA[
+
+  Copyright (c) 2009 The JOMC Project
+  Copyright (c) 2005 Christian Schulte <schulte2005@users.sourceforge.net>
+  All rights reserved.
+
+  Redistribution and use in source and binary forms, with or without
+  modification, are permitted provided that the following conditions
+  are met:
+
+    * Redistributions of source code must retain the above copyright
+      notice, this list of conditions and the following disclaimer.
+
+    * Redistributions in binary form must reproduce the above copyright
+      notice, this list of conditions and the following disclaimer in
+      the documentation and/or other materials provided with the
+      distribution.
+
+  THIS SOFTWARE IS PROVIDED BY THE JOMC PROJECT AND CONTRIBUTORS "AS IS"
+  AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+  THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+  PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE JOMC PROJECT OR
+  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+  EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+  PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+  OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+  WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+  OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+  $Id: jomc-1.0.xsd 363 2009-08-01 00:25:34Z schulte2005 $
+
+]]></xsd:documentation>
+  </xsd:annotation>
+  <!--                                                                       -->
+  <!-- Text                                                                  -->
+  <!--                                                                       -->
+  <xsd:element name="text" type="jomc:Text"/>
+  <xsd:complexType name="Text">
+    <xsd:annotation>
+      <xsd:appinfo>
+        <jaxb:class>
+          <jaxb:javadoc><![CDATA[Text paired with corresponding language.]]></jaxb:javadoc>
+        </jaxb:class>
+      </xsd:appinfo>
+    </xsd:annotation>
+    <xsd:simpleContent>
+      <xsd:extension base="xsd:string">
+        <xsd:attribute name="language" type="xsd:language" use="required">
+          <xsd:annotation>
+            <xsd:appinfo>
+              <jaxb:property>
+                <jaxb:javadoc><![CDATA[The language of this text.]]></jaxb:javadoc>
+              </jaxb:property>
+            </xsd:appinfo>
+          </xsd:annotation>
+        </xsd:attribute>
+      </xsd:extension>
+    </xsd:simpleContent>
+  </xsd:complexType>
+  <!--                                                                       -->
+  <!-- Texts                                                                 -->
+  <!--                                                                       -->
+  <xsd:element name="texts" type="jomc:Texts">
+    <xsd:key name="text-key">
+      <xsd:annotation>
+        <xsd:documentation xml:lang="en"><![CDATA[
+        Checks uniqueness of languages.]]>
+        </xsd:documentation>
+      </xsd:annotation>
+      <xsd:selector xpath=".//jomc:text"/>
+      <xsd:field xpath="@language"/>
+    </xsd:key>
+    <xsd:keyref name="text-default-language-reference"
+                refer="jomc:text-key">
+      <xsd:selector xpath="."/>
+      <xsd:field xpath="@defaultLanguage"/>
+    </xsd:keyref>
+  </xsd:element>
+  <xsd:complexType name="Texts">
+    <xsd:annotation>
+      <xsd:appinfo>
+        <jaxb:class>
+          <jaxb:javadoc><![CDATA[List of texts.]]></jaxb:javadoc>
+        </jaxb:class>
+      </xsd:appinfo>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element ref="jomc:text" minOccurs="1"
+                   maxOccurs="unbounded"/>
+    </xsd:sequence>
+    <xsd:attribute name="defaultLanguage" type="xsd:language"
+                   use="required">
+      <xsd:annotation>
+        <xsd:appinfo>
+          <jaxb:property>
+            <jaxb:javadoc><![CDATA[Default text of this list.]]></jaxb:javadoc>
+          </jaxb:property>
+        </xsd:appinfo>
+      </xsd:annotation>
+    </xsd:attribute>
+  </xsd:complexType>
+  <!--                                                                       -->
+  <!-- Documentation                                                         -->
+  <!--                                                                       -->
+  <xsd:element name="documentation" type="jomc:Texts">
+    <xsd:key name="documentation-key">
+      <xsd:selector xpath=".//jomc:text"/>
+      <xsd:field xpath="@language"/>
+    </xsd:key>
+    <xsd:keyref name="default-documentation-reference"
+                refer="jomc:documentation-key">
+      <xsd:selector xpath="."/>
+      <xsd:field xpath="@defaultLanguage"/>
+    </xsd:keyref>
+  </xsd:element>
+  <!--                                                                       -->
+  <!-- Template                                                              -->
+  <!--                                                                       -->
+  <xsd:element name="template" type="jomc:Texts">
+    <xsd:key name="template-key">
+      <xsd:selector xpath=".//jomc:text"/>
+      <xsd:field xpath="@language"/>
+    </xsd:key>
+    <xsd:keyref name="default-template-reference"
+                refer="jomc:template-key">
+      <xsd:selector xpath="."/>
+      <xsd:field xpath="@defaultLanguage"/>
+    </xsd:keyref>
+  </xsd:element>
+  <!--                                                                       -->
+  <!-- ModelObject                                                           -->
+  <!--                                                                       -->
+  <xsd:complexType name="ModelObject">
+    <xsd:annotation>
+      <xsd:appinfo>
+        <jaxb:class>
+          <jaxb:javadoc><![CDATA[Base model object.]]></jaxb:javadoc>
+        </jaxb:class>
+      </xsd:appinfo>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element ref="jomc:documentation" minOccurs="0" maxOccurs="1">
+        <xsd:annotation>
+          <xsd:appinfo>
+            <jaxb:property>
+              <jaxb:javadoc><![CDATA[Documentation of this object.]]></jaxb:javadoc>
+            </jaxb:property>
+          </xsd:appinfo>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element ref="jomc:authors" minOccurs="0" maxOccurs="1">
+        <xsd:annotation>
+          <xsd:appinfo>
+            <jaxb:property>
+              <jaxb:javadoc><![CDATA[Authors of this object.]]></jaxb:javadoc>
+            </jaxb:property>
+          </xsd:appinfo>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="modelVersion" type="jomc:Version" use="optional"
+                   default="1.0">
+      <xsd:annotation>
+        <xsd:appinfo>
+          <jaxb:property>
+            <jaxb:javadoc><![CDATA[Version of the model of this object.]]></jaxb:javadoc>
+          </jaxb:property>
+        </xsd:appinfo>
+      </xsd:annotation>
+    </xsd:attribute>
+    <xsd:attribute name="createDate" type="xsd:dateTime" use="optional">
+      <xsd:annotation>
+        <xsd:appinfo>
+          <jaxb:property>
+            <jaxb:javadoc><![CDATA[The date this object got created.]]></jaxb:javadoc>
+          </jaxb:property>
+        </xsd:appinfo>
+      </xsd:annotation>
+    </xsd:attribute>
+  </xsd:complexType>
+  <!--                                                                       -->
+  <!-- Modules                                                               -->
+  <!--                                                                       -->
+  <xsd:element name="modules" type="jomc:Modules">
+    <xsd:key name="module-key">
+      <xsd:selector xpath=".//jomc:module"/>
+      <xsd:field xpath="@name"/>
+    </xsd:key>
+    <xsd:key name="specification-key">
+      <xsd:selector xpath=".//jomc:specifications/jomc:specification"/>
+      <xsd:field xpath="@identifier"/>
+    </xsd:key>
+    <xsd:keyref name="specification-reference"
+                refer="jomc:specification-key">
+      <xsd:selector xpath=".//jomc:specifications/jomc:reference"/>
+      <xsd:field xpath="@identifier"/>
+    </xsd:keyref>
+    <xsd:key name="implementation-key">
+      <xsd:selector xpath=".//jomc:implementations/jomc:implementation"/>
+      <xsd:field xpath="@identifier"/>
+    </xsd:key>
+    <!-- xsd:unique name="implementation-reference-key">
+      <xsd:selector xpath=".//jomc:implementations/jomc:implementation"/>
+      <xsd:field xpath=".//jomc:specifications/jomc:reference/@identifier"/>
+      <xsd:field xpath="@name"/>
+    </xsd:unique -->
+    <xsd:keyref name="implementation-parent-reference"
+                refer="jomc:implementation-key">
+      <xsd:selector xpath=".//jomc:implementations/jomc:implementation"/>
+      <xsd:field xpath="@parent"/>
+    </xsd:keyref>
+    <xsd:keyref name="dependency-specification-reference"
+                refer="jomc:specification-key">
+      <xsd:selector xpath=".//jomc:dependency"/>
+      <xsd:field xpath="@identifier"/>
+    </xsd:keyref>
+  </xsd:element>
+  <xsd:complexType name="Modules">
+    <xsd:annotation>
+      <xsd:appinfo>
+        <jaxb:class>
+          <jaxb:javadoc><![CDATA[List of modules.]]></jaxb:javadoc>
+        </jaxb:class>
+      </xsd:appinfo>
+    </xsd:annotation>
+    <xsd:complexContent>
+      <xsd:extension base="jomc:ModelObject">
+        <xsd:sequence>
+          <xsd:element ref="jomc:module" minOccurs="0"
+                       maxOccurs="unbounded"/>
+        </xsd:sequence>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <!--                                                                       -->
+  <!-- Module                                                                -->
+  <!--                                                                       -->
+  <xsd:element name="module" type="jomc:Module">
+    <xsd:key name="message-key">
+      <xsd:selector xpath="jomc:messages/jomc:message"/>
+      <xsd:field xpath="@name"/>
+    </xsd:key>
+    <xsd:keyref name="message-reference"
+                refer="jomc:message-key">
+      <xsd:selector xpath=".//jomc:messages/jomc:reference"/>
+      <xsd:field xpath="@name"/>
+    </xsd:keyref>
+    <xsd:key name="property-key">
+      <xsd:selector xpath="jomc:properties/jomc:property"/>
+      <xsd:field xpath="@name"/>
+    </xsd:key>
+    <xsd:keyref name="property-reference"
+                refer="jomc:property-key">
+      <xsd:selector xpath=".//jomc:properties/jomc:reference"/>
+      <xsd:field xpath="@name"/>
+    </xsd:keyref>
+  </xsd:element>
+  <xsd:complexType name="Module">
+    <xsd:annotation>
+      <xsd:appinfo>
+        <jaxb:class>
+          <jaxb:javadoc><![CDATA[Module meta-data.
+<p>A module consists of the properties {@code name},{@code description} and
+{@code version}. Property {@code name} holds the name of the module uniquely
+identifying the module in a collectionof modules. Property {@code description}
+holds a textual description, property {@code version} a textual version of the
+module. A module defines specifications, implementations and properties.</p>]]></jaxb:javadoc>
+        </jaxb:class>
+      </xsd:appinfo>
+    </xsd:annotation>
+    <xsd:complexContent>
+      <xsd:extension base="jomc:ModelObject">
+        <xsd:sequence>
+          <xsd:element ref="jomc:specifications" minOccurs="0"
+                       maxOccurs="1">
+            <xsd:annotation>
+              <xsd:appinfo>
+                <jaxb:property>
+                  <jaxb:javadoc><![CDATA[Specifications defined in this module.]]></jaxb:javadoc>
+                </jaxb:property>
+              </xsd:appinfo>
+            </xsd:annotation>
+          </xsd:element>
+          <xsd:element ref="jomc:implementations" minOccurs="0"
+                       maxOccurs="1">
+            <xsd:annotation>
+              <xsd:appinfo>
+                <jaxb:property>
+                  <jaxb:javadoc><![CDATA[Implementations defined in this module.]]></jaxb:javadoc>
+                </jaxb:property>
+              </xsd:appinfo>
+            </xsd:annotation>
+          </xsd:element>
+          <xsd:element ref="jomc:properties" minOccurs="0" maxOccurs="1">
+            <xsd:annotation>
+              <xsd:appinfo>
+                <jaxb:property>
+                  <jaxb:javadoc><![CDATA[Properties defined in this module.]]>></jaxb:javadoc>
+                </jaxb:property>
+              </xsd:appinfo>
+            </xsd:annotation>
+          </xsd:element>
+          <xsd:element ref="jomc:messages" minOccurs="0" maxOccurs="1">
+            <xsd:annotation>
+              <xsd:appinfo>
+                <jaxb:property>
+                  <jaxb:javadoc><![CDATA[Messages defined in this module.]]></jaxb:javadoc>
+                </jaxb:property>
+              </xsd:appinfo>
+            </xsd:annotation>
+          </xsd:element>
+        </xsd:sequence>
+        <xsd:attribute name="name" type="jomc:Identifier" use="required">
+          <xsd:annotation>
+            <xsd:appinfo>
+              <jaxb:property>
+                <jaxb:javadoc><![CDATA[Name of this module.]]></jaxb:javadoc>
+              </jaxb:property>
+            </xsd:appinfo>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="version" type="jomc:Version" use="optional">
+          <xsd:annotation>
+            <xsd:appinfo>
+              <jaxb:property>
+                <jaxb:javadoc><![CDATA[Version of this module.]]></jaxb:javadoc>
+              </jaxb:property>
+            </xsd:appinfo>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="vendor" type="jomc:String" use="optional">
+          <xsd:annotation>
+            <xsd:appinfo>
+              <jaxb:property>
+                <jaxb:javadoc><![CDATA[Vendor of this module.]]></jaxb:javadoc>
+              </jaxb:property>
+            </xsd:appinfo>
+          </xsd:annotation>
+        </xsd:attribute>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <!--                                                                       -->
+  <!-- Specifications                                                        -->
+  <!--                                                                       -->
+  <xsd:element name="specifications" type="jomc:Specifications">
+    <xsd:unique name="specification-uniqueness">
+      <xsd:annotation>
+        <xsd:documentation xml:lang="en"><![CDATA[
+          Checks uniquenes of specifications.]]>
+        </xsd:documentation>
+      </xsd:annotation>
+      <xsd:selector xpath=".//jomc:specification"/>
+      <xsd:field xpath="@identifier"/>
+    </xsd:unique>
+    <xsd:unique name="specification-reference-uniqueness">
+      <xsd:annotation>
+        <xsd:documentation xml:lang="en"><![CDATA[
+          Checks uniquenes of specification references.]]>
+        </xsd:documentation>
+      </xsd:annotation>
+      <xsd:selector xpath=".//jomc:reference"/>
+      <xsd:field xpath="@identifier"/>
+    </xsd:unique>
+  </xsd:element>
+  <xsd:complexType name="Specifications">
+    <xsd:annotation>
+      <xsd:appinfo>
+        <jaxb:class>
+          <jaxb:javadoc><![CDATA[List of specications.]]></jaxb:javadoc>
+        </jaxb:class>
+      </xsd:appinfo>
+    </xsd:annotation>
+    <xsd:complexContent>
+      <xsd:extension base="jomc:ModelObject">
+        <xsd:choice>
+          <xsd:element ref="jomc:specification" minOccurs="0"
+                       maxOccurs="unbounded"/>
+          <xsd:element name="reference"
+                       type="jomc:SpecificationReference"
+                       minOccurs="0" maxOccurs="unbounded"/>
+
+        </xsd:choice>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <!--                                                                       -->
+  <!-- Specification                                                         -->
+  <!--                                                                       -->
+  <xsd:element name="specification" type="jomc:Specification"/>
+  <xsd:complexType name="Specification">
+    <xsd:annotation>
+      <xsd:appinfo>
+        <jaxb:class>
+          <jaxb:javadoc><![CDATA[Specification meta-data.
+<p>A specification consists of the properties {@code identifier},
+{@code vendor}, {@code description} and {@code version}. Property
+{@code identifier} holds an identifier uniquely identifying the specification in
+a set of specifications. Property {@code vendor} holds vendor information for
+the vendor providing the specification. Property {@code description} holds a
+textual description and property {@code version} holds a textual version of the
+specification.
+
+<p>Property {@code multiplicity} specifies the number of implementations allowed
+to exist among a set of modules. A specification with {@link Multiplicity#ONE}
+specifies that no more than one implementation of the specification is allowed
+to exist among a set of modules (including none). A specification with
+{@link Multiplicity#MANY} specifies that multiple implementations of the
+specification are allowed to exist among a set of modules (including none).</p>
+
+<p>Property {@code scope} specifies the scope the specification applies to. In
+multiton scope, a new object is created whenever requested. In context scope,
+objects are bound to a system's context. An object is only created if not
+already available in context. In singleton scope, objects are bound to a
+system's single instance store. An object is only created if not already
+available in that single instance store.</p>]]></jaxb:javadoc>
+        </jaxb:class>
+      </xsd:appinfo>
+    </xsd:annotation>
+    <xsd:complexContent>
+      <xsd:extension base="jomc:ModelObject">
+        <xsd:sequence>
+          <xsd:element ref="jomc:properties" minOccurs="0" maxOccurs="1">
+            <xsd:annotation>
+              <xsd:appinfo>
+                <jaxb:property>
+                  <jaxb:javadoc><![CDATA[Properties of this specification.]]></jaxb:javadoc>
+                </jaxb:property>
+              </xsd:appinfo>
+            </xsd:annotation>
+          </xsd:element>
+        </xsd:sequence>
+        <xsd:attribute name="identifier" type="jomc:Identifier" use="required">
+          <xsd:annotation>
+            <xsd:appinfo>
+              <jaxb:property>
+                <jaxb:javadoc><![CDATA[The identifier of this specification.]]></jaxb:javadoc>
+              </jaxb:property>
+            </xsd:appinfo>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="vendor" type="jomc:String" use="optional">
+          <xsd:annotation>
+            <xsd:appinfo>
+              <jaxb:property>
+                <jaxb:javadoc><![CDATA[The presentation vendor of this specification.]]></jaxb:javadoc>
+              </jaxb:property>
+            </xsd:appinfo>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="version" type="jomc:Version" use="optional">
+          <xsd:annotation>
+            <xsd:appinfo>
+              <jaxb:property>
+                <jaxb:javadoc><![CDATA[The version of this specification.]]></jaxb:javadoc>
+              </jaxb:property>
+            </xsd:appinfo>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="multiplicity" type="jomc:Multiplicity"
+                       use="optional" default="Many">
+          <xsd:annotation>
+            <xsd:appinfo>
+              <jaxb:property>
+                <jaxb:javadoc><![CDATA[
+The mandatory implementation multiplicity among a set of modules of this
+specification. A multiplicity equal to {@link Multiplicity#ONE} specifies
+exactly one implementation of the specification must exist among a set of
+modules. A multiplicity equal to {@link Multiplicity#MANY} specifies that many
+implementations are allowed to exist among a set of modules (including none).]]></jaxb:javadoc>
+              </jaxb:property>
+            </xsd:appinfo>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="scope" type="jomc:Scope" use="optional"
+                       default="Multiton">
+          <xsd:annotation>
+            <xsd:appinfo>
+              <jaxb:property>
+                <jaxb:javadoc><![CDATA[
+Scope this specification applies to. {@link Scope#MULTITON} scope specifies that
+a new implementation instance is to be created each time requested.
+{@link Scope#CONTEXT} scope specifies that implementation instances are to be
+bound to a system's context. {@link Scope#SINGLETON} scope specifies that
+implementation instances are to be bound to a system's single instance store.]]></jaxb:javadoc>
+              </jaxb:property>
+            </xsd:appinfo>
+          </xsd:annotation>
+        </xsd:attribute>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <!--                                                                       -->
+  <!-- SpecificationReference                                                -->
+  <!--                                                                       -->
+  <xsd:complexType name="SpecificationReference">
+    <xsd:annotation>
+      <xsd:appinfo>
+        <jaxb:class>
+           <jaxb:javadoc><![CDATA[Reference to a specification.]]></jaxb:javadoc>
+        </jaxb:class>
+      </xsd:appinfo>
+    </xsd:annotation>
+    <xsd:complexContent>
+      <xsd:extension base="jomc:ModelObject">
+        <xsd:attribute name="identifier" type="jomc:Identifier" use="required">
+          <xsd:annotation>
+            <xsd:appinfo>
+              <jaxb:property>
+                <jaxb:javadoc><![CDATA[The identifier of the referenced specification.]]></jaxb:javadoc>
+              </jaxb:property>
+            </xsd:appinfo>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="version" type="jomc:Version" use="optional">
+          <xsd:annotation>
+            <xsd:appinfo>
+              <jaxb:property>
+                <jaxb:javadoc><![CDATA[The version of the referenced specification.]]></jaxb:javadoc>
+              </jaxb:property>
+            </xsd:appinfo>
+          </xsd:annotation>
+        </xsd:attribute>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <!--                                                                       -->
+  <!-- Implementations                                                       -->
+  <!--                                                                       -->
+  <xsd:element name="implementations" type="jomc:Implementations">
+    <xsd:unique name="implementation-uniqueness">
+      <xsd:annotation>
+        <xsd:documentation xml:lang="en"><![CDATA[
+          Checks uniquenes of implementations.]]>
+        </xsd:documentation>
+      </xsd:annotation>
+      <xsd:selector xpath=".//jomc:implementation"/>
+      <xsd:field xpath="@identifier"/>
+    </xsd:unique>
+    <xsd:unique name="implementation-location-uniqueness">
+      <xsd:annotation>
+        <xsd:documentation xml:lang="en"><![CDATA[
+          Checks uniquenes of implementation locations.]]>
+        </xsd:documentation>
+      </xsd:annotation>
+      <xsd:selector xpath=".//jomc:implementation"/>
+      <xsd:field xpath="@location"/>
+    </xsd:unique>
+  </xsd:element>
+  <xsd:complexType name="Implementations">
+    <xsd:annotation>
+      <xsd:appinfo>
+        <jaxb:class>
+          <jaxb:javadoc><![CDATA[List of implementations.]]></jaxb:javadoc>
+        </jaxb:class>
+      </xsd:appinfo>
+    </xsd:annotation>
+    <xsd:complexContent>
+      <xsd:extension base="jomc:ModelObject">
+        <xsd:sequence>
+          <xsd:element ref="jomc:implementation" minOccurs="0"
+                       maxOccurs="unbounded"/>
+        </xsd:sequence>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <!--                                                                       -->
+  <!-- Implementation                                                        -->
+  <!--                                                                       -->
+  <xsd:element name="implementation" type="jomc:Implementation"/>
+  <xsd:complexType name="Implementation">
+    <xsd:annotation>
+      <xsd:appinfo>
+        <jaxb:class>
+          <jaxb:javadoc><![CDATA[Implementation meta-data.
+<p>An implementation consists of the properties {@code identifier}, {@code name},
+{@code class}, {@code location}, {@code description}, {@code vendor} and
+{@code version}. Property {@code identifier} holds an identifier uniquely
+identifying the implementation in a set of implementations. Property
+{@code name} holds a name of the implementation uniquely identifying the
+implementation for a specification. Property {@code class} holds the name of the
+class providing implementation instances. Property {@code location} holds a
+location URI used for locating implementation instances. Property
+{@code description} holds a textual description. Property {@code vendor} holds
+vendor information for the vendor providing the implementation. Property
+{@code version} holds a textual version of the implementation.</p>
+
+<p>Properties, dependencies and specifications may be inherited from a
+{@code parent}. Property {@code final} flags an implementation as the final node
+in an inheritance hierarchy.</p>
+
+<p>The {@code stateless} flag indicates that an implementation does not retain
+state across operations.</p>]]></jaxb:javadoc>
+        </jaxb:class>
+      </xsd:appinfo>
+    </xsd:annotation>
+    <xsd:complexContent>
+      <xsd:extension base="jomc:ModelObject">
+        <xsd:sequence>
+          <xsd:element ref="jomc:specifications" minOccurs="0" maxOccurs="1">
+            <xsd:annotation>
+              <xsd:appinfo>
+                <jaxb:property>
+                  <jaxb:javadoc><![CDATA[Specifications implemented by this implementation.]]></jaxb:javadoc>
+                </jaxb:property>
+              </xsd:appinfo>
+            </xsd:annotation>
+          </xsd:element>
+          <xsd:element ref="jomc:dependencies" minOccurs="0" maxOccurs="1">
+            <xsd:annotation>
+              <xsd:appinfo>
+                <jaxb:property>
+                  <jaxb:javadoc><![CDATA[Dependencies of this implementation.]]></jaxb:javadoc>
+                </jaxb:property>
+              </xsd:appinfo>
+            </xsd:annotation>
+          </xsd:element>
+          <xsd:element ref="jomc:properties" minOccurs="0" maxOccurs="1">
+            <xsd:annotation>
+              <xsd:appinfo>
+                <jaxb:property>
+                  <jaxb:javadoc><![CDATA[Properties of this implementation.]]></jaxb:javadoc>
+                </jaxb:property>
+              </xsd:appinfo>
+            </xsd:annotation>
+          </xsd:element>
+          <xsd:element ref="jomc:messages" minOccurs="0" maxOccurs="1">
+            <xsd:annotation>
+              <xsd:appinfo>
+                <jaxb:property>
+                  <jaxb:javadoc><![CDATA[Messages of this implementation.]]></jaxb:javadoc>
+                </jaxb:property>
+              </xsd:appinfo>
+            </xsd:annotation>
+          </xsd:element>
+        </xsd:sequence>
+        <xsd:attribute name="identifier" type="jomc:Identifier" use="required">
+          <xsd:annotation>
+            <xsd:appinfo>
+              <jaxb:property>
+                <jaxb:javadoc><![CDATA[The identifier of this implementation.]]></jaxb:javadoc>
+              </jaxb:property>
+            </xsd:appinfo>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="name" type="jomc:Identifier" use="required">
+          <xsd:annotation>
+            <xsd:appinfo>
+              <jaxb:property>
+                <jaxb:javadoc><![CDATA[The name of this implementation.]]></jaxb:javadoc>
+              </jaxb:property>
+            </xsd:appinfo>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="class" type="jomc:Identifier" use="optional">
+          <xsd:annotation>
+            <xsd:appinfo>
+              <jaxb:property>
+                <jaxb:javadoc><![CDATA[The name of the class providing instances of this implementation.]]></jaxb:javadoc>
+              </jaxb:property>
+            </xsd:appinfo>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="location" type="xsd:anyURI" use="optional">
+          <xsd:annotation>
+            <xsd:appinfo>
+              <jaxb:property>
+                <jaxb:javadoc><![CDATA[The location URI used for locating instances of this implementation.]]></jaxb:javadoc>
+              </jaxb:property>
+            </xsd:appinfo>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="vendor" type="jomc:String" use="optional">
+          <xsd:annotation>
+            <xsd:appinfo>
+              <jaxb:property>
+                <jaxb:javadoc><![CDATA[The presentation vendor of this implementation.]]></jaxb:javadoc>
+              </jaxb:property>
+            </xsd:appinfo>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="version" type="jomc:Version" use="optional">
+          <xsd:annotation>
+            <xsd:appinfo>
+              <jaxb:property>
+                <jaxb:javadoc><![CDATA[The version of this implementation.]]></jaxb:javadoc>
+              </jaxb:property>
+            </xsd:appinfo>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="parent" type="jomc:Identifier" use="optional">
+          <xsd:annotation>
+            <xsd:appinfo>
+              <jaxb:property>
+                <jaxb:javadoc><![CDATA[
+Identifier of an implementation this implementation inherits from. When given,
+this implementation will inherit up the hierarchy starting at that parent.]]></jaxb:javadoc>
+              </jaxb:property>
+            </xsd:appinfo>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="final" type="xsd:boolean" use="optional"
+                       default="false">
+          <xsd:annotation>
+            <xsd:appinfo>
+              <jaxb:property>
+                <jaxb:javadoc><![CDATA[
+Flags this implementation the final node in an inheritance hierarchy.]]></jaxb:javadoc>
+              </jaxb:property>
+            </xsd:appinfo>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="stateless" type="xsd:boolean" use="optional"
+                       default="false">
+          <xsd:annotation>
+            <xsd:appinfo>
+              <jaxb:property>
+                <jaxb:javadoc><![CDATA[
+Flags this implementation stateless.]]></jaxb:javadoc>
+              </jaxb:property>
+            </xsd:appinfo>
+          </xsd:annotation>
+        </xsd:attribute>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <!--                                                                       -->
+  <!-- ImplementationReference                                               -->
+  <!--                                                                       -->
+  <xsd:complexType name="ImplementationReference">
+    <xsd:annotation>
+      <xsd:appinfo>
+        <jaxb:class>
+           <jaxb:javadoc><![CDATA[Reference to an implementation.]]></jaxb:javadoc>
+        </jaxb:class>
+      </xsd:appinfo>
+    </xsd:annotation>
+    <xsd:complexContent>
+      <xsd:extension base="jomc:SpecificationReference">
+        <xsd:attribute name="implementationName" type="jomc:Identifier"
+                       use="optional">
+          <xsd:annotation>
+            <xsd:appinfo>
+              <jaxb:property>
+                <jaxb:javadoc><![CDATA[
+Name of the referenced implementation of the specification. If not set, the
+specification's multiplicity determines the implementation(s) of the reference.]]></jaxb:javadoc>
+              </jaxb:property>
+            </xsd:appinfo>
+          </xsd:annotation>
+        </xsd:attribute>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <!--                                                                       -->
+  <!-- Dependencies                                                          -->
+  <!--                                                                       -->
+  <xsd:element name="dependencies" type="jomc:Dependencies">
+    <xsd:unique name="dependency-uniqueness">
+      <xsd:annotation>
+        <xsd:documentation xml:lang="en"><![CDATA[
+          Checks dependency uniquenes.]]>
+        </xsd:documentation>
+      </xsd:annotation>
+      <xsd:selector xpath=".//jomc:dependency"/>
+      <xsd:field xpath="@name"/>
+    </xsd:unique>
+  </xsd:element>
+  <xsd:complexType name="Dependencies">
+    <xsd:annotation>
+      <xsd:appinfo>
+        <jaxb:class>
+          <jaxb:javadoc><![CDATA[List of dependencies.]]></jaxb:javadoc>
+        </jaxb:class>
+      </xsd:appinfo>
+    </xsd:annotation>
+    <xsd:complexContent>
+      <xsd:extension base="jomc:ModelObject">
+        <xsd:sequence>
+          <xsd:element ref="jomc:dependency" minOccurs="0"
+                       maxOccurs="unbounded"/>
+        </xsd:sequence>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <!--                                                                       -->
+  <!-- Dependency                                                            -->
+  <!--                                                                       -->
+  <xsd:element name="dependency" type="jomc:Dependency"/>
+  <xsd:complexType name="Dependency">
+    <xsd:annotation>
+      <xsd:appinfo>
+        <jaxb:class>
+          <jaxb:javadoc><![CDATA[
+Dependency meta-data.
+<p>A dependency consists of a name uniquely identifying the dependency in a set
+of dependencies and pairs a specification with corresponding implementations
+from a set of available implementations. Properties set with a dependency
+overwrite properties of the dependencies specification. The {@code bound} flag
+indicates if the instance of the dependency is bound to the declaring
+implementation. The {@code optional} flag indicates an optional dependency.</p>]]></jaxb:javadoc>
+        </jaxb:class>
+      </xsd:appinfo>
+    </xsd:annotation>
+    <xsd:complexContent>
+      <xsd:extension base="jomc:ImplementationReference">
+        <xsd:sequence>
+          <xsd:element ref="jomc:properties" minOccurs="0" maxOccurs="1">
+            <xsd:annotation>
+              <xsd:appinfo>
+                <jaxb:property>
+                  <jaxb:javadoc><![CDATA[Properties of this dependency.]]></jaxb:javadoc>
+                </jaxb:property>
+              </xsd:appinfo>
+            </xsd:annotation>
+          </xsd:element>
+        </xsd:sequence>
+        <xsd:attribute name="name" type="jomc:Identifier" use="required">
+          <xsd:annotation>
+            <xsd:appinfo>
+              <jaxb:property>
+                <jaxb:javadoc><![CDATA[Name of this dependency.]]></jaxb:javadoc>
+              </jaxb:property>
+            </xsd:appinfo>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="bound" type="xsd:boolean" use="optional"
+                       default="true">
+          <xsd:annotation>
+            <xsd:appinfo>
+              <jaxb:property>
+                <jaxb:javadoc><![CDATA[True, if this dependency is bound to its object; false, if not.]]></jaxb:javadoc>
+              </jaxb:property>
+            </xsd:appinfo>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="optional" type="xsd:boolean" use="optional"
+                       default="false">
+          <xsd:annotation>
+            <xsd:appinfo>
+              <jaxb:property>
+                <jaxb:javadoc><![CDATA[True, if this dependency is optional; false, if not.]]></jaxb:javadoc>
+              </jaxb:property>
+            </xsd:appinfo>
+          </xsd:annotation>
+        </xsd:attribute>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <!--                                                                       -->
+  <!-- Properties                                                            -->
+  <!--                                                                       -->
+  <xsd:element name="properties" type="jomc:Properties">
+    <xsd:unique name="property-name-uniqueness">
+      <xsd:annotation>
+        <xsd:documentation xml:lang="en"><![CDATA[
+          Checks property name uniquenes.]]>
+        </xsd:documentation>
+      </xsd:annotation>
+      <xsd:selector xpath=".//jomc:property"/>
+      <xsd:field xpath="@name"/>
+    </xsd:unique>
+    <xsd:unique name="property-reference-uniqueness">
+      <xsd:annotation>
+        <xsd:documentation xml:lang="en"><![CDATA[
+          Checks property reference uniquenes.]]>
+        </xsd:documentation>
+      </xsd:annotation>
+      <xsd:selector xpath=".//jomc:reference"/>
+      <xsd:field xpath="@name"/>
+    </xsd:unique>
+  </xsd:element>
+  <xsd:complexType name="Properties">
+    <xsd:annotation>
+      <xsd:appinfo>
+        <jaxb:class>
+           <jaxb:javadoc><![CDATA[List of properties.]]></jaxb:javadoc>
+        </jaxb:class>
+      </xsd:appinfo>
+    </xsd:annotation>
+    <xsd:complexContent>
+      <xsd:extension base="jomc:ModelObject">
+        <xsd:sequence>
+          <xsd:element ref="jomc:property" minOccurs="0"
+                       maxOccurs="unbounded"/>
+          <xsd:element name="reference" type="jomc:PropertyReference"
+                       minOccurs="0" maxOccurs="unbounded"/>
+        </xsd:sequence>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <!--                                                                       -->
+  <!-- Property                                                              -->
+  <!--                                                                       -->
+  <xsd:element name="property" type="jomc:Property"/>
+  <xsd:complexType name="Property">
+    <xsd:annotation>
+      <xsd:appinfo>
+        <jaxb:class>
+           <jaxb:javadoc><![CDATA[
+Property meta-data.
+<p>A property consists of the properties {@code name}, {@code type} and
+{@code value}. Property {@code name} holds the name uniquely identifying the
+property in a collection of properties. Property {@code type} holds the type of
+the property. Property {@code value} holds the properties value which is of type
+{@code type}.</p>]]></jaxb:javadoc>
+        </jaxb:class>
+      </xsd:appinfo>
+    </xsd:annotation>
+    <xsd:complexContent>
+      <xsd:extension base="jomc:ModelObject">
+        <xsd:sequence>
+          <xsd:any namespace="##other" minOccurs="0" maxOccurs="1"
+                   processContents="lax">
+            <xsd:annotation>
+              <xsd:appinfo>
+                <jaxb:property>
+                   <jaxb:javadoc><![CDATA[Object value of this property.]]></jaxb:javadoc>
+                </jaxb:property>
+              </xsd:appinfo>
+            </xsd:annotation>
+          </xsd:any>
+        </xsd:sequence>
+        <xsd:attribute name="name" type="jomc:Identifier" use="required">
+          <xsd:annotation>
+            <xsd:appinfo>
+              <jaxb:property>
+                 <jaxb:javadoc><![CDATA[Name of this property.]]></jaxb:javadoc>
+              </jaxb:property>
+            </xsd:appinfo>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="type" type="jomc:PropertyType" use="optional"
+                       default="java.lang.String">
+          <xsd:annotation>
+            <xsd:appinfo>
+              <jaxb:property>
+                 <jaxb:javadoc><![CDATA[Type of this property.]]></jaxb:javadoc>
+              </jaxb:property>
+            </xsd:appinfo>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="value" type="jomc:String" use="optional">
+          <xsd:annotation>
+            <xsd:appinfo>
+              <jaxb:property>
+                 <jaxb:javadoc><![CDATA[Value of this property.]]></jaxb:javadoc>
+              </jaxb:property>
+            </xsd:appinfo>
+          </xsd:annotation>
+        </xsd:attribute>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <!--                                                                       -->
+  <!-- PropertyReference                                                     -->
+  <!--                                                                       -->
+  <xsd:complexType name="PropertyReference">
+    <xsd:annotation>
+      <xsd:appinfo>
+        <jaxb:class>
+           <jaxb:javadoc><![CDATA[Reference to a property.]]></jaxb:javadoc>
+        </jaxb:class>
+      </xsd:appinfo>
+    </xsd:annotation>
+    <xsd:complexContent>
+      <xsd:extension base="jomc:ModelObject">
+        <xsd:attribute name="name" type="jomc:Identifier" use="required">
+          <xsd:annotation>
+            <xsd:appinfo>
+              <jaxb:property>
+                 <jaxb:javadoc><![CDATA[The name of the referenced property.]]></jaxb:javadoc>
+              </jaxb:property>
+            </xsd:appinfo>
+          </xsd:annotation>
+        </xsd:attribute>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <!--                                                                       -->
+  <!-- Messages                                                              -->
+  <!--                                                                       -->
+  <xsd:element name="messages" type="jomc:Messages">
+    <xsd:unique name="message-name-uniqueness">
+      <xsd:annotation>
+        <xsd:documentation xml:lang="en"><![CDATA[
+          Checks message identifier uniquenes.]]>
+        </xsd:documentation>
+      </xsd:annotation>
+      <xsd:selector xpath=".//jomc:message"/>
+      <xsd:field xpath="@name"/>
+    </xsd:unique>
+    <xsd:unique name="message-reference-uniqueness">
+      <xsd:annotation>
+        <xsd:documentation xml:lang="en"><![CDATA[
+          Checks message reference uniquenes.]]>
+        </xsd:documentation>
+      </xsd:annotation>
+      <xsd:selector xpath=".//jomc:reference"/>
+      <xsd:field xpath="@name"/>
+    </xsd:unique>
+  </xsd:element>
+  <xsd:complexType name="Messages">
+    <xsd:annotation>
+      <xsd:appinfo>
+        <jaxb:class>
+           <jaxb:javadoc><![CDATA[List of messages.]]></jaxb:javadoc>
+        </jaxb:class>
+      </xsd:appinfo>
+    </xsd:annotation>
+    <xsd:complexContent>
+      <xsd:extension base="jomc:ModelObject">
+        <xsd:sequence>
+          <xsd:element ref="jomc:message" minOccurs="0"
+                       maxOccurs="unbounded"/>
+          <xsd:element name="reference" type="jomc:MessageReference"
+                       minOccurs="0" maxOccurs="unbounded"/>
+        </xsd:sequence>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <!--                                                                       -->
+  <!-- Message                                                               -->
+  <!--                                                                       -->
+  <xsd:element name="message" type="jomc:Message"/>
+  <xsd:complexType name="Message">
+    <xsd:annotation>
+      <xsd:appinfo>
+        <jaxb:class>
+           <jaxb:javadoc><![CDATA[
+Message meta-data.
+<p>A message consists of the properties {@code name}, {@code template} and
+{@code arguments}. Property {@code name} holds a name uniquely identifying the
+message in a list of messages. Property {@code template} holds the template of
+the message. Property {@code arguments} holds meta-data describing arguments to
+format the message with.</p>]]></jaxb:javadoc>
+        </jaxb:class>
+      </xsd:appinfo>
+    </xsd:annotation>
+    <xsd:complexContent>
+      <xsd:extension base="jomc:ModelObject">
+        <xsd:sequence>
+          <xsd:element ref="jomc:template" minOccurs="0" maxOccurs="1">
+            <xsd:annotation>
+              <xsd:appinfo>
+                <jaxb:property>
+                   <jaxb:javadoc><![CDATA[The template of this message.]]></jaxb:javadoc>
+                </jaxb:property>
+              </xsd:appinfo>
+            </xsd:annotation>
+          </xsd:element>
+          <xsd:element ref="jomc:arguments" minOccurs="0" maxOccurs="1">
+            <xsd:annotation>
+              <xsd:appinfo>
+                <jaxb:property>
+                   <jaxb:javadoc><![CDATA[The arguments of this message.]]></jaxb:javadoc>
+                </jaxb:property>
+              </xsd:appinfo>
+            </xsd:annotation>
+          </xsd:element>
+        </xsd:sequence>
+        <xsd:attribute name="name" type="jomc:Identifier" use="required">
+          <xsd:annotation>
+            <xsd:appinfo>
+              <jaxb:property>
+                 <jaxb:javadoc><![CDATA[The name of this message.]]></jaxb:javadoc>
+              </jaxb:property>
+            </xsd:appinfo>
+          </xsd:annotation>
+        </xsd:attribute>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <!--                                                                       -->
+  <!-- MessageReference                                                      -->
+  <!--                                                                       -->
+  <xsd:complexType name="MessageReference">
+    <xsd:annotation>
+      <xsd:appinfo>
+        <jaxb:class>
+           <jaxb:javadoc><![CDATA[Reference to a text message.]]></jaxb:javadoc>
+        </jaxb:class>
+      </xsd:appinfo>
+    </xsd:annotation>
+    <xsd:complexContent>
+      <xsd:extension base="jomc:ModelObject">
+        <xsd:attribute name="name" type="jomc:Identifier" use="required">
+          <xsd:annotation>
+            <xsd:appinfo>
+              <jaxb:property>
+                 <jaxb:javadoc><![CDATA[The name of the referenced message.]]></jaxb:javadoc>
+              </jaxb:property>
+            </xsd:appinfo>
+          </xsd:annotation>
+        </xsd:attribute>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <!--                                                                       -->
+  <!-- Arguments                                                             -->
+  <!--                                                                       -->
+  <xsd:element name="arguments" type="jomc:Arguments">
+    <xsd:unique name="argument-name-uniqueness">
+      <xsd:annotation>
+        <xsd:documentation xml:lang="en"><![CDATA[
+          Checks argument name uniquenes.]]>
+        </xsd:documentation>
+      </xsd:annotation>
+      <xsd:selector xpath=".//jomc:argument"/>
+      <xsd:field xpath="@name"/>
+    </xsd:unique>
+    <xsd:unique name="argument-index-uniqueness">
+      <xsd:annotation>
+        <xsd:documentation xml:lang="en"><![CDATA[
+          Checks argument index uniquenes.]]>
+        </xsd:documentation>
+      </xsd:annotation>
+      <xsd:selector xpath=".//jomc:argument"/>
+      <xsd:field xpath="@index"/>
+    </xsd:unique>
+  </xsd:element>
+  <xsd:complexType name="Arguments">
+    <xsd:annotation>
+      <xsd:appinfo>
+        <jaxb:class>
+           <jaxb:javadoc><![CDATA[List of arguments.]]></jaxb:javadoc>
+        </jaxb:class>
+      </xsd:appinfo>
+    </xsd:annotation>
+    <xsd:complexContent>
+      <xsd:extension base="jomc:ModelObject">
+        <xsd:sequence>
+          <xsd:element ref="jomc:argument" minOccurs="0"
+                       maxOccurs="unbounded"/>
+        </xsd:sequence>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <!--                                                                       -->
+  <!-- Argument                                                              -->
+  <!--                                                                       -->
+  <xsd:element name="argument" type="jomc:Argument"/>
+  <xsd:complexType name="Argument">
+    <xsd:annotation>
+      <xsd:appinfo>
+        <jaxb:class>
+           <jaxb:javadoc><![CDATA[
+Argument meta-data.
+<p>An argument consists of the properties {@code index}, {@code name} and
+{@code type}. Property {@code index} holds the index of the argument in a list
+of arguments. Property {@code name} holds the name uniquely identifying the
+argument in a set of arguments. Property {@code type} holds the type of the
+argument.</p>]]></jaxb:javadoc>
+        </jaxb:class>
+      </xsd:appinfo>
+    </xsd:annotation>
+    <xsd:complexContent>
+      <xsd:extension base="jomc:ModelObject">
+        <xsd:attribute name="index" type="xsd:int" use="required">
+          <xsd:annotation>
+            <xsd:appinfo>
+              <jaxb:property>
+                 <jaxb:javadoc><![CDATA[Index of this argument.]]></jaxb:javadoc>
+              </jaxb:property>
+            </xsd:appinfo>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="name" type="jomc:Identifier" use="required">
+          <xsd:annotation>
+            <xsd:appinfo>
+              <jaxb:property>
+                 <jaxb:javadoc><![CDATA[Name of this argument.]]></jaxb:javadoc>
+              </jaxb:property>
+            </xsd:appinfo>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="type" type="jomc:ArgumentType"
+                       use="optional" default="Text">
+          <xsd:annotation>
+            <xsd:appinfo>
+              <jaxb:property>
+                 <jaxb:javadoc><![CDATA[Type of this argument.]]></jaxb:javadoc>
+              </jaxb:property>
+            </xsd:appinfo>
+          </xsd:annotation>
+        </xsd:attribute>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <!--                                                                       -->
+  <!-- Instances                                                             -->
+  <!--                                                                       -->
+  <xsd:element name="instances" type="jomc:Instances">
+    <xsd:unique name="instance-uniqueness">
+      <xsd:annotation>
+        <xsd:documentation xml:lang="en"><![CDATA[
+          Checks instance uniquenes.]]>
+        </xsd:documentation>
+      </xsd:annotation>
+      <xsd:selector xpath=".//jomc:instance"/>
+      <xsd:field xpath="@identifier"/>
+    </xsd:unique>
+  </xsd:element>
+  <xsd:complexType name="Instances">
+    <xsd:annotation>
+      <xsd:appinfo>
+        <jaxb:class>
+           <jaxb:javadoc><![CDATA[List of instances.]]></jaxb:javadoc>
+        </jaxb:class>
+      </xsd:appinfo>
+    </xsd:annotation>
+    <xsd:complexContent>
+      <xsd:extension base="jomc:ModelObject">
+        <xsd:sequence>
+          <xsd:element ref="jomc:instance" minOccurs="0"
+                       maxOccurs="unbounded"/>
+        </xsd:sequence>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <!--                                                                       -->
+  <!-- Instance                                                              -->
+  <!--                                                                       -->
+  <xsd:element name="instance" type="jomc:Instance"/>
+  <xsd:complexType name="Instance">
+    <xsd:annotation>
+      <xsd:appinfo>
+        <jaxb:class>
+          <jaxb:javadoc><![CDATA[Instance meta-data.]]></jaxb:javadoc>
+        </jaxb:class>
+      </xsd:appinfo>
+    </xsd:annotation>
+    <xsd:complexContent>
+      <xsd:extension base="jomc:ModelObject">
+        <xsd:sequence>
+          <xsd:element ref="jomc:specifications" minOccurs="0" maxOccurs="1">
+            <xsd:annotation>
+              <xsd:appinfo>
+                <jaxb:property>
+                  <jaxb:javadoc><![CDATA[Specifications of this instance.]]></jaxb:javadoc>
+                </jaxb:property>
+              </xsd:appinfo>
+            </xsd:annotation>
+          </xsd:element>
+          <xsd:element ref="jomc:dependencies" minOccurs="0" maxOccurs="1">
+            <xsd:annotation>
+              <xsd:appinfo>
+                <jaxb:property>
+                  <jaxb:javadoc><![CDATA[Dependencies of this instance.]]></jaxb:javadoc>
+                </jaxb:property>
+              </xsd:appinfo>
+            </xsd:annotation>
+          </xsd:element>
+          <xsd:element ref="jomc:properties" minOccurs="0" maxOccurs="1">
+            <xsd:annotation>
+              <xsd:appinfo>
+                <jaxb:property>
+                  <jaxb:javadoc><![CDATA[Properties of this instance.]]></jaxb:javadoc>
+                </jaxb:property>
+              </xsd:appinfo>
+            </xsd:annotation>
+          </xsd:element>
+          <xsd:element ref="jomc:messages" minOccurs="0" maxOccurs="1">
+            <xsd:annotation>
+              <xsd:appinfo>
+                <jaxb:property>
+                  <jaxb:javadoc><![CDATA[Messages of this instance.]]></jaxb:javadoc>
+                </jaxb:property>
+              </xsd:appinfo>
+            </xsd:annotation>
+          </xsd:element>
+        </xsd:sequence>
+        <xsd:attribute name="identifier" type="jomc:Identifier"
+                       use="required">
+          <xsd:annotation>
+            <xsd:appinfo>
+              <jaxb:property>
+                <jaxb:javadoc><![CDATA[The identifier of this instance.]]></jaxb:javadoc>
+              </jaxb:property>
+            </xsd:appinfo>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="implementationName" type="jomc:Identifier"
+                       use="required">
+          <xsd:annotation>
+            <xsd:appinfo>
+              <jaxb:property>
+                <jaxb:javadoc><![CDATA[The name of the implementation of this instance.]]></jaxb:javadoc>
+              </jaxb:property>
+            </xsd:appinfo>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="class" type="jomc:Identifier"
+                       use="required">
+          <xsd:annotation>
+            <xsd:appinfo>
+              <jaxb:property>
+                <jaxb:javadoc><![CDATA[The class of this instance.]]></jaxb:javadoc>
+              </jaxb:property>
+            </xsd:appinfo>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="scope" type="jomc:Scope" use="optional"
+                       default="Multiton">
+          <xsd:annotation>
+            <xsd:appinfo>
+              <jaxb:property>
+                <jaxb:javadoc><![CDATA[Scope this instance is bound to.]]></jaxb:javadoc>
+              </jaxb:property>
+            </xsd:appinfo>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="stateless" type="xsd:boolean" use="optional"
+                       default="false">
+          <xsd:annotation>
+            <xsd:appinfo>
+              <jaxb:property>
+                <jaxb:javadoc><![CDATA[Flags this instance stateless.]]></jaxb:javadoc>
+              </jaxb:property>
+            </xsd:appinfo>
+          </xsd:annotation>
+        </xsd:attribute>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <!--                                                                       -->
+  <!-- Authors                                                               -->
+  <!--                                                                       -->
+  <xsd:element name="authors" type="jomc:Authors"/>
+  <xsd:complexType name="Authors">
+    <xsd:annotation>
+      <xsd:appinfo>
+        <jaxb:class>
+           <jaxb:javadoc><![CDATA[List of authors.]]></jaxb:javadoc>
+        </jaxb:class>
+      </xsd:appinfo>
+    </xsd:annotation>
+    <xsd:complexContent>
+      <xsd:extension base="jomc:ModelObject">
+        <xsd:choice>
+          <xsd:element name="author" type="jomc:Author" minOccurs="0"
+                       maxOccurs="unbounded"/>
+        </xsd:choice>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <!--                                                                       -->
+  <!-- Author                                                                -->
+  <!--                                                                       -->
+  <xsd:element name="author" type="jomc:Author"/>
+  <xsd:complexType name="Author">
+    <xsd:annotation>
+      <xsd:appinfo>
+        <jaxb:class>
+          <jaxb:javadoc><![CDATA[Author.]]></jaxb:javadoc>
+        </jaxb:class>
+      </xsd:appinfo>
+    </xsd:annotation>
+    <xsd:complexContent>
+      <xsd:extension base="jomc:ModelObject">
+        <xsd:attribute name="name" type="jomc:String" use="required">
+          <xsd:annotation>
+            <xsd:appinfo>
+              <jaxb:property>
+                <jaxb:javadoc><![CDATA[Name of the author.]]></jaxb:javadoc>
+              </jaxb:property>
+            </xsd:appinfo>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="version" type="jomc:Version" use="optional">
+          <xsd:annotation>
+            <xsd:appinfo>
+              <jaxb:property>
+                <jaxb:javadoc><![CDATA[The version of the object created due to the author.]]></jaxb:javadoc>
+              </jaxb:property>
+            </xsd:appinfo>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="mail" type="jomc:String" use="optional">
+          <xsd:annotation>
+            <xsd:appinfo>
+              <jaxb:property>
+                <jaxb:javadoc><![CDATA[Mail address of the author.]]></jaxb:javadoc>
+              </jaxb:property>
+            </xsd:appinfo>
+          </xsd:annotation>
+        </xsd:attribute>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <!--                                                                       -->
+  <!-- Simple types.                                                         -->
+  <!--                                                                       -->
+  <xsd:simpleType name="String">
+    <xsd:restriction base="xsd:string"/>
+  </xsd:simpleType>
+  <xsd:simpleType name="Version">
+    <xsd:annotation>
+      <xsd:documentation xml:lang="en"><![CDATA[
+        Restricts "xsd:string" to a maximum length of 100 characters.]]>
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:maxLength value="100"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="Identifier">
+    <xsd:annotation>
+      <xsd:documentation xml:lang="en"><![CDATA[
+        Identifier of an entity,]]>
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:pattern value="\p{L}.*"/>
+      <xsd:whiteSpace value="collapse"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="PropertyType">
+    <xsd:annotation>
+      <xsd:appinfo>
+        <jaxb:typesafeEnumClass>
+          <jaxb:javadoc><![CDATA[Enumeration of property types.]]></jaxb:javadoc>
+        </jaxb:typesafeEnumClass>
+      </xsd:appinfo>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:NCName">
+      <xsd:enumeration value="byte"/>
+      <xsd:enumeration value="short"/>
+      <xsd:enumeration value="int"/>
+      <xsd:enumeration value="long"/>
+      <xsd:enumeration value="char"/>
+      <xsd:enumeration value="float"/>
+      <xsd:enumeration value="double"/>
+      <xsd:enumeration value="boolean"/>
+      <xsd:enumeration value="java.lang.Byte"/>
+      <xsd:enumeration value="java.lang.Short"/>
+      <xsd:enumeration value="java.lang.Integer"/>
+      <xsd:enumeration value="java.lang.Long"/>
+      <xsd:enumeration value="java.lang.Character"/>
+      <xsd:enumeration value="java.lang.Float"/>
+      <xsd:enumeration value="java.lang.Double"/>
+      <xsd:enumeration value="java.lang.Boolean"/>
+      <xsd:enumeration value="java.lang.String"/>
+      <xsd:enumeration value="java.lang.Object"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="ArgumentType">
+    <xsd:annotation>
+      <xsd:appinfo>
+        <jaxb:typesafeEnumClass>
+          <jaxb:javadoc><![CDATA[Enumeration of argument types.]]></jaxb:javadoc>
+        </jaxb:typesafeEnumClass>
+      </xsd:appinfo>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:NCName">
+      <xsd:enumeration value="Number"/>
+      <xsd:enumeration value="Date"/>
+      <xsd:enumeration value="Time"/>
+      <xsd:enumeration value="Text"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="Multiplicity">
+    <xsd:annotation>
+      <xsd:appinfo>
+        <jaxb:typesafeEnumClass>
+          <jaxb:javadoc><![CDATA[Enumeration of multiplicities.]]></jaxb:javadoc>
+        </jaxb:typesafeEnumClass>
+      </xsd:appinfo>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:NCName">
+      <xsd:enumeration value="One">
+        <xsd:annotation>
+          <xsd:appinfo>
+            <jaxb:typesafeEnumMember name="ONE">
+              <jaxb:javadoc><![CDATA[
+A multiplicity equal to {@code ONE} specifies that no more than one
+implementation of the specification is allowed to exist among a set of modules
+(including none).]]></jaxb:javadoc>
+            </jaxb:typesafeEnumMember>
+          </xsd:appinfo>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="Many">
+        <xsd:annotation>
+          <xsd:appinfo>
+            <jaxb:typesafeEnumMember name="MANY">
+              <jaxb:javadoc><![CDATA[
+A multiplicity equal to {@code MANY} specifies that many implementations of the
+specification are allowed to exist among a set of modules (including none).]]></jaxb:javadoc>
+            </jaxb:typesafeEnumMember>
+          </xsd:appinfo>
+        </xsd:annotation>
+      </xsd:enumeration>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="Scope">
+    <xsd:annotation>
+      <xsd:appinfo>
+        <jaxb:typesafeEnumClass>
+          <jaxb:javadoc><![CDATA[Enumeration of scopes.]]></jaxb:javadoc>
+        </jaxb:typesafeEnumClass>
+      </xsd:appinfo>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:NCName">
+      <xsd:enumeration value="Multiton">
+        <xsd:annotation>
+          <xsd:appinfo>
+            <jaxb:typesafeEnumMember name="MULTITON">
+              <jaxb:javadoc><![CDATA[
+In multiton scope, a new instance is created whenever requested.]]></jaxb:javadoc>
+            </jaxb:typesafeEnumMember>
+          </xsd:appinfo>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="Context">
+        <xsd:annotation>
+          <xsd:appinfo>
+            <jaxb:typesafeEnumMember name="CONTEXT">
+              <jaxb:javadoc><![CDATA[
+In context scope, instances are bound to a system's context. An instance is only
+created if not already available in context.]]></jaxb:javadoc>
+            </jaxb:typesafeEnumMember>
+          </xsd:appinfo>
+        </xsd:annotation>
+      </xsd:enumeration>
+      <xsd:enumeration value="Singleton">
+        <xsd:annotation>
+          <xsd:appinfo>
+            <jaxb:typesafeEnumMember name="SINGLETON">
+              <jaxb:javadoc><![CDATA[
+In singleton scope, instances are bound to a system's single instance store. An
+instance is only created if not already available in that single instance store.]]></jaxb:javadoc>
+            </jaxb:typesafeEnumMember>
+          </xsd:appinfo>
+        </xsd:annotation>
+      </xsd:enumeration>
+    </xsd:restriction>
+  </xsd:simpleType>
+</xsd:schema>

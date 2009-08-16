@@ -1,0 +1,974 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+  jDTAUS Container Model
+  Copyright (c) 2005 Christian Schulte
+
+  Christian Schulte, Haldener Strasse 72, 58095 Hagen, Germany
+  <schulte2005@users.sourceforge.net> (+49 2331 3543887)
+
+  This library is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Lesser General Public
+  License as published by the Free Software Foundation; either
+  version 2.1 of the License, or any later version.
+
+  This library is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+  Lesser General Public License for more details.
+
+  You should have received a copy of the GNU Lesser General Public
+  License along with this library; if not, write to the Free Software
+  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+
+  Document   : jdtaus-container-1.1.xsd
+  Author     : Christian Schulte <schulte2005@users.sourceforge.net>
+  Description: jDTAUS Container Model.
+
+  Example usage:
+
+  <xsd:import namespace="http://jdtaus.org/core/model/container"
+              schemaLocation="http://jdtaus.sourceforge.net/1.0.x/jdtaus-core/jdtaus-core-schemas/jdtaus-container-1.1.xsd" />
+
+  The recommended namespace prefix is "container".
+
+  $Id: jdtaus-container-1.1.xsd 8043 2009-07-02 01:22:46Z schulte2005 $
+-->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            xmlns:container="http://jdtaus.org/core/model/container"
+            targetNamespace="http://jdtaus.org/core/model/container"
+            elementFormDefault="qualified"
+            attributeFormDefault="qualified">
+  <xsd:annotation>
+    <xsd:documentation xml:lang="en"><![CDATA[
+  jDTAUS Container Model
+  Copyright (c) 2005 Christian Schulte
+
+  Christian Schulte, Haldener Strasse 72, 58095 Hagen, Germany
+  <schulte2005@users.sourceforge.net> (+49 2331 3543887)
+
+  This library is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Lesser General Public
+  License as published by the Free Software Foundation; either
+  version 2.1 of the License, or any later version.
+
+  This library is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+  Lesser General Public License for more details.
+
+  You should have received a copy of the GNU Lesser General Public
+  License along with this library; if not, write to the Free Software
+  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+
+  Document   : jdtaus-container-1.1.xsd
+  Author     : Christian Schulte <schulte2005@users.sourceforge.net>
+  Description: jDTAUS Container Model.
+
+  Example usage:
+
+  <xsd:import namespace="http://jdtaus.org/core/model/container"
+              schemaLocation="http://jdtaus.sourceforge.net/1.0.x/jdtaus-core/jdtaus-core-schemas/jdtaus-container-1.1.xsd" />
+
+  The recommended namespace prefix is "container".]]>
+    </xsd:documentation>
+  </xsd:annotation>
+  <!--                                                                       -->
+  <!-- Text                                                                  -->
+  <!--                                                                       -->
+  <xsd:element name="text" type="container:Text" />
+  <xsd:complexType name="Text">
+    <xsd:annotation>
+      <xsd:documentation xml:lang="en"><![CDATA[
+      Text paired with corresponding language.]]>
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:simpleContent>
+      <xsd:extension base="xsd:string">
+        <xsd:attribute name="language" type="xsd:language" use="required"/>
+      </xsd:extension>
+    </xsd:simpleContent>
+  </xsd:complexType>
+  <!--                                                                       -->
+  <!-- Texts                                                                 -->
+  <!--                                                                       -->
+  <xsd:element name="texts" type="container:Texts">
+    <xsd:key name="text-key">
+      <xsd:annotation>
+        <xsd:documentation xml:lang="en"><![CDATA[
+        Checks uniqueness of languages.]]>
+        </xsd:documentation>
+      </xsd:annotation>
+      <xsd:selector xpath=".//container:text"/>
+      <xsd:field xpath="@container:language"/>
+    </xsd:key>
+    <xsd:keyref name="text-default-language-reference"
+                refer="container:text-key">
+      <xsd:selector xpath="."/>
+      <xsd:field xpath="@container:defaultLanguage"/>
+    </xsd:keyref>
+  </xsd:element>
+  <xsd:complexType name="Texts">
+    <xsd:annotation>
+      <xsd:documentation xml:lang="en"><![CDATA[
+      List of text language pairs.]]>
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element ref="container:text" minOccurs="1"
+                   maxOccurs="unbounded"/>
+    </xsd:sequence>
+    <xsd:attribute name="defaultLanguage" type="xsd:language"
+                   use="required">
+      <xsd:annotation>
+        <xsd:documentation xml:lang="en"><![CDATA[
+        Default text of the list.]]>
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+  </xsd:complexType>
+  <!--                                                                       -->
+  <!-- Documentation                                                         -->
+  <!--                                                                       -->
+  <xsd:element name="documentation" type="container:Texts">
+    <xsd:key name="documentation-key">
+      <xsd:selector xpath=".//container:text"/>
+      <xsd:field xpath="@container:language"/>
+    </xsd:key>
+    <xsd:keyref name="default-documentation-reference"
+                 refer="container:documentation-key">
+      <xsd:selector xpath="."/>
+      <xsd:field xpath="@container:defaultLanguage"/>
+    </xsd:keyref>
+  </xsd:element>
+  <!--                                                                       -->
+  <!-- Template                                                              -->
+  <!--                                                                       -->
+  <xsd:element name="template" type="container:Texts">
+    <xsd:key name="template-key">
+      <xsd:selector xpath=".//container:text"/>
+      <xsd:field xpath="@container:language"/>
+    </xsd:key>
+    <xsd:keyref name="default-template-reference"
+                 refer="container:template-key">
+      <xsd:selector xpath="."/>
+      <xsd:field xpath="@container:defaultLanguage"/>
+    </xsd:keyref>
+  </xsd:element>
+  <!--                                                                       -->
+  <!-- ModelObject                                                           -->
+  <!--                                                                       -->
+  <xsd:complexType name="ModelObject">
+    <xsd:annotation>
+      <xsd:documentation xml:lang="en"><![CDATA[
+      Base complex type for model objects.]]>
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:sequence>
+      <xsd:element ref="container:documentation" minOccurs="0" maxOccurs="1">
+        <xsd:annotation>
+          <xsd:documentation xml:lang="en">
+            Documentation of the object.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="modelVersion" type="container:Version" use="optional">
+      <xsd:annotation>
+        <xsd:documentation xml:lang="en"><![CDATA[
+        Version of the model in use.]]>
+        </xsd:documentation>
+      </xsd:annotation>
+    </xsd:attribute>
+  </xsd:complexType>
+  <!--                                                                       -->
+  <!-- Modules                                                               -->
+  <!--                                                                       -->
+  <xsd:element name="modules" type="container:Modules">
+    <xsd:key name="module-key">
+      <xsd:selector xpath=".//container:module"/>
+      <xsd:field xpath="@container:name"/>
+    </xsd:key>
+    <xsd:key name="specification-key">
+      <xsd:selector xpath=".//container:specifications/container:specification"/>
+      <xsd:field xpath="@container:identifier"/>
+    </xsd:key>
+    <xsd:keyref name="specification-reference"
+                refer="container:specification-key">
+      <xsd:selector xpath=".//container:specifications/container:reference"/>
+      <xsd:field xpath="@container:identifier"/>
+    </xsd:keyref>
+    <xsd:key name="implementation-key">
+      <xsd:selector xpath=".//container:implementations/container:implementation"/>
+      <xsd:field xpath="@container:identifier"/>
+    </xsd:key>
+    <xsd:keyref name="implementation-parent-reference"
+                refer="container:implementation-key">
+      <xsd:selector xpath=".//container:implementations/container:implementation"/>
+      <xsd:field xpath="@container:parent"/>
+    </xsd:keyref>
+    <xsd:keyref name="dependency-specification-reference"
+                refer="container:specification-key">
+      <xsd:selector xpath=".//container:dependency"/>
+      <xsd:field xpath="@container:identifier"/>
+    </xsd:keyref>
+  </xsd:element>
+  <xsd:complexType name="Modules">
+    <xsd:annotation>
+      <xsd:documentation xml:lang="en"><![CDATA[
+        List of modules.]]>
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexContent>
+      <xsd:extension base="container:ModelObject">
+        <xsd:sequence>
+          <xsd:element ref="container:module" minOccurs="0"
+                       maxOccurs="unbounded"/>
+        </xsd:sequence>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <!--                                                                       -->
+  <!-- Module                                                                -->
+  <!--                                                                       -->
+  <xsd:element name="module" type="container:Module">
+    <xsd:key name="message-key">
+      <xsd:selector xpath="container:messages/container:message"/>
+      <xsd:field xpath="@container:name"/>
+    </xsd:key>
+    <xsd:keyref name="message-reference"
+                refer="container:message-key">
+      <xsd:selector xpath=".//container:messages/container:reference"/>
+      <xsd:field xpath="@container:name"/>
+    </xsd:keyref>
+  </xsd:element>
+  <xsd:complexType name="Module">
+    <xsd:annotation>
+      <xsd:documentation xml:lang="en">
+        jDTAUS module.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexContent>
+      <xsd:extension base="container:ModelObject">
+        <xsd:sequence>
+          <xsd:element ref="container:specifications" minOccurs="0"
+                       maxOccurs="1">
+            <xsd:annotation>
+              <xsd:documentation xml:lang="en">
+                Specifications defined in the module.
+              </xsd:documentation>
+            </xsd:annotation>
+          </xsd:element>
+          <xsd:element ref="container:implementations" minOccurs="0"
+                       maxOccurs="1">
+            <xsd:annotation>
+              <xsd:documentation xml:lang="en">
+                Implementations defined in the module.
+              </xsd:documentation>
+            </xsd:annotation>
+          </xsd:element>
+          <xsd:element ref="container:properties" minOccurs="0" maxOccurs="1">
+            <xsd:annotation>
+              <xsd:documentation xml:lang="en">
+                Module properties.
+              </xsd:documentation>
+            </xsd:annotation>
+          </xsd:element>
+          <xsd:element ref="container:messages" minOccurs="0" maxOccurs="1">
+            <xsd:annotation>
+              <xsd:documentation xml:lang="en">
+                Module messages.
+              </xsd:documentation>
+            </xsd:annotation>
+          </xsd:element>
+        </xsd:sequence>
+        <xsd:attribute name="name" type="container:Identifier" use="required">
+          <xsd:annotation>
+            <xsd:documentation xml:lang="en">
+              Unique logical module name.
+            </xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="version" type="container:Version" use="required">
+          <xsd:annotation>
+            <xsd:documentation xml:lang="en">
+              Version of the module.
+            </xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <!--                                                                       -->
+  <!-- Specifications                                                        -->
+  <!--                                                                       -->
+  <xsd:element name="specifications" type="container:Specifications">
+    <xsd:unique name="specification-uniqueness">
+      <xsd:annotation>
+        <xsd:documentation xml:lang="en">
+          Checks uniquenes of specifications.
+        </xsd:documentation>
+      </xsd:annotation>
+      <xsd:selector xpath=".//container:specification"/>
+      <xsd:field xpath="@container:identifier"/>
+    </xsd:unique>
+    <xsd:unique name="specification-reference-uniqueness">
+      <xsd:annotation>
+        <xsd:documentation xml:lang="en">
+          Checks uniquenes of specification references.
+        </xsd:documentation>
+      </xsd:annotation>
+      <xsd:selector xpath=".//container:reference"/>
+      <xsd:field xpath="@container:identifier"/>
+    </xsd:unique>
+  </xsd:element>
+  <xsd:complexType name="Specifications">
+    <xsd:annotation>
+      <xsd:documentation xml:lang="en">
+        Maps class-names to specification meta-data.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexContent>
+      <xsd:extension base="container:ModelObject">
+        <xsd:choice>
+          <xsd:element ref="container:specification" minOccurs="0"
+                       maxOccurs="unbounded"/>
+          <xsd:element name="reference"
+                       type="container:SpecificationReference"
+                       minOccurs="0" maxOccurs="unbounded"/>
+
+        </xsd:choice>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <!--                                                                       -->
+  <!-- Specification                                                         -->
+  <!--                                                                       -->
+  <xsd:element name="specification" type="container:Specification"/>
+  <xsd:complexType name="Specification">
+    <xsd:annotation>
+      <xsd:documentation xml:lang="en">
+        Meta-data describing a specification.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexContent>
+      <xsd:extension base="container:ModelObject">
+        <xsd:sequence>
+          <xsd:element ref="container:properties" minOccurs="0" maxOccurs="1">
+            <xsd:annotation>
+              <xsd:documentation xml:lang="en">
+                Properties of the specification.
+              </xsd:documentation>
+            </xsd:annotation>
+          </xsd:element>
+        </xsd:sequence>
+        <xsd:attribute name="identifier" type="container:Identifier"
+                       use="required">
+          <xsd:annotation>
+            <xsd:documentation xml:lang="en">
+              The unique identifier of the specification.
+            </xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="vendor" type="container:String" use="required">
+          <xsd:annotation>
+            <xsd:documentation xml:lang="en">
+              The presentation vendor of the specification.
+            </xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="version" type="container:Version" use="required">
+          <xsd:annotation>
+            <xsd:documentation xml:lang="en">
+              The version of the specification.
+            </xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="multiplicity" type="container:Multiplicity"
+                       use="required">
+          <xsd:annotation>
+            <xsd:documentation xml:lang="en">
+              Specifies the mandatory implementation multiplicity among a set
+              of modules. A multiplicity of one specifies that exactly one
+              implementation of the specification must exist among all modules.
+              A multiplicity of many specifies that many implementations are
+              allowed to exist among all modules (including none).
+            </xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="stateless" type="xsd:boolean" use="optional">
+          <xsd:annotation>
+            <xsd:documentation xml:lang="en">
+              Flag indicating that an implementation's state need not be
+              retained across method invocations for an implementation to
+              operate as specified.
+            </xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="scope" type="container:Scope" use="required">
+          <xsd:annotation>
+            <xsd:documentation xml:lang="en">
+              Scope the specification applies to. Multition scope specifies
+              a new implementation instance to be created each time requested.
+              Context scope specifies implementation instances to be bound to
+              a system's context. Singleton scope specifies implementation
+              instances to be bound to a system's single instance store.
+            </xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <!--                                                                       -->
+  <!-- SpecificationReference                                                -->
+  <!--                                                                       -->
+  <xsd:complexType name="SpecificationReference">
+    <xsd:complexContent>
+      <xsd:extension base="container:ModelObject">
+        <xsd:attribute name="identifier" type="container:Identifier"
+                     use="required">
+          <xsd:annotation>
+            <xsd:documentation xml:lang="en">
+                The identifier of the referenced specification.
+            </xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="version" type="container:Version" use="optional">
+          <xsd:annotation>
+            <xsd:documentation xml:lang="en">
+                The version of the referenced specification.
+            </xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <!--                                                                       -->
+  <!-- Implementations                                                       -->
+  <!--                                                                       -->
+  <xsd:element name="implementations" type="container:Implementations">
+    <xsd:unique name="implementation-uniqueness">
+      <xsd:annotation>
+        <xsd:documentation xml:lang="en">
+          Checks uniquenes of implementations.
+        </xsd:documentation>
+      </xsd:annotation>
+      <xsd:selector xpath=".//container:implementation"/>
+      <xsd:field xpath="@container:identifier"/>
+    </xsd:unique>
+  </xsd:element>
+  <xsd:complexType name="Implementations">
+    <xsd:annotation>
+      <xsd:documentation xml:lang="en">
+        Maps class-names to implementation meta-data.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexContent>
+      <xsd:extension base="container:ModelObject">
+        <xsd:sequence>
+          <xsd:element ref="container:implementation" minOccurs="0"
+                       maxOccurs="unbounded"/>
+        </xsd:sequence>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <!--                                                                       -->
+  <!-- Implementation                                                        -->
+  <!--                                                                       -->
+  <xsd:element name="implementation" type="container:Implementation"/>
+  <xsd:complexType name="Implementation">
+    <xsd:annotation>
+      <xsd:documentation xml:lang="en">
+        Meta-data describing an implementation.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexContent>
+      <xsd:extension base="container:ModelObject">
+        <xsd:sequence>
+          <xsd:element ref="container:specifications" minOccurs="0" maxOccurs="1">
+            <xsd:annotation>
+              <xsd:documentation xml:lang="en">
+                Specifications implemented by this implementation.
+              </xsd:documentation>
+            </xsd:annotation>
+          </xsd:element>
+          <xsd:element ref="container:dependencies" minOccurs="0" maxOccurs="1">
+            <xsd:annotation>
+              <xsd:documentation xml:lang="en">
+                Implementations the implementation depends on.
+              </xsd:documentation>
+            </xsd:annotation>
+          </xsd:element>
+          <xsd:element ref="container:properties" minOccurs="0" maxOccurs="1">
+            <xsd:annotation>
+              <xsd:documentation xml:lang="en">
+                Properties of the implementation.
+              </xsd:documentation>
+            </xsd:annotation>
+          </xsd:element>
+          <xsd:element ref="container:messages" minOccurs="0" maxOccurs="1">
+            <xsd:annotation>
+              <xsd:documentation xml:lang="en">
+                Messages of the implementation.
+              </xsd:documentation>
+            </xsd:annotation>
+          </xsd:element>
+        </xsd:sequence>
+        <xsd:attribute name="identifier" type="container:Identifier"
+                       use="required">
+          <xsd:annotation>
+            <xsd:documentation xml:lang="en">
+              The unique identifier of the implementation.
+            </xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="name" type="container:Identifier" use="required">
+          <xsd:annotation>
+            <xsd:documentation xml:lang="en">
+              The logical name of the implementation.
+            </xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="vendor" type="container:String" use="required">
+          <xsd:annotation>
+            <xsd:documentation xml:lang="en">
+              The presentation vendor of the implementation.
+            </xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="version" type="container:Version" use="required">
+          <xsd:annotation>
+            <xsd:documentation xml:lang="en">
+              The version of the implementation.
+            </xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="parent" type="container:Identifier" use="optional">
+          <xsd:annotation>
+            <xsd:documentation xml:lang="en">
+              Identifier of an implementation this implementation inherits from.
+              When given this implementation will inherit up the hierarchy
+              starting with parent.
+            </xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="final" type="xsd:boolean" use="optional">
+          <xsd:annotation>
+            <xsd:documentation xml:lang="en">
+              Flags an implementation as the final node in the inheritance
+              hierarchy. Defaults to false.
+            </xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <!--                                                                       -->
+  <!-- ImplementationReference                                               -->
+  <!--                                                                       -->
+  <xsd:complexType name="ImplementationReference">
+    <xsd:complexContent>
+      <xsd:extension base="container:SpecificationReference">
+        <xsd:attribute name="implementationName" type="container:Identifier"
+                       use="optional">
+          <xsd:annotation>
+            <xsd:documentation xml:lang="en">
+              <xsd:annotation>
+                <xsd:documentation xml:lang="en">
+                  Name of the referenced implementation of the specification.
+                  If not set, the specification's multiplicity determines the
+                  implementation(s) of the reference.
+                </xsd:documentation>
+              </xsd:annotation>
+            </xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <!--                                                                       -->
+  <!-- Dependencies                                                          -->
+  <!--                                                                       -->
+  <xsd:element name="dependencies" type="container:Dependencies">
+    <xsd:unique name="dependency-uniqueness">
+      <xsd:annotation>
+        <xsd:documentation xml:lang="en">
+          Checks dependency uniquenes.
+        </xsd:documentation>
+      </xsd:annotation>
+      <xsd:selector xpath=".//container:dependency"/>
+      <xsd:field xpath="@container:name"/>
+    </xsd:unique>
+  </xsd:element>
+  <xsd:complexType name="Dependencies">
+    <xsd:annotation>
+      <xsd:documentation xml:lang="en">
+        Implementations the implementation depends on.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexContent>
+      <xsd:extension base="container:ModelObject">
+        <xsd:sequence>
+          <xsd:element ref="container:dependency" minOccurs="0"
+                       maxOccurs="unbounded"/>
+        </xsd:sequence>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <!--                                                                       -->
+  <!-- Dependency                                                            -->
+  <!--                                                                       -->
+  <xsd:element name="dependency" type="container:Dependency"/>
+  <xsd:complexType name="Dependency">
+    <xsd:annotation>
+      <xsd:documentation xml:lang="en">
+        Object an implementation depends on.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexContent>
+      <xsd:extension base="container:ImplementationReference">
+        <xsd:sequence>
+          <xsd:element ref="container:properties" minOccurs="0" maxOccurs="1">
+            <xsd:annotation>
+              <xsd:documentation xml:lang="en">
+                Properties to be set with the object.
+              </xsd:documentation>
+            </xsd:annotation>
+          </xsd:element>
+        </xsd:sequence>
+        <xsd:attribute name="name" type="container:Identifier" use="required">
+          <xsd:annotation>
+            <xsd:documentation xml:lang="en">
+              Logical name of the dependency.
+            </xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="bound" type="xsd:boolean" use="required">
+          <xsd:annotation>
+            <xsd:documentation xml:lang="en">
+              True, if the dependency is bound to the implementation instance;
+              false, if not.
+            </xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <!--                                                                       -->
+  <!-- Properties                                                            -->
+  <!--                                                                       -->
+  <xsd:element name="properties" type="container:Properties">
+    <xsd:unique name="property-name-uniqueness">
+      <xsd:annotation>
+        <xsd:documentation xml:lang="en">
+          Checks property name uniquenes.
+        </xsd:documentation>
+      </xsd:annotation>
+      <xsd:selector xpath=".//container:property"/>
+      <xsd:field xpath="@container:name"/>
+    </xsd:unique>
+  </xsd:element>
+  <xsd:complexType name="Properties">
+    <xsd:annotation>
+      <xsd:documentation xml:lang="en">
+        Properties.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexContent>
+      <xsd:extension base="container:ModelObject">
+        <xsd:sequence>
+          <xsd:element ref="container:property" minOccurs="0"
+                       maxOccurs="unbounded"/>
+        </xsd:sequence>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <!--                                                                       -->
+  <!-- Property                                                              -->
+  <!--                                                                       -->
+  <xsd:element name="property" type="container:Property"/>
+  <xsd:complexType name="Property">
+    <xsd:annotation>
+      <xsd:documentation xml:lang="en">
+        Property of the module.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexContent>
+      <xsd:extension base="container:ModelObject">
+        <xsd:attribute name="name" type="container:Identifier" use="required">
+          <xsd:annotation>
+            <xsd:documentation xml:lang="en">
+              Name of the property.
+            </xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="type" type="container:PropertyType" use="required">
+          <xsd:annotation>
+            <xsd:documentation xml:lang="en">
+              Type of the property.
+            </xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="value" type="container:String" use="optional">
+          <xsd:annotation>
+            <xsd:documentation xml:lang="en">
+              Value of the property.
+            </xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <!--                                                                       -->
+  <!-- Messages                                                              -->
+  <!--                                                                       -->
+  <xsd:element name="messages" type="container:Messages">
+    <xsd:unique name="message-uniqueness">
+      <xsd:annotation>
+        <xsd:documentation xml:lang="en">
+          Checks message identifier uniquenes.
+        </xsd:documentation>
+      </xsd:annotation>
+      <xsd:selector xpath=".//container:message"/>
+      <xsd:field xpath="@container:name"/>
+    </xsd:unique>
+    <xsd:unique name="message-reference-uniqueness">
+      <xsd:annotation>
+        <xsd:documentation xml:lang="en">
+          Checks message reference uniquenes.
+        </xsd:documentation>
+      </xsd:annotation>
+      <xsd:selector xpath=".//container:reference"/>
+      <xsd:field xpath="@container:name"/>
+    </xsd:unique>
+  </xsd:element>
+  <xsd:complexType name="Messages">
+    <xsd:annotation>
+      <xsd:documentation xml:lang="en">
+        Messages.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexContent>
+      <xsd:extension base="container:ModelObject">
+        <xsd:choice>
+          <xsd:element ref="container:message" minOccurs="0"
+                       maxOccurs="unbounded"/>
+          <xsd:element name="reference" type="container:MessageReference"
+                       minOccurs="0" maxOccurs="unbounded"/>
+        </xsd:choice>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <!--                                                                       -->
+  <!-- Message                                                               -->
+  <!--                                                                       -->
+  <xsd:element name="message" type="container:Message"/>
+  <xsd:complexType name="Message">
+    <xsd:annotation>
+      <xsd:documentation xml:lang="en">
+        Text message.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexContent>
+      <xsd:extension base="container:ModelObject">
+        <xsd:sequence>
+          <xsd:element ref="container:template" minOccurs="0" maxOccurs="1"/>
+          <xsd:element ref="container:arguments" minOccurs="0" maxOccurs="1"/>
+        </xsd:sequence>
+        <xsd:attribute name="name" type="container:Identifier" use="required">
+          <xsd:annotation>
+            <xsd:documentation xml:lang="en">
+              Name of the text message.
+            </xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <!--                                                                       -->
+  <!-- MessageReference                                                      -->
+  <!--                                                                       -->
+  <xsd:complexType name="MessageReference">
+    <xsd:annotation>
+      <xsd:documentation xml:lang="en">
+        Reference to a text message.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexContent>
+      <xsd:extension base="container:ModelObject">
+        <xsd:attribute name="name" type="container:Identifier" use="required">
+          <xsd:annotation>
+            <xsd:documentation xml:lang="en">
+              Name of the referenced message.
+            </xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <!--                                                                       -->
+  <!-- Arguments                                                             -->
+  <!--                                                                       -->
+  <xsd:element name="arguments" type="container:Arguments">
+    <xsd:unique name="argument-name-uniqueness">
+      <xsd:annotation>
+        <xsd:documentation xml:lang="en">
+          Checks argument name uniquenes.
+        </xsd:documentation>
+      </xsd:annotation>
+      <xsd:selector xpath=".//container:argument"/>
+      <xsd:field xpath="@container:name"/>
+    </xsd:unique>
+    <xsd:unique name="argument-index-uniqueness">
+      <xsd:annotation>
+        <xsd:documentation xml:lang="en">
+          Checks argument index uniquenes.
+        </xsd:documentation>
+      </xsd:annotation>
+      <xsd:selector xpath=".//container:argument"/>
+      <xsd:field xpath="@container:index"/>
+    </xsd:unique>
+  </xsd:element>
+  <xsd:complexType name="Arguments">
+    <xsd:annotation>
+      <xsd:documentation xml:lang="en">
+        Arguments.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexContent>
+      <xsd:extension base="container:ModelObject">
+        <xsd:sequence>
+          <xsd:element ref="container:argument" minOccurs="0"
+                       maxOccurs="unbounded"/>
+        </xsd:sequence>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <!--                                                                       -->
+  <!-- Argument                                                              -->
+  <!--                                                                       -->
+  <xsd:element name="argument" type="container:Argument"/>
+  <xsd:complexType name="Argument">
+    <xsd:annotation>
+      <xsd:documentation xml:lang="en">
+        Argument.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexContent>
+      <xsd:extension base="container:ModelObject">
+        <xsd:attribute name="index" type="xsd:integer" use="optional">
+          <xsd:annotation>
+            <xsd:documentation xml:lang="en">
+              Index of the argument.
+            </xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="name" type="container:Identifier" use="required">
+          <xsd:annotation>
+            <xsd:documentation xml:lang="en">
+              Name of the argument.
+            </xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="type" type="container:ArgumentType"
+                       use="required">
+          <xsd:annotation>
+            <xsd:documentation xml:lang="en">
+              Type of the Argument.
+            </xsd:documentation>
+          </xsd:annotation>
+        </xsd:attribute>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <!--                                                                       -->
+  <!-- Simple types.                                                         -->
+  <!--                                                                       -->
+  <xsd:simpleType name="String">
+    <xsd:restriction base="xsd:string"/>
+  </xsd:simpleType>
+  <xsd:simpleType name="Version">
+    <xsd:annotation>
+      <xsd:documentation xml:lang="en"><![CDATA[
+        Restricts "xsd:string" to a maximum length of 100 characters.]]>
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:maxLength value="100"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="Identifier">
+    <xsd:annotation>
+      <xsd:documentation xml:lang="en"><![CDATA[
+        Identifier of an entity,]]>
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:string">
+      <xsd:pattern value="\p{L}.*"/>
+      <xsd:whiteSpace value="collapse"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="PropertyType">
+    <xsd:annotation>
+      <xsd:documentation xml:lang="en"><![CDATA[
+        Enumeration of Java primitive types including theire wrapper types
+        and <code>java.lang.String</code>.]]>
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:NCName">
+      <xsd:enumeration value="byte"/>
+      <xsd:enumeration value="short"/>
+      <xsd:enumeration value="int"/>
+      <xsd:enumeration value="long"/>
+      <xsd:enumeration value="char"/>
+      <xsd:enumeration value="float"/>
+      <xsd:enumeration value="double"/>
+      <xsd:enumeration value="boolean"/>
+      <xsd:enumeration value="java.lang.Byte"/>
+      <xsd:enumeration value="java.lang.Short"/>
+      <xsd:enumeration value="java.lang.Integer"/>
+      <xsd:enumeration value="java.lang.Long"/>
+      <xsd:enumeration value="java.lang.Character"/>
+      <xsd:enumeration value="java.lang.Float"/>
+      <xsd:enumeration value="java.lang.Double"/>
+      <xsd:enumeration value="java.lang.Boolean"/>
+      <xsd:enumeration value="java.lang.String"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="ArgumentType">
+    <xsd:annotation>
+      <xsd:documentation xml:lang="en"><![CDATA[
+        Enumeration argument types.]]>
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:NCName">
+      <xsd:enumeration value="number"/>
+      <xsd:enumeration value="date"/>
+      <xsd:enumeration value="time"/>
+      <xsd:enumeration value="text"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="Multiplicity">
+    <xsd:annotation>
+      <xsd:documentation xml:lang="en">
+        Enumeration of multiplicities.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:NCName">
+      <xsd:enumeration value="one"/>
+      <xsd:enumeration value="many"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+  <xsd:simpleType name="Scope">
+    <xsd:annotation>
+      <xsd:documentation xml:lang="en">
+        Enumeration of scopes.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:restriction base="xsd:NCName">
+      <xsd:enumeration value="multiton"/>
+      <xsd:enumeration value="context"/>
+      <xsd:enumeration value="singleton"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+</xsd:schema>

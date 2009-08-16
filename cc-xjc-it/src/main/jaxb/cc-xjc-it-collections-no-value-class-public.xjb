@@ -1,0 +1,259 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+  Copyright (c) 2009 The CC-XJC Project. All rights reserved.
+
+  Redistribution and use in source and binary forms, with or without
+  modification, are permitted provided that the following conditions
+  are met:
+
+    * Redistributions of source code must retain the above copyright
+      notice, this  list of conditions and the following disclaimer.
+
+    * Redistributions in binary form must reproduce the above copyright
+      notice, this list of conditions and the following disclaimer in
+      the documentation and/or other materials provided with the
+      distribution.
+
+  THIS SOFTWARE IS PROVIDED BY THE CC-XJC PROJECT AND CONTRIBUTORS "AS IS"
+  AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+  THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+  PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE CC-XJC PROJECT OR
+  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+  EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+  PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+  OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+  WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+  OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+  $Id$
+
+-->
+<jaxb:bindings xmlns:xjc="http://java.sun.com/xml/ns/jaxb/xjc"
+               xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+               xmlns:xs="http://www.w3.org/2001/XMLSchema"
+               jaxb:version="2.0">
+
+  <jaxb:globalBindings generateValueClass="false">
+    <jaxb:serializable uid="1"/>
+  </jaxb:globalBindings>
+
+  <jaxb:bindings schemaLocation="../schemas/cc-xjc-it.xsd">
+    <jaxb:schemaBindings>
+      <jaxb:package name="net.sourceforge.ccxjc.it.model.pub.collections.novalueclass.ccxjcit"/>
+    </jaxb:schemaBindings>
+  </jaxb:bindings>
+
+  <jaxb:bindings schemaLocation="../schemas/javaee_5.xsd">
+    <jaxb:schemaBindings>
+      <jaxb:package name="net.sourceforge.ccxjc.it.model.pub.collections.novalueclass.javaee"/>
+    </jaxb:schemaBindings>
+  </jaxb:bindings>
+
+  <jaxb:bindings schemaLocation="../schemas/persistence_1_0.xsd">
+    <jaxb:schemaBindings>
+      <jaxb:package name="net.sourceforge.ccxjc.it.model.pub.collections.novalueclass.persistence"/>
+    </jaxb:schemaBindings>
+  </jaxb:bindings>
+
+  <jaxb:bindings schemaLocation="../schemas/orm_1_0.xsd">
+    <jaxb:schemaBindings>
+      <jaxb:package name="net.sourceforge.ccxjc.it.model.pub.collections.novalueclass.persistence.orm"/>
+    </jaxb:schemaBindings>
+  </jaxb:bindings>
+
+  <jaxb:bindings schemaLocation="../schemas/spring-beans-2.5.xsd">
+    <jaxb:schemaBindings>
+      <jaxb:package name="net.sourceforge.ccxjc.it.model.pub.collections.novalueclass.spring.beans"/>
+    </jaxb:schemaBindings>
+    <jaxb:bindings node="xs:element[@name='constructor-arg']/xs:complexType/xs:attribute[@name='ref']">
+      <jaxb:property name="refShortcut"/>
+    </jaxb:bindings>
+    <jaxb:bindings node="xs:element[@name='constructor-arg']/xs:complexType/xs:attribute[@name='value']">
+      <jaxb:property name="valueShortcut"/>
+    </jaxb:bindings>
+    <jaxb:bindings node="xs:complexType[@name='propertyType']/xs:attribute[@name='ref']">
+      <jaxb:property name="refShortcut"/>
+    </jaxb:bindings>
+    <jaxb:bindings node="xs:complexType[@name='propertyType']/xs:attribute[@name='value']">
+      <jaxb:property name="valueShortcut"/>
+    </jaxb:bindings>
+    <jaxb:bindings node="xs:complexType[@name='entryType']/xs:sequence/xs:element[@ref='key']">
+      <jaxb:property name="keyElement"/>
+    </jaxb:bindings>
+  </jaxb:bindings>
+
+  <jaxb:bindings schemaLocation="../schemas/spring-aop-2.5.xsd">
+    <jaxb:schemaBindings>
+      <jaxb:package name="net.sourceforge.ccxjc.it.model.pub.collections.novalueclass.spring.aop"/>
+    </jaxb:schemaBindings>
+  </jaxb:bindings>
+
+  <jaxb:bindings schemaLocation="../schemas/spring-context-2.5.xsd">
+    <jaxb:schemaBindings>
+      <jaxb:package name="net.sourceforge.ccxjc.it.model.pub.collections.novalueclass.spring.context"/>
+    </jaxb:schemaBindings>
+  </jaxb:bindings>
+
+  <jaxb:bindings schemaLocation="../schemas/spring-jee-2.5.xsd">
+    <jaxb:schemaBindings>
+      <jaxb:package name="net.sourceforge.ccxjc.it.model.pub.collections.novalueclass.spring.jee"/>
+    </jaxb:schemaBindings>
+  </jaxb:bindings>
+
+  <jaxb:bindings schemaLocation="../schemas/spring-jms-2.5.xsd">
+    <jaxb:schemaBindings>
+      <jaxb:package name="net.sourceforge.ccxjc.it.model.pub.collections.novalueclass.spring.jms"/>
+    </jaxb:schemaBindings>
+  </jaxb:bindings>
+
+  <jaxb:bindings schemaLocation="../schemas/spring-lang-2.5.xsd">
+    <jaxb:schemaBindings>
+      <jaxb:package name="net.sourceforge.ccxjc.it.model.pub.collections.novalueclass.spring.lang"/>
+    </jaxb:schemaBindings>
+  </jaxb:bindings>
+
+  <jaxb:bindings schemaLocation="../schemas/spring-osgi.xsd">
+    <jaxb:schemaBindings>
+      <jaxb:package name="net.sourceforge.ccxjc.it.model.pub.collections.novalueclass.spring.osgi"/>
+    </jaxb:schemaBindings>
+  </jaxb:bindings>
+
+  <jaxb:bindings schemaLocation="../schemas/spring-tool-2.5.xsd">
+    <jaxb:schemaBindings>
+      <jaxb:package name="net.sourceforge.ccxjc.it.model.pub.collections.novalueclass.spring.tool"/>
+    </jaxb:schemaBindings>
+  </jaxb:bindings>
+
+  <jaxb:bindings schemaLocation="../schemas/spring-tx-2.5.xsd">
+    <jaxb:schemaBindings>
+      <jaxb:package name="net.sourceforge.ccxjc.it.model.pub.collections.novalueclass.spring.tx"/>
+    </jaxb:schemaBindings>
+  </jaxb:bindings>
+
+  <jaxb:bindings schemaLocation="../schemas/spring-util-2.5.xsd">
+    <jaxb:schemaBindings>
+      <jaxb:package name="net.sourceforge.ccxjc.it.model.pub.collections.novalueclass.spring.util"/>
+    </jaxb:schemaBindings>
+  </jaxb:bindings>
+
+  <jaxb:bindings schemaLocation="../schemas/spring-webflow-config-1.0.xsd">
+    <jaxb:schemaBindings>
+      <jaxb:package name="net.sourceforge.ccxjc.it.model.pub.collections.novalueclass.spring.webflow.config"/>
+    </jaxb:schemaBindings>
+  </jaxb:bindings>
+
+  <!--                                                                       -->
+  <!-- Disabled due to XJC producing code which does not compile.            -->
+  <!--                                                                       -->
+  <jaxb:bindings schemaLocation="../schemas/ebics.xsd">
+    <jaxb:schemaBindings map="false">
+      <jaxb:package name="net.sourceforge.ccxjc.it.model.pub.collections.novalueclass.ebics.h003"/>
+    </jaxb:schemaBindings>
+  </jaxb:bindings>
+
+  <jaxb:bindings schemaLocation="../schemas/ebics_hev.xsd">
+    <jaxb:schemaBindings map="false">
+      <jaxb:package name="net.sourceforge.ccxjc.it.model.pub.collections.novalueclass.ebics.h000"/>
+    </jaxb:schemaBindings>
+  </jaxb:bindings>
+
+  <jaxb:bindings schemaLocation="../schemas/ebics_signature.xsd">
+    <jaxb:schemaBindings map="false">
+      <jaxb:package name="net.sourceforge.ccxjc.it.model.pub.collections.novalueclass.ebics.s001"/>
+    </jaxb:schemaBindings>
+  </jaxb:bindings>
+
+  <jaxb:bindings schemaLocation="../schemas/xmldsig-core-schema.xsd">
+    <jaxb:schemaBindings map="false">
+      <jaxb:package name="net.sourceforge.ccxjc.it.model.pub.collections.novalueclass.xmldsig"/>
+    </jaxb:schemaBindings>
+  </jaxb:bindings>
+  <!--                                                                       -->
+
+  <jaxb:bindings schemaLocation="../schemas/jdtaus-container-1.1.xsd">
+    <jaxb:schemaBindings>
+      <jaxb:package name="net.sourceforge.ccxjc.it.model.pub.collections.novalueclass.jdtaus.container"/>
+    </jaxb:schemaBindings>
+  </jaxb:bindings>
+
+  <jaxb:bindings schemaLocation="../schemas/jomc-1.0.xsd">
+    <jaxb:schemaBindings>
+      <jaxb:package name="net.sourceforge.ccxjc.it.model.pub.collections.novalueclass.jomc"/>
+    </jaxb:schemaBindings>
+  </jaxb:bindings>
+
+  <jaxb:bindings schemaLocation="../schemas/maven-v4_0_0.xsd">
+    <jaxb:schemaBindings>
+      <jaxb:package name="net.sourceforge.ccxjc.it.model.pub.collections.novalueclass.maven.pom400"/>
+    </jaxb:schemaBindings>
+  </jaxb:bindings>
+
+  <jaxb:bindings schemaLocation="../schemas/settings-1.0.0.xsd">
+    <jaxb:schemaBindings>
+      <jaxb:package name="net.sourceforge.ccxjc.it.model.pub.collections.novalueclass.maven.settings100"/>
+    </jaxb:schemaBindings>
+  </jaxb:bindings>
+
+  <jaxb:bindings schemaLocation="../schemas/profiles-1.0.0.xsd">
+    <jaxb:schemaBindings>
+      <jaxb:package name="net.sourceforge.ccxjc.it.model.pub.collections.novalueclass.maven.profiles100"/>
+    </jaxb:schemaBindings>
+  </jaxb:bindings>
+
+  <jaxb:bindings schemaLocation="../schemas/assembly-1.1.1.xsd">
+    <jaxb:schemaBindings>
+      <jaxb:package name="net.sourceforge.ccxjc.it.model.pub.collections.novalueclass.maven.assembly111"/>
+    </jaxb:schemaBindings>
+  </jaxb:bindings>
+
+  <jaxb:bindings schemaLocation="../schemas/changes-1.0.0.xsd">
+    <jaxb:schemaBindings>
+      <jaxb:package name="net.sourceforge.ccxjc.it.model.pub.collections.novalueclass.maven.changes100"/>
+    </jaxb:schemaBindings>
+  </jaxb:bindings>
+
+  <jaxb:bindings schemaLocation="../schemas/decoration-1.0.0.xsd">
+    <jaxb:schemaBindings>
+      <jaxb:package name="net.sourceforge.ccxjc.it.model.pub.collections.novalueclass.maven.decoration100"/>
+    </jaxb:schemaBindings>
+  </jaxb:bindings>
+
+  <jaxb:bindings schemaLocation="../schemas/portlet-app_1_0.xsd">
+    <jaxb:schemaBindings>
+      <jaxb:package name="net.sourceforge.ccxjc.it.model.pub.collections.novalueclass.portlet.app100"/>
+    </jaxb:schemaBindings>
+  </jaxb:bindings>
+
+  <jaxb:bindings schemaLocation="../schemas/portlet-app_2_0.xsd">
+    <jaxb:schemaBindings>
+      <jaxb:package name="net.sourceforge.ccxjc.it.model.pub.collections.novalueclass.portlet.app200"/>
+    </jaxb:schemaBindings>
+  </jaxb:bindings>
+
+  <jaxb:bindings schemaLocation="../schemas/ws-addr.xsd">
+    <jaxb:schemaBindings>
+      <jaxb:package name="net.sourceforge.ccxjc.it.model.pub.collections.novalueclass.wsaddr"/>
+    </jaxb:schemaBindings>
+  </jaxb:bindings>
+
+  <jaxb:bindings schemaLocation="../schemas/wsmc-1.0-schema-200702.xsd">
+    <jaxb:schemaBindings>
+      <jaxb:package name="net.sourceforge.ccxjc.it.model.pub.collections.novalueclass.wsmc"/>
+    </jaxb:schemaBindings>
+  </jaxb:bindings>
+
+  <jaxb:bindings schemaLocation="../schemas/wsrm-1.1-schema-200702.xsd">
+    <jaxb:schemaBindings>
+      <jaxb:package name="net.sourceforge.ccxjc.it.model.pub.collections.novalueclass.wsrm"/>
+    </jaxb:schemaBindings>
+  </jaxb:bindings>
+
+  <jaxb:bindings schemaLocation="../schemas/wsrmp-1.1-schema-200702.xsd">
+    <jaxb:schemaBindings>
+      <jaxb:package name="net.sourceforge.ccxjc.it.model.pub.collections.novalueclass.wsrmp"/>
+    </jaxb:schemaBindings>
+  </jaxb:bindings>
+
+</jaxb:bindings>

@@ -82,5 +82,14 @@
       </action>
     </release>
 
+    <!-- ******************************************************************* -->
+    <release version="1.0-beta-7" date="2009-08-18">
+      <action dev="schulte2005" type="fix">
+      Added support for various property types not supported prior to this
+      version (collectionType=&amp;indexed&amp;,
+      generateValueClass=&amp;false&amp;, etc.).
+      </action>
+    </release>
+
   </body>
 </document>
