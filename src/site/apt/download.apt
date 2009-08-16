@@ -39,10 +39,23 @@ Download
 
 * Releases
 
-  Releases are deployed to the Sourceforge file release system. Please see the
-  {{{https://sourceforge.net/project/showfiles.php?group_id=260900}Sourceforge FRS}}.
-  The {{{http://ccxjc.sourceforge.net/changes-report.html}changes report}}
-  contains information regarding changes between releases.
+  Releases are deployed to the CC-XJC release repository and to the
+  {{{http://sourceforge.net/projects/ccxjc/files/}Sourceforge file release system}}.
+  The {{{http://ccxjc.sourceforge.net/changes-report.html}changes report}} contains
+  information regarding changes between releases.
+
+---
+<repository>
+  <id>http://ccxjc.sourceforge.net/maven2/releases</id>
+  <url>http://ccxjc.sourceforge.net/maven2/releases</url>
+  <releases>
+    <enabled>true</enabled>
+  </releases>
+  <snapshots>
+    <enabled>false</enabled>
+  </snapshots>
+</repository>
+---
 
 * Snapshots
 

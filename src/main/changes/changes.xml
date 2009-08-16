@@ -83,11 +83,32 @@
     </release>
 
     <!-- ******************************************************************* -->
-    <release version="1.0-beta-7" date="2009-08-18">
-      <action dev="schulte2005" type="fix">
+    <release version="1.0-beta-7" date="2009-08-16">
+      <action dev="schulte2005" type="fix"><![CDATA[
       Added support for various property types not supported prior to this
       version (collectionType=&amp;indexed&amp;,
-      generateValueClass=&amp;false&amp;, etc.).
+      generateValueClass=&amp;false&amp;, etc.).]]>
+      </action>
+      <action dev="schulte2005" type="update"><![CDATA[
+      Added <code>-cc-visibility</code> option.]]>
+      </action>
+    </release>
+
+    <!-- ******************************************************************* -->
+    <release version="1.0-beta-8" date="2009-08-18">
+      <action dev="schulte2005" type="fix"><![CDATA[
+      Corrected an <code>IllegalArgumentException</code> thrown by
+      generated <code>copyObject</code> methods.]]>
+      </action>
+      <action dev="schulte2005" type="update"><![CDATA[
+      Removed generated <code>copyOfQName</code> methods and added
+      <code>QName</code> to the list of immutable types.]]>
+      </action>
+      <action dev="schulte2005" type="update"><![CDATA[
+      Added support for <code>@XmlAnyAttribute</code>.]]>
+      </action>
+      <action dev="schulte2005" type="update"><![CDATA[
+      Added <code>-cc-target</code> option.]]>
       </action>
     </release>
 

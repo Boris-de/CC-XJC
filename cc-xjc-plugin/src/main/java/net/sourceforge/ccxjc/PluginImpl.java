@@ -42,6 +42,7 @@ import com.sun.codemodel.JForLoop;
 import com.sun.codemodel.JInvocation;
 import com.sun.codemodel.JMethod;
 import com.sun.codemodel.JMod;
+import com.sun.codemodel.JOp;
 import com.sun.codemodel.JTryBlock;
 import com.sun.codemodel.JType;
 import com.sun.codemodel.JVar;
@@ -78,7 +79,6 @@ import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.Duration;
 import javax.xml.datatype.XMLGregorianCalendar;
-import javax.xml.namespace.QName;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
@@ -110,6 +110,8 @@ public final class PluginImpl extends Plugin
 
     private static final String VISIBILITY_OPTION_NAME = "-cc-visibility";
 
+    private static final String TARGET_OPTION_NAME = "-cc-target";
+
     private static final String[] IMMUTABLE_NAMES =
     {
         "java.lang.Boolean",
@@ -124,7 +126,8 @@ public final class PluginImpl extends Plugin
         "java.lang.String",
         "java.math.BigDecimal",
         "java.math.BigInteger",
-        "java.util.UUID"
+        "java.util.UUID",
+        "javax.xml.namespace.QName"
     };
 
     private static final String[] VISIBILITY_ARGUMENTS =
@@ -132,11 +135,24 @@ public final class PluginImpl extends Plugin
         "private", "package", "protected", "public"
     };
 
+    private static final String[] TARGET_ARGUMENTS =
+    {
+        "1.5", "1.6", "1.7"
+    };
+
+    private static final int TARGET_1_5 = 5;
+
+    private static final int TARGET_1_6 = 6;
+
+    private static final int TARGET_1_7 = 7;
+
     private boolean success;
 
     private Options options;
 
     private String visibility = "package";
+
+    private int target = TARGET_1_5;
 
     private BigInteger methodCount;
 
@@ -160,13 +176,23 @@ public final class PluginImpl extends Plugin
     public int parseArgument( final Options opt, final String[] args, final int i )
         throws BadCommandLineException, IOException
     {
-        final StringBuffer supportedArguments = new StringBuffer().append( '[' );
+        final StringBuffer supportedVisibilities = new StringBuffer().append( '[' );
         for ( Iterator<String> it = Arrays.asList( VISIBILITY_ARGUMENTS ).iterator(); it.hasNext(); )
         {
-            supportedArguments.append( it.next() );
+            supportedVisibilities.append( it.next() );
             if ( it.hasNext() )
             {
-                supportedArguments.append( ", " );
+                supportedVisibilities.append( ", " );
+            }
+        }
+
+        final StringBuffer supportedTargets = new StringBuffer().append( '[' );
+        for ( Iterator<String> it = Arrays.asList( TARGET_ARGUMENTS ).iterator(); it.hasNext(); )
+        {
+            supportedTargets.append( it.next() );
+            if ( it.hasNext() )
+            {
+                supportedTargets.append( ", " );
             }
         }
 
@@ -174,9 +200,9 @@ public final class PluginImpl extends Plugin
         {
             if ( i + 1 >= args.length )
             {
-                throw new BadCommandLineException( this.getMessage( "badVisibilityOption", new Object[]
+                throw new BadCommandLineException( this.getMessage( "badOption", new Object[]
                     {
-                        VISIBILITY_OPTION_NAME, supportedArguments.append( ']' ).toString()
+                        VISIBILITY_OPTION_NAME, supportedVisibilities.append( ']' ).toString()
                     } ) );
 
             }
@@ -195,11 +221,59 @@ public final class PluginImpl extends Plugin
 
             if ( !supported )
             {
-                throw new BadCommandLineException( this.getMessage( "badVisibilityOption", new Object[]
+                throw new BadCommandLineException( this.getMessage( "badOption", new Object[]
                     {
-                        VISIBILITY_OPTION_NAME, supportedArguments.append( ']' ).toString()
+                        VISIBILITY_OPTION_NAME, supportedVisibilities.append( ']' ).toString()
                     } ) );
 
+            }
+
+            return 2;
+        }
+
+        if ( args[i].startsWith( TARGET_OPTION_NAME ) )
+        {
+            if ( i + 1 >= args.length )
+            {
+                throw new BadCommandLineException( this.getMessage( "badOption", new Object[]
+                    {
+                        TARGET_OPTION_NAME, supportedTargets.append( ']' ).toString()
+                    } ) );
+
+            }
+
+            final String targetArg = args[i + 1].trim();
+
+            boolean supported = false;
+            for ( String argument : TARGET_ARGUMENTS )
+            {
+                if ( argument.equals( targetArg ) )
+                {
+                    supported = true;
+                    break;
+                }
+            }
+
+            if ( !supported )
+            {
+                throw new BadCommandLineException( this.getMessage( "badOption", new Object[]
+                    {
+                        TARGET_OPTION_NAME, supportedTargets.append( ']' ).toString()
+                    } ) );
+
+            }
+
+            if ( targetArg.equals( "1.5" ) )
+            {
+                this.target = TARGET_1_5;
+            }
+            else if ( targetArg.equals( "1.6" ) )
+            {
+                this.target = TARGET_1_6;
+            }
+            else if ( targetArg.equals( "1.7" ) )
+            {
+                this.target = TARGET_1_7;
             }
 
             return 2;
@@ -278,6 +352,11 @@ public final class PluginImpl extends Plugin
         }
 
         return JMod.NONE;
+    }
+
+    private boolean isTargetSupported( final int target )
+    {
+        return target <= this.target;
     }
 
     private JMethod getStandardConstructor( final ClassOutline clazz )
@@ -411,7 +490,7 @@ public final class PluginImpl extends Plugin
             {
                 noObjectsField = clazz._package().objectFactory().field(
                     JMod.PRIVATE | JMod.STATIC | JMod.FINAL, Object[].class, NO_OBJECTS_FIELDNAME,
-                    JExpr.newArray( clazz.parent().getCodeModel().ref( Class.class ), 0 ) );
+                    JExpr.newArray( clazz.parent().getCodeModel().ref( Object.class ), 0 ) );
 
             }
         }
@@ -422,7 +501,7 @@ public final class PluginImpl extends Plugin
             {
                 noObjectsField = clazz.implClass.field(
                     JMod.PRIVATE | JMod.STATIC | JMod.FINAL, Object[].class, NO_OBJECTS_FIELDNAME,
-                    JExpr.newArray( clazz.parent().getCodeModel().ref( Class.class ), 0 ) );
+                    JExpr.newArray( clazz.parent().getCodeModel().ref( Object.class ), 0 ) );
 
             }
         }
@@ -477,6 +556,7 @@ public final class PluginImpl extends Plugin
         }
 
         m.body()._return( JExpr.FALSE );
+        this.methodCount = this.methodCount.add( BigInteger.ONE );
         return ( mod != JMod.PRIVATE ? clazz._package().objectFactory().staticInvoke( m ) : JExpr.invoke( m ) );
     }
 
@@ -698,62 +778,6 @@ public final class PluginImpl extends Plugin
         return ( mod != JMod.PRIVATE ? clazz._package().objectFactory().staticInvoke( m ) : JExpr.invoke( m ) );
     }
 
-    private JInvocation getCopyOfQNameInvocation( final ClassOutline clazz )
-    {
-        final JClass qnameClass = clazz.parent().getCodeModel().ref( QName.class );
-        final JType[] signature =
-        {
-            qnameClass
-        };
-
-        final String methodName = "copyOfQName";
-        final int mod = this.getVisibilityModifier();
-
-        if ( mod != JMod.PRIVATE )
-        {
-            for ( JMethod m : clazz._package().objectFactory().methods() )
-            {
-                if ( m.name().equals( methodName ) && m.hasSignature( signature ) )
-                {
-                    return clazz._package().objectFactory().staticInvoke( m );
-                }
-            }
-        }
-        else
-        {
-            for ( JMethod m : clazz.implClass.methods() )
-            {
-                if ( m.name().equals( methodName ) && m.hasSignature( signature ) )
-                {
-                    return JExpr.invoke( m );
-                }
-            }
-        }
-
-        final JMethod m =
-            ( mod != JMod.PRIVATE
-              ? clazz._package().objectFactory().method( JMod.STATIC | mod, QName.class, methodName )
-              : clazz.implClass.method( JMod.STATIC | mod, QName.class, methodName ) );
-
-        final JVar qName = m.param( JMod.FINAL, qnameClass, "qName" );
-
-        m.javadoc().append( "Creates and returns a copy of a given {@code QName} instance." );
-        m.javadoc().addParam( qName ).append( "The instance to copy or {@code null}." );
-        m.javadoc().addReturn().append( "A copy of {@code qName} or {@code null} if {@code qName} is {@code null}." );
-
-        m.body().directStatement( "// " + this.getMessage( "title", null ) );
-
-        final JConditional ifNotNull = m.body()._if( qName.ne( JExpr._null() ) );
-        ifNotNull._then()._return( JExpr._new( qnameClass ).
-            arg( JExpr.invoke( qName, "getNamespaceURI" ) ).
-            arg( JExpr.invoke( qName, "getLocalPart" ) ).
-            arg( JExpr.invoke( qName, "getPrefix" ) ) );
-
-        m.body()._return( JExpr._null() );
-        this.methodCount = this.methodCount.add( BigInteger.ONE );
-        return ( mod != JMod.PRIVATE ? clazz._package().objectFactory().staticInvoke( m ) : JExpr.invoke( m ) );
-    }
-
     private JInvocation getCopyOfXMLGregorianCalendarInvocation( final ClassOutline clazz )
     {
         final JClass xmlGregorianCalendar = clazz.parent().getCodeModel().ref( XMLGregorianCalendar.class );
@@ -880,6 +904,9 @@ public final class PluginImpl extends Plugin
         final JClass noSuchMethod = clazz.parent().getCodeModel().ref( NoSuchMethodException.class );
         final JClass illegalAccess = clazz.parent().getCodeModel().ref( IllegalAccessException.class );
         final JClass invocationTarget = clazz.parent().getCodeModel().ref( InvocationTargetException.class );
+        final JClass securityException = clazz.parent().getCodeModel().ref( SecurityException.class );
+        final JClass illegalArgument = clazz.parent().getCodeModel().ref( IllegalArgumentException.class );
+        final JClass initializerError = clazz.parent().getCodeModel().ref( ExceptionInInitializerError.class );
         final JClass assertionError = clazz.parent().getCodeModel().ref( AssertionError.class );
 
         final String methodName = "copyOfObject";
@@ -946,7 +973,8 @@ public final class PluginImpl extends Plugin
 
         final JTryBlock tryCloneMethod = objectNotNull._then()._try();
         tryCloneMethod.body()._return( JExpr.invoke( JExpr.invoke( JExpr.invoke( o, "getClass" ), "getMethod" ).
-            arg( "clone" ).arg( this.getNoClassesField( clazz ) ), "invoke" ).arg( this.getNoObjectsField( clazz ) ) );
+            arg( "clone" ).arg( this.getNoClassesField( clazz ) ), "invoke" ).arg( o ).
+            arg( this.getNoObjectsField( clazz ) ) );
 
         final JExpression assertionErrorMsg =
             JExpr.lit( "Unexpected instance during copying object '" ).plus( o ).plus( JExpr.lit( "'." ) );
@@ -971,6 +999,27 @@ public final class PluginImpl extends Plugin
 
         catchInvocationTarget.body()._throw( JExpr.cast( assertionError, JExpr._new( assertionError ).
             arg( assertionErrorMsg ).invoke( "initCause" ).arg( catchInvocationTarget.param( "e" ) ) ) );
+
+        final JCatchBlock catchSecurityException = tryCloneMethod._catch( securityException );
+        catchSecurityException.body().directStatement( "// Please report this at " +
+                                                       this.getMessage( "bugtrackerUrl", null ) );
+
+        catchSecurityException.body()._throw( JExpr.cast( assertionError, JExpr._new( assertionError ).
+            arg( assertionErrorMsg ).invoke( "initCause" ).arg( catchSecurityException.param( "e" ) ) ) );
+
+        final JCatchBlock catchIllegalArgument = tryCloneMethod._catch( illegalArgument );
+        catchIllegalArgument.body().directStatement( "// Please report this at " +
+                                                     this.getMessage( "bugtrackerUrl", null ) );
+
+        catchIllegalArgument.body()._throw( JExpr.cast( assertionError, JExpr._new( assertionError ).
+            arg( assertionErrorMsg ).invoke( "initCause" ).arg( catchIllegalArgument.param( "e" ) ) ) );
+
+        final JCatchBlock catchInitializerError = tryCloneMethod._catch( initializerError );
+        catchInitializerError.body().directStatement( "// Please report this at " +
+                                                      this.getMessage( "bugtrackerUrl", null ) );
+
+        catchInitializerError.body()._throw( JExpr.cast( assertionError, JExpr._new( assertionError ).
+            arg( assertionErrorMsg ).invoke( "initCause" ).arg( catchInitializerError.param( "e" ) ) ) );
 
         m.body()._return( JExpr._null() );
         this.methodCount = this.methodCount.add( BigInteger.ONE );
@@ -1028,7 +1077,7 @@ public final class PluginImpl extends Plugin
         return ( mod != JMod.PRIVATE ? clazz._package().objectFactory().staticInvoke( m ) : JExpr.invoke( m ) );
     }
 
-    private JInvocation getCopyOfClassInfoElementInvocation( final ClassOutline clazz, final CTypeInfo type )
+    private JInvocation getCopyOfClassInfoElementInvocation( final ClassOutline clazz, final CNonElement type )
     {
         final JType jaxbElement = clazz.parent().getCodeModel().ref( JAXBElement.class );
         final JType javaType = type.toType( clazz.parent(), Aspect.IMPLEMENTATION );
@@ -1477,8 +1526,18 @@ public final class PluginImpl extends Plugin
         }
         else if ( type == CBuiltinLeafInfo.BASE64_BYTE_ARRAY )
         {
-            final JType byteArray = classOutline.parent().getCodeModel().ref( byte[].class );
-            expr = JExpr.cast( byteArray, this.getCopyOfArrayInvocation( classOutline ).arg( source ) );
+            if ( this.isTargetSupported( TARGET_1_6 ) )
+            {
+                final JClass arrays = classOutline.parent().getCodeModel().ref( Arrays.class );
+                expr = JOp.cond( source.eq( JExpr._null() ), JExpr._null(), arrays.staticInvoke( "copyOf" ).
+                    arg( source ).arg( source.ref( "length" ) ) );
+
+            }
+            else
+            {
+                final JType byteArray = classOutline.parent().getCodeModel().ref( byte[].class );
+                expr = JExpr.cast( byteArray, this.getCopyOfArrayInvocation( classOutline ).arg( source ) );
+            }
         }
         else if ( type == CBuiltinLeafInfo.BIG_DECIMAL || type == CBuiltinLeafInfo.BIG_INTEGER ||
                   type == CBuiltinLeafInfo.STRING || type == CBuiltinLeafInfo.BOOLEAN || type == CBuiltinLeafInfo.INT ||
@@ -1489,7 +1548,7 @@ public final class PluginImpl extends Plugin
         }
         else if ( type == CBuiltinLeafInfo.QNAME )
         {
-            expr = this.getCopyOfQNameInvocation( classOutline ).arg( source );
+            expr = source;
         }
         else if ( type == CBuiltinLeafInfo.CALENDAR )
         {
@@ -1619,9 +1678,18 @@ public final class PluginImpl extends Plugin
                     }
                     else
                     {
-                        paramNotNullBlock.assign( JExpr.refthis( field.name() ), JExpr.cast(
-                            field.type(), this.getCopyOfObjectInvocation( clazz ).arg( o.ref( field ) ) ) );
+                        if ( field.name().equals( "otherAttributes" ) && clazz.target.declaresAttributeWildcard() )
+                        {
+                            paramNotNullBlock.add(
+                                JExpr.refthis( field.name() ).invoke( "putAll" ).arg( o.ref( field ) ) );
 
+                        }
+                        else
+                        {
+                            paramNotNullBlock.assign( JExpr.refthis( field.name() ), JExpr.cast(
+                                field.type(), this.getCopyOfObjectInvocation( clazz ).arg( o.ref( field ) ) ) );
+
+                        }
                     }
                 }
             }

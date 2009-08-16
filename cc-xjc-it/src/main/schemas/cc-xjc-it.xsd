@@ -124,6 +124,7 @@
     <xsd:attribute name="ENTITIES" type="xsd:ENTITIES" use="required"/>
     <xsd:attribute name="NMTOKEN" type="xsd:NMTOKEN" use="required"/>
     <xsd:attribute name="NMTOKENS" type="xsd:NMTOKENS" use="required"/>
+    <xsd:anyAttribute namespace="##other" processContents="lax"/>
   </xsd:complexType>
   <!--                                                                       -->
   <!-- ChoiceComplexType                                                     -->
