@@ -129,6 +129,8 @@
           <configuration>
             <tagBase>https://ccxjc.svn.sourceforge.net/svnroot/ccxjc/tags</tagBase>
             <preparationGoals>clean install</preparationGoals>
+            <useReleaseProfile>false</useReleaseProfile>
+            <releaseProfiles>ccxjc-release</releaseProfiles>
           </configuration>
         </plugin>
         <plugin>
@@ -480,4 +482,37 @@
     <module>cc-xjc-it</module>
     <module>cc-xjc-dist</module>
   </modules>
+  <profiles>
+    <profile>
+      <id>ccxjc-release</id>
+      <activation>
+        <activeByDefault>false</activeByDefault>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <inherited>true</inherited>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-source-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>attach-sources</id>
+                <goals>
+                  <goal>jar</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <inherited>true</inherited>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-deploy-plugin</artifactId>
+            <configuration>
+              <updateReleaseInfo>true</updateReleaseInfo>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
 </project>
