@@ -40,10 +40,7 @@
   <artifactId>cc-xjc-plugin</artifactId>
   <packaging>jar</packaging>
   <name>CC-XJC Plugin</name>
-  <description><![CDATA[
-  JAXB 2.0 Schema to Java compiler plugin for adding a copy constructor to
-  schema derived classes.]]>
-  </description>
+  <description>JAXB 2.0 Schema to Java compiler plugin for adding a copy constructor to schema derived classes.</description>
   <build>
     <resources>
       <resource>
@@ -62,6 +59,39 @@
             <goals>
               <goal>maven-version</goal>
             </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>copy-dependencies</id>
+            <phase>validate</phase>
+            <goals>
+              <goal>copy</goal>
+            </goals>
+            <configuration>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>${pom.groupId}</groupId>
+                  <artifactId>cc-xjc</artifactId>
+                  <version>${pom.version}</version>
+                  <type>xhtml</type>
+                  <outputDirectory>${project.build.outputDirectory}/META-INF</outputDirectory>
+                  <destFileName>README.xhtml</destFileName>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>${pom.groupId}</groupId>
+                  <artifactId>cc-xjc</artifactId>
+                  <version>${pom.version}</version>
+                  <type>lic</type>
+                  <outputDirectory>${project.build.outputDirectory}/META-INF</outputDirectory>
+                  <destFileName>LICENSE.txt</destFileName>
+                </artifactItem>
+              </artifactItems>
+            </configuration>
           </execution>
         </executions>
       </plugin>

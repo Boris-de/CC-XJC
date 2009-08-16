@@ -54,7 +54,6 @@
               <goal>copy</goal>
             </goals>
             <configuration>
-              <outputDirectory>${project.build.directory}/artifacts</outputDirectory>
               <artifactItems>
                 <artifactItem>
                   <groupId>${pom.groupId}</groupId>
