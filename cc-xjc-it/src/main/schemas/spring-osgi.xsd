@@ -9,9 +9,12 @@
         attributeFormDefault="unqualified"
         version="1.2">
 
-	<xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
-    <xsd:import namespace="http://www.springframework.org/schema/beans"/>
-    <xsd:import namespace="http://www.springframework.org/schema/tool"/>
+	<xsd:import namespace="http://www.w3.org/XML/1998/namespace"
+                schemaLocation="xml.xsd"/>
+    <xsd:import namespace="http://www.springframework.org/schema/beans"
+                schemaLocation="spring-beans-2.5.xsd"/>
+    <xsd:import namespace="http://www.springframework.org/schema/tool"
+                schemaLocation="spring-tool-2.5.xsd"/>
 
     <xsd:annotation>
         <xsd:documentation><![CDATA[

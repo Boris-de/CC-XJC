@@ -18,7 +18,8 @@ Provides an easy way to configure a flow executor and an XML flow definition reg
 		</xsd:documentation>
 	</xsd:annotation>
 
-	<xsd:import namespace="http://www.springframework.org/schema/beans"/>
+	<xsd:import namespace="http://www.springframework.org/schema/beans"
+                schemaLocation="spring-beans-2.5.xsd"/>
 
 	<xsd:element name="registry">
 		<xsd:annotation>
