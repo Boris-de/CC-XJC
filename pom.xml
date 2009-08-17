@@ -254,6 +254,11 @@
               <artifactId>cc-xjc-plugin</artifactId>
               <version>${pom.version}</version>
             </dependency>
+            <dependency>
+              <groupId>org.jvnet.jaxb2_commons</groupId>
+              <artifactId>basic</artifactId>
+              <version>0.4.1.5</version>
+            </dependency>
           </dependencies>
         </plugin>
         <plugin>
@@ -398,6 +403,11 @@
         <groupId>com.sun.xml.bind</groupId>
         <artifactId>jaxb-xjc</artifactId>
         <version>${jaxbImplVersion}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.jvnet.jaxb2_commons</groupId>
+        <artifactId>basic</artifactId>
+        <version>0.4.1.5</version>
       </dependency>
       <dependency>
         <groupId>commons-lang</groupId>

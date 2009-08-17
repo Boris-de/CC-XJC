@@ -32,7 +32,6 @@ package net.sourceforge.ccxjc;
 import com.sun.codemodel.JBlock;
 import com.sun.codemodel.JCatchBlock;
 import com.sun.codemodel.JClass;
-import com.sun.codemodel.JCodeModel;
 import com.sun.codemodel.JConditional;
 import com.sun.codemodel.JDefinedClass;
 import com.sun.codemodel.JExpr;
@@ -75,17 +74,7 @@ import java.util.List;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import javax.xml.bind.JAXBElement;
-import javax.xml.datatype.DatatypeConfigurationException;
-import javax.xml.datatype.DatatypeFactory;
-import javax.xml.datatype.Duration;
 import javax.xml.datatype.XMLGregorianCalendar;
-import javax.xml.transform.TransformerConfigurationException;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.TransformerFactoryConfigurationError;
-import javax.xml.transform.dom.DOMResult;
-import javax.xml.transform.dom.DOMSource;
-import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.ErrorHandler;
 
@@ -101,10 +90,6 @@ public final class PluginImpl extends Plugin
     private static final JType[] NO_ARGS = new JType[ 0 ];
 
     private static final String MESSAGE_PREFIX = "CC-XJC";
-
-    private static final String NO_CLASSES_FIELDNAME = "CCXJC_NO_CLASSES";
-
-    private static final String NO_OBJECTS_FIELDNAME = "CCXJC_NO_OBJECTS";
 
     private static final String OPTION_NAME = "copy-constructor";
 
@@ -127,7 +112,8 @@ public final class PluginImpl extends Plugin
         "java.math.BigDecimal",
         "java.math.BigInteger",
         "java.util.UUID",
-        "javax.xml.namespace.QName"
+        "javax.xml.namespace.QName",
+        "javax.xml.datatype.Duration"
     };
 
     private static final String[] VISIBILITY_ARGUMENTS =
@@ -152,7 +138,7 @@ public final class PluginImpl extends Plugin
 
     private String visibility = "package";
 
-    private int target = TARGET_1_5;
+    private int targetJdk = TARGET_1_5;
 
     private BigInteger methodCount;
 
@@ -265,15 +251,15 @@ public final class PluginImpl extends Plugin
 
             if ( targetArg.equals( "1.5" ) )
             {
-                this.target = TARGET_1_5;
+                this.targetJdk = TARGET_1_5;
             }
             else if ( targetArg.equals( "1.6" ) )
             {
-                this.target = TARGET_1_6;
+                this.targetJdk = TARGET_1_6;
             }
             else if ( targetArg.equals( "1.7" ) )
             {
-                this.target = TARGET_1_7;
+                this.targetJdk = TARGET_1_7;
             }
 
             return 2;
@@ -356,7 +342,7 @@ public final class PluginImpl extends Plugin
 
     private boolean isTargetSupported( final int target )
     {
-        return target <= this.target;
+        return target <= this.targetJdk;
     }
 
     private JMethod getStandardConstructor( final ClassOutline clazz )
@@ -445,68 +431,6 @@ public final class PluginImpl extends Plugin
         }
 
         return null;
-    }
-
-    private JFieldVar getNoClassesField( final ClassOutline clazz )
-    {
-        JFieldVar noClassesField;
-        final int mod = this.getVisibilityModifier();
-
-        if ( mod != JMod.PRIVATE )
-        {
-            noClassesField = clazz._package().objectFactory().fields().get( NO_CLASSES_FIELDNAME );
-            if ( noClassesField == null )
-            {
-                noClassesField = clazz._package().objectFactory().field(
-                    JMod.PRIVATE | JMod.STATIC | JMod.FINAL, Class[].class, NO_CLASSES_FIELDNAME,
-                    JExpr.newArray( clazz.parent().getCodeModel().ref( Class.class ), 0 ) );
-
-            }
-        }
-        else
-        {
-            noClassesField = clazz.implClass.fields().get( NO_CLASSES_FIELDNAME );
-            if ( noClassesField == null )
-            {
-                noClassesField = clazz.implClass.field(
-                    JMod.PRIVATE | JMod.STATIC | JMod.FINAL, Class[].class, NO_CLASSES_FIELDNAME,
-                    JExpr.newArray( clazz.parent().getCodeModel().ref( Class.class ), 0 ) );
-
-            }
-        }
-
-        return noClassesField;
-    }
-
-    private JFieldVar getNoObjectsField( final ClassOutline clazz )
-    {
-        JFieldVar noObjectsField;
-        final int mod = this.getVisibilityModifier();
-
-        if ( mod != JMod.PRIVATE )
-        {
-            noObjectsField = clazz._package().objectFactory().fields().get( NO_OBJECTS_FIELDNAME );
-            if ( noObjectsField == null )
-            {
-                noObjectsField = clazz._package().objectFactory().field(
-                    JMod.PRIVATE | JMod.STATIC | JMod.FINAL, Object[].class, NO_OBJECTS_FIELDNAME,
-                    JExpr.newArray( clazz.parent().getCodeModel().ref( Object.class ), 0 ) );
-
-            }
-        }
-        else
-        {
-            noObjectsField = clazz.implClass.fields().get( NO_OBJECTS_FIELDNAME );
-            if ( noObjectsField == null )
-            {
-                noObjectsField = clazz.implClass.field(
-                    JMod.PRIVATE | JMod.STATIC | JMod.FINAL, Object[].class, NO_OBJECTS_FIELDNAME,
-                    JExpr.newArray( clazz.parent().getCodeModel().ref( Object.class ), 0 ) );
-
-            }
-        }
-
-        return noObjectsField;
     }
 
     private JInvocation getIsImmutableObjectInvocation( final ClassOutline clazz )
@@ -624,213 +548,6 @@ public final class PluginImpl extends Plugin
         return ( mod != JMod.PRIVATE ? clazz._package().objectFactory().staticInvoke( m ) : JExpr.invoke( m ) );
     }
 
-    private JInvocation getCopyOfDomElementInvocation( final ClassOutline clazz )
-    {
-        final JCodeModel codeModel = clazz.parent().getCodeModel();
-        final JClass elementClass = codeModel.ref( Element.class );
-        final JClass transformerFactory = codeModel.ref( TransformerFactory.class );
-        final JClass transformerFactoryConfError = codeModel.ref( TransformerFactoryConfigurationError.class );
-        final JClass transformerConfException = codeModel.ref( TransformerConfigurationException.class );
-        final JClass transformerException = codeModel.ref( TransformerException.class );
-        final JClass domSource = codeModel.ref( DOMSource.class );
-        final JClass domResult = codeModel.ref( DOMResult.class );
-        final JClass document = codeModel.ref( Document.class );
-        final JClass assertionError = clazz.parent().getCodeModel().ref( AssertionError.class );
-        final JType[] signature =
-        {
-            elementClass
-        };
-
-        final String methodName = "copyOfDOMElement";
-        final int mod = this.getVisibilityModifier();
-
-        if ( mod != JMod.PRIVATE )
-        {
-            for ( JMethod m : clazz._package().objectFactory().methods() )
-            {
-                if ( m.name().equals( methodName ) && m.hasSignature( signature ) )
-                {
-                    return clazz._package().objectFactory().staticInvoke( m );
-                }
-            }
-        }
-        else
-        {
-            for ( JMethod m : clazz.implClass.methods() )
-            {
-                if ( m.name().equals( methodName ) && m.hasSignature( signature ) )
-                {
-                    return JExpr.invoke( m );
-                }
-            }
-        }
-
-        final JMethod m =
-            ( mod != JMod.PRIVATE
-              ? clazz._package().objectFactory().method( JMod.STATIC | mod, elementClass, methodName )
-              : clazz.implClass.method( JMod.STATIC | mod, elementClass, methodName ) );
-
-        final JVar element = m.param( JMod.FINAL, elementClass, "element" );
-
-        m.javadoc().append( "Creates and returns a copy of a given DOM {@code Element} instance." );
-        m.javadoc().addParam( element ).append( "The instance to copy or {@code null}." );
-        m.javadoc().addReturn().append(
-            "A copy of {@code element} or {@code null} if {@code element} is {@code null}." );
-
-        m.body().directStatement( "// " + this.getMessage( "title", null ) );
-
-        final JConditional ifNotNull = m.body()._if( element.ne( JExpr._null() ) );
-        final JTryBlock tryTransform = ifNotNull._then()._try();
-
-        final JVar domSrc = tryTransform.body().decl( JMod.FINAL, domSource, "domSource",
-                                                      JExpr._new( domSource ).arg( element ) );
-
-        final JVar domRes = tryTransform.body().decl( JMod.FINAL, domResult, "domResult",
-                                                      JExpr._new( domResult ) );
-
-        tryTransform.body().add( JExpr.invoke( JExpr.invoke(
-            transformerFactory.staticInvoke( "newInstance" ), "newTransformer" ), "transform" ).
-            arg( domSrc ).arg( domRes ) );
-
-        tryTransform.body()._return( JExpr.invoke( JExpr.cast( document, JExpr.invoke(
-            domRes, "getNode" ) ), "getDocumentElement" ) );
-
-        final JCatchBlock catchTransformerFactoryConfError = tryTransform._catch( transformerFactoryConfError );
-        catchTransformerFactoryConfError.body()._throw( JExpr._new( assertionError ).arg(
-            catchTransformerFactoryConfError.param( "e" ) ) );
-
-        final JCatchBlock catchTransformerConfException = tryTransform._catch( transformerConfException );
-        catchTransformerConfException.body()._throw( JExpr._new( assertionError ).arg(
-            catchTransformerConfException.param( "e" ) ) );
-
-        final JCatchBlock catchTransformerException = tryTransform._catch( transformerException );
-        catchTransformerException.body()._throw( JExpr._new( assertionError ).arg(
-            catchTransformerException.param( "e" ) ) );
-
-        m.body()._return( JExpr._null() );
-        this.methodCount = this.methodCount.add( BigInteger.ONE );
-        return ( mod != JMod.PRIVATE ? clazz._package().objectFactory().staticInvoke( m ) : JExpr.invoke( m ) );
-    }
-
-    private JInvocation getCopyOfDurationInvocation( final ClassOutline clazz )
-    {
-        final JClass durationClass = clazz.parent().getCodeModel().ref( Duration.class );
-        final JClass datatypeFactory = clazz.parent().getCodeModel().ref( DatatypeFactory.class );
-        final JClass assertionError = clazz.parent().getCodeModel().ref( AssertionError.class );
-        final JClass datatypeConfigurationException =
-            clazz.parent().getCodeModel().ref( DatatypeConfigurationException.class );
-
-        final JType[] signature =
-        {
-            durationClass
-        };
-
-        final String methodName = "copyOfDuration";
-        final int mod = this.getVisibilityModifier();
-
-        if ( mod != JMod.PRIVATE )
-        {
-            for ( JMethod m : clazz._package().objectFactory().methods() )
-            {
-                if ( m.name().equals( methodName ) && m.hasSignature( signature ) )
-                {
-                    return clazz._package().objectFactory().staticInvoke( m );
-                }
-            }
-        }
-        else
-        {
-            for ( JMethod m : clazz.implClass.methods() )
-            {
-                if ( m.name().equals( methodName ) && m.hasSignature( signature ) )
-                {
-                    return JExpr.invoke( m );
-                }
-            }
-        }
-
-        final JMethod m =
-            ( mod != JMod.PRIVATE
-              ? clazz._package().objectFactory().method( JMod.STATIC | mod, Duration.class, methodName )
-              : clazz.implClass.method( JMod.STATIC | mod, Duration.class, methodName ) );
-
-        final JVar duration = m.param( JMod.FINAL, durationClass, "duration" );
-
-        m.javadoc().append( "Creates and returns a copy of a given {@code Duration} instance." );
-        m.javadoc().addParam( duration ).append( "The instance to copy to {@code null}." );
-        m.javadoc().addReturn().append(
-            "A copy of {@code duration} or {@code null} if {@code duration} is {@code null}." );
-
-        m.body().directStatement( "// " + this.getMessage( "title", null ) );
-
-        final JConditional ifNotNull = m.body()._if( duration.ne( JExpr._null() ) );
-        final JTryBlock tryCopyDuration = ifNotNull._then()._try();
-
-        tryCopyDuration.body()._return( JExpr.invoke( datatypeFactory.staticInvoke( "newInstance" ), "newDuration" ).
-            arg( JExpr.invoke( duration, "toString" ) ) );
-
-        final JCatchBlock catchDatatypeConfiguration = tryCopyDuration._catch( datatypeConfigurationException );
-        catchDatatypeConfiguration.body()._throw( JExpr._new( assertionError ).arg(
-            catchDatatypeConfiguration.param( "e" ) ) );
-
-        m.body()._return( JExpr._null() );
-        this.methodCount = this.methodCount.add( BigInteger.ONE );
-        return ( mod != JMod.PRIVATE ? clazz._package().objectFactory().staticInvoke( m ) : JExpr.invoke( m ) );
-    }
-
-    private JInvocation getCopyOfXMLGregorianCalendarInvocation( final ClassOutline clazz )
-    {
-        final JClass xmlGregorianCalendar = clazz.parent().getCodeModel().ref( XMLGregorianCalendar.class );
-        final JType[] signature =
-        {
-            xmlGregorianCalendar
-        };
-
-        final String methodName = "copyOfXMLGregorianCalendar";
-        final int mod = this.getVisibilityModifier();
-
-        if ( mod != JMod.PRIVATE )
-        {
-            for ( JMethod m : clazz._package().objectFactory().methods() )
-            {
-                if ( m.name().equals( methodName ) && m.hasSignature( signature ) )
-                {
-                    return clazz._package().objectFactory().staticInvoke( m );
-                }
-            }
-        }
-        else
-        {
-            for ( JMethod m : clazz.implClass.methods() )
-            {
-                if ( m.name().equals( methodName ) && m.hasSignature( signature ) )
-                {
-                    return JExpr.invoke( m );
-                }
-            }
-        }
-
-        final JMethod m =
-            ( mod != JMod.PRIVATE
-              ? clazz._package().objectFactory().method( JMod.STATIC | mod, XMLGregorianCalendar.class, methodName )
-              : clazz.implClass.method( JMod.STATIC | mod, XMLGregorianCalendar.class, methodName ) );
-
-        final JVar cal = m.param( JMod.FINAL, xmlGregorianCalendar, "calendar" );
-
-        m.javadoc().append( "Creates and returns a copy of a given {@code XMLGregorianCalendar} instance." );
-        m.javadoc().addParam( cal ).append( "The instance to copy or {@code null}." );
-        m.javadoc().addReturn().append(
-            "A copy of {@code calendar} or {@code null} if {@code calendar} is {@code null}." );
-
-        m.body().directStatement( "// " + this.getMessage( "title", null ) );
-
-        final JConditional ifNotNull = m.body()._if( cal.ne( JExpr._null() ) );
-        ifNotNull._then()._return( JExpr.cast( xmlGregorianCalendar, cal.invoke( "clone" ) ) );
-        m.body()._return( JExpr._null() );
-        this.methodCount = this.methodCount.add( BigInteger.ONE );
-        return ( mod != JMod.PRIVATE ? clazz._package().objectFactory().staticInvoke( m ) : JExpr.invoke( m ) );
-    }
-
     private JInvocation getCopyOfArrayInvocation( final ClassOutline clazz )
     {
         final JClass object = clazz.parent().getCodeModel().ref( Object.class );
@@ -888,7 +605,8 @@ public final class PluginImpl extends Plugin
         forEachRef.test( i.gte( JExpr.lit( 0 ) ) );
         forEachRef.update( i.decr() );
         forEachRef.body().add( array.staticInvoke( "set" ).arg( copy ).arg( i ).
-            arg( array.staticInvoke( "get" ).arg( arrayArg ).arg( i ) ) );
+            arg( this.getCopyOfObjectInvocation( clazz ).arg( array.staticInvoke( "get" ).
+            arg( arrayArg ).arg( i ) ) ) );
 
         arrayNotNull._then()._return( copy );
         m.body()._return( JExpr._null() );
@@ -908,6 +626,8 @@ public final class PluginImpl extends Plugin
         final JClass illegalArgument = clazz.parent().getCodeModel().ref( IllegalArgumentException.class );
         final JClass initializerError = clazz.parent().getCodeModel().ref( ExceptionInInitializerError.class );
         final JClass assertionError = clazz.parent().getCodeModel().ref( AssertionError.class );
+        final JClass classArray = clazz.parent().getCodeModel().ref( Class[].class );
+        final JClass objectArray = clazz.parent().getCodeModel().ref( Object[].class );
 
         final String methodName = "copyOfObject";
         final int mod = this.getVisibilityModifier();
@@ -964,8 +684,8 @@ public final class PluginImpl extends Plugin
         isImmutable._then()._return( o );
 
         final JConditional instanceOfDOMElement = objectNotNull._then()._if( o._instanceof( element ) );
-        instanceOfDOMElement._then()._return( this.getCopyOfDomElementInvocation( clazz ).
-            arg( JExpr.cast( element, o ) ) );
+        instanceOfDOMElement._then()._return( JExpr.cast( element, JExpr.invoke(
+            JExpr.cast( element, o ), "cloneNode" ).arg( JExpr.TRUE ) ) );
 
         final JConditional instanceOfElement = objectNotNull._then()._if( o._instanceof( jaxbElement ) );
         instanceOfElement._then()._return( this.getCopyOfJaxbElementInvocation( clazz ).
@@ -973,8 +693,8 @@ public final class PluginImpl extends Plugin
 
         final JTryBlock tryCloneMethod = objectNotNull._then()._try();
         tryCloneMethod.body()._return( JExpr.invoke( JExpr.invoke( JExpr.invoke( o, "getClass" ), "getMethod" ).
-            arg( "clone" ).arg( this.getNoClassesField( clazz ) ), "invoke" ).arg( o ).
-            arg( this.getNoObjectsField( clazz ) ) );
+            arg( "clone" ).arg( JExpr.cast( classArray, JExpr._null() ) ), "invoke" ).arg( o ).
+            arg( JExpr.cast( objectArray, JExpr._null() ) ) );
 
         final JExpression assertionErrorMsg =
             JExpr.lit( "Unexpected instance during copying object '" ).plus( o ).plus( JExpr.lit( "'." ) );
@@ -1021,57 +741,6 @@ public final class PluginImpl extends Plugin
         catchInitializerError.body()._throw( JExpr.cast( assertionError, JExpr._new( assertionError ).
             arg( assertionErrorMsg ).invoke( "initCause" ).arg( catchInitializerError.param( "e" ) ) ) );
 
-        m.body()._return( JExpr._null() );
-        this.methodCount = this.methodCount.add( BigInteger.ONE );
-        return ( mod != JMod.PRIVATE ? clazz._package().objectFactory().staticInvoke( m ) : JExpr.invoke( m ) );
-    }
-
-    private JInvocation getCopyOfClassInfoInvocation( final ClassOutline clazz, final CTypeInfo type )
-    {
-        final JType javaType = type.toType( clazz.parent(), Aspect.IMPLEMENTATION );
-        final JType[] signature =
-        {
-            javaType
-        };
-
-        final String methodName = "copyOf" + this.getMethodNamePart( javaType );
-        final int mod = this.getVisibilityModifier();
-
-        if ( mod != JMod.PRIVATE )
-        {
-            for ( JMethod m : clazz._package().objectFactory().methods() )
-            {
-                if ( m.name().equals( methodName ) && m.hasSignature( signature ) )
-                {
-                    return clazz._package().objectFactory().staticInvoke( m );
-                }
-            }
-        }
-        else
-        {
-            for ( JMethod m : clazz.implClass.methods() )
-            {
-                if ( m.name().equals( methodName ) && m.hasSignature( signature ) )
-                {
-                    return JExpr.invoke( m );
-                }
-            }
-        }
-
-        final JMethod m =
-            ( mod != JMod.PRIVATE
-              ? clazz._package().objectFactory().method( JMod.STATIC | mod, javaType, methodName )
-              : clazz.implClass.method( JMod.STATIC | mod, javaType, methodName ) );
-
-        final JVar param = m.param( JMod.FINAL, javaType, "clazz" );
-
-        m.javadoc().append( "Creates and returns a copy of a given {@code " + javaType.binaryName() + "} instance." );
-        m.javadoc().addParam( param ).append( "The instance to copy or {@code null}." );
-        m.javadoc().addReturn().append( "A copy of {@code clazz} or {@code null} if {@code clazz} is {@code null}." );
-
-        m.body().directStatement( "// " + this.getMessage( "title", null ) );
-
-        m.body()._if( param.ne( JExpr._null() ) )._then()._return( JExpr.invoke( param, "clone" ) );
         m.body()._return( JExpr._null() );
         this.methodCount = this.methodCount.add( BigInteger.ONE );
         return ( mod != JMod.PRIVATE ? clazz._package().objectFactory().staticInvoke( m ) : JExpr.invoke( m ) );
@@ -1535,8 +1204,69 @@ public final class PluginImpl extends Plugin
             }
             else
             {
-                final JType byteArray = classOutline.parent().getCodeModel().ref( byte[].class );
-                expr = JExpr.cast( byteArray, this.getCopyOfArrayInvocation( classOutline ).arg( source ) );
+                final JClass byteArray = classOutline.parent().getCodeModel().ref( byte[].class );
+                final JClass array = classOutline.parent().getCodeModel().ref( Array.class );
+                final JClass system = classOutline.parent().getCodeModel().ref( System.class );
+
+                final JType[] signature =
+                {
+                    byteArray
+                };
+
+                final String methodName = "copyOfBytes";
+                final int mod = this.getVisibilityModifier();
+
+                if ( mod != JMod.PRIVATE )
+                {
+                    for ( JMethod m : classOutline._package().objectFactory().methods() )
+                    {
+                        if ( m.name().equals( methodName ) && m.hasSignature( signature ) )
+                        {
+                            return classOutline._package().objectFactory().staticInvoke( m ).arg( source );
+                        }
+                    }
+                }
+                else
+                {
+                    for ( JMethod m : classOutline.implClass.methods() )
+                    {
+                        if ( m.name().equals( methodName ) && m.hasSignature( signature ) )
+                        {
+                            return JExpr.invoke( m ).arg( source );
+                        }
+                    }
+                }
+
+                final JMethod m =
+                    ( mod != JMod.PRIVATE
+                      ? classOutline._package().objectFactory().method( JMod.STATIC | mod, byteArray, methodName )
+                      : classOutline.implClass.method( JMod.STATIC | mod, byteArray, methodName ) );
+
+                final JVar bytes = m.param( JMod.FINAL, byteArray, "bytes" );
+
+                m.javadoc().append( "Creates and returns a copy of a given array of bytes." );
+                m.javadoc().addParam( bytes ).append( "The array to copy or {@code null}." );
+                m.javadoc().addReturn().append(
+                    "A copy of {@code bytes} or {@code null} if {@code bytes} is {@code null}." );
+
+                m.body().directStatement( "// " + this.getMessage( "title", null ) );
+
+                final JConditional bytesNotNull = m.body()._if( bytes.ne( JExpr._null() ) );
+                final JVar copy = bytesNotNull._then().decl(
+                    JMod.FINAL, byteArray, "copy", JExpr.cast( byteArray, array.staticInvoke( "newInstance" ).arg(
+                    bytes.invoke( "getClass" ).invoke( "getComponentType" ) ).arg( bytes.ref( "length" ) ) ) );
+
+                bytesNotNull._then().add( system.staticInvoke( "arraycopy" ).arg( bytes ).arg( JExpr.lit( 0 ) ).
+                    arg( copy ).arg( JExpr.lit( 0 ) ).arg( bytes.ref( "length" ) ) );
+
+                bytesNotNull._then()._return( copy );
+
+                m.body()._return( JExpr._null() );
+                this.methodCount = this.methodCount.add( BigInteger.ONE );
+                expr = ( mod != JMod.PRIVATE
+                         ? classOutline._package().objectFactory().staticInvoke( m ).arg( source )
+                         : JExpr.invoke( m ).arg( source ) );
+
             }
         }
         else if ( type == CBuiltinLeafInfo.BIG_DECIMAL || type == CBuiltinLeafInfo.BIG_INTEGER ||
@@ -1552,11 +1282,14 @@ public final class PluginImpl extends Plugin
         }
         else if ( type == CBuiltinLeafInfo.CALENDAR )
         {
-            expr = this.getCopyOfXMLGregorianCalendarInvocation( classOutline ).arg( source );
+            final JClass xmlCal = classOutline.parent().getCodeModel().ref( XMLGregorianCalendar.class );
+            expr = JOp.cond( source.eq( JExpr._null() ), JExpr._null(),
+                             JExpr.cast( xmlCal, source.invoke( "clone" ) ) );
+
         }
         else if ( type == CBuiltinLeafInfo.DURATION )
         {
-            expr = this.getCopyOfDurationInvocation( classOutline ).arg( source );
+            expr = source;
         }
         else if ( type == CBuiltinLeafInfo.DATA_HANDLER || type == CBuiltinLeafInfo.IMAGE ||
                   type == CBuiltinLeafInfo.XML_SOURCE )
@@ -1573,7 +1306,10 @@ public final class PluginImpl extends Plugin
         block.directStatement( "// CWildcardTypeInfo: " +
                                type.toType( classOutline.parent(), Aspect.IMPLEMENTATION ).binaryName() );
 
-        return this.getCopyOfDomElementInvocation( classOutline ).arg( source );
+        return JOp.cond( source.eq( JExpr._null() ), JExpr._null(),
+                         JExpr.cast( classOutline.parent().getCodeModel().ref( Element.class ),
+                                     source.invoke( "cloneNode" ).arg( JExpr.TRUE ) ) );
+
     }
 
     private JExpression getClassInfoCopyExpression( final ClassOutline classOutline, final CClassInfo type,
@@ -1582,7 +1318,7 @@ public final class PluginImpl extends Plugin
         block.directStatement(
             "// CClassInfo: " + type.toType( classOutline.parent(), Aspect.IMPLEMENTATION ).binaryName() );
 
-        return this.getCopyOfClassInfoInvocation( classOutline, type ).arg( source );
+        return JOp.cond( source.eq( JExpr._null() ), JExpr._null(), source.invoke( "clone" ) );
     }
 
     private JExpression getNonElementCopyExpression( final ClassOutline classOutline, final CNonElement type,

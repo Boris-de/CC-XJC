@@ -300,6 +300,17 @@ public class SimpleTypeAttributesCollectionsTest
         start = System.currentTimeMillis();
         for ( int i = runs; i >= 0; i-- )
         {
+            this.assertTestSimpleTypeAttributes( (SimpleTypeAttributes) a.copyTo( null ) );
+        }
+        final long jaxbMillis = System.currentTimeMillis() - start;
+
+        System.gc();
+        System.gc();
+        System.gc();
+
+        start = System.currentTimeMillis();
+        for ( int i = runs; i >= 0; i-- )
+        {
             this.assertTestSimpleTypeAttributes( new SimpleTypeAttributes( a ) );
         }
         final long copyMillis = System.currentTimeMillis() - start;
@@ -310,6 +321,9 @@ public class SimpleTypeAttributesCollectionsTest
 
         System.out.println( "Creating " + runs + " copies using serialization took " + serializableMillis +
                             "ms. (100%)" );
+
+        System.out.println( "Creating " + runs + " copies using jaxb2_commons took " + jaxbMillis + "ms. (" +
+                            ( 100L * jaxbMillis / serializableMillis ) + "%)" );
 
         System.out.println( "Creating " + runs + " copies using copy constructor took " + copyMillis + "ms. (" +
                             ( 100L * copyMillis / serializableMillis ) + "%)" );

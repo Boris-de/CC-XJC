@@ -105,6 +105,10 @@
                 <arg>-copy-constructor</arg>
                 <arg>-cc-visibility</arg>
                 <arg>private</arg>
+                <arg>-XtoString</arg>
+                <arg>-Xequals</arg>
+                <arg>-XhashCode</arg>
+                <arg>-Xcopyable</arg>
               </args>
               <schemaDirectory>src/main/schemas</schemaDirectory>
               <bindingDirectory>src/main/jaxb</bindingDirectory>
@@ -127,6 +131,10 @@
                 <arg>-copy-constructor</arg>
                 <arg>-cc-visibility</arg>
                 <arg>private</arg>
+                <arg>-XtoString</arg>
+                <arg>-Xequals</arg>
+                <arg>-XhashCode</arg>
+                <arg>-Xcopyable</arg>
               </args>
               <schemaDirectory>src/main/schemas</schemaDirectory>
               <bindingDirectory>src/main/jaxb</bindingDirectory>
@@ -149,6 +157,10 @@
                 <arg>-copy-constructor</arg>
                 <arg>-cc-visibility</arg>
                 <arg>private</arg>
+                <arg>-XtoString</arg>
+                <arg>-Xequals</arg>
+                <arg>-XhashCode</arg>
+                <arg>-Xcopyable</arg>
               </args>
               <schemaDirectory>src/main/schemas</schemaDirectory>
               <bindingDirectory>src/main/jaxb</bindingDirectory>
@@ -171,6 +183,10 @@
                 <arg>-copy-constructor</arg>
                 <arg>-cc-visibility</arg>
                 <arg>private</arg>
+                <arg>-XtoString</arg>
+                <arg>-Xequals</arg>
+                <arg>-XhashCode</arg>
+                <arg>-Xcopyable</arg>
               </args>
               <schemaDirectory>src/main/schemas</schemaDirectory>
               <bindingDirectory>src/main/jaxb</bindingDirectory>
@@ -192,6 +208,10 @@
             <configuration>
               <args>
                 <arg>-copy-constructor</arg>
+                <arg>-XtoString</arg>
+                <arg>-Xequals</arg>
+                <arg>-XhashCode</arg>
+                <arg>-Xcopyable</arg>
               </args>
               <schemaDirectory>src/main/schemas</schemaDirectory>
               <bindingDirectory>src/main/jaxb</bindingDirectory>
@@ -212,6 +232,10 @@
             <configuration>
               <args>
                 <arg>-copy-constructor</arg>
+                <arg>-XtoString</arg>
+                <arg>-Xequals</arg>
+                <arg>-XhashCode</arg>
+                <arg>-Xcopyable</arg>
               </args>
               <schemaDirectory>src/main/schemas</schemaDirectory>
               <bindingDirectory>src/main/jaxb</bindingDirectory>
@@ -232,6 +256,10 @@
             <configuration>
               <args>
                 <arg>-copy-constructor</arg>
+                <arg>-XtoString</arg>
+                <arg>-Xequals</arg>
+                <arg>-XhashCode</arg>
+                <arg>-Xcopyable</arg>
               </args>
               <schemaDirectory>src/main/schemas</schemaDirectory>
               <bindingDirectory>src/main/jaxb</bindingDirectory>
@@ -252,6 +280,10 @@
             <configuration>
               <args>
                 <arg>-copy-constructor</arg>
+                <arg>-XtoString</arg>
+                <arg>-Xequals</arg>
+                <arg>-XhashCode</arg>
+                <arg>-Xcopyable</arg>
               </args>
               <schemaDirectory>src/main/schemas</schemaDirectory>
               <bindingDirectory>src/main/jaxb</bindingDirectory>
@@ -275,6 +307,10 @@
                 <arg>-copy-constructor</arg>
                 <arg>-cc-visibility</arg>
                 <arg>protected</arg>
+                <arg>-XtoString</arg>
+                <arg>-Xequals</arg>
+                <arg>-XhashCode</arg>
+                <arg>-Xcopyable</arg>
               </args>
               <schemaDirectory>src/main/schemas</schemaDirectory>
               <bindingDirectory>src/main/jaxb</bindingDirectory>
@@ -297,6 +333,10 @@
                 <arg>-copy-constructor</arg>
                 <arg>-cc-visibility</arg>
                 <arg>protected</arg>
+                <arg>-XtoString</arg>
+                <arg>-Xequals</arg>
+                <arg>-XhashCode</arg>
+                <arg>-Xcopyable</arg>
               </args>
               <schemaDirectory>src/main/schemas</schemaDirectory>
               <bindingDirectory>src/main/jaxb</bindingDirectory>
@@ -319,6 +359,10 @@
                 <arg>-copy-constructor</arg>
                 <arg>-cc-visibility</arg>
                 <arg>protected</arg>
+                <arg>-XtoString</arg>
+                <arg>-Xequals</arg>
+                <arg>-XhashCode</arg>
+                <arg>-Xcopyable</arg>
               </args>
               <schemaDirectory>src/main/schemas</schemaDirectory>
               <bindingDirectory>src/main/jaxb</bindingDirectory>
@@ -341,6 +385,10 @@
                 <arg>-copy-constructor</arg>
                 <arg>-cc-visibility</arg>
                 <arg>protected</arg>
+                <arg>-XtoString</arg>
+                <arg>-Xequals</arg>
+                <arg>-XhashCode</arg>
+                <arg>-Xcopyable</arg>
               </args>
               <schemaDirectory>src/main/schemas</schemaDirectory>
               <bindingDirectory>src/main/jaxb</bindingDirectory>
@@ -364,6 +412,10 @@
                 <arg>-copy-constructor</arg>
                 <arg>-cc-visibility</arg>
                 <arg>public</arg>
+                <arg>-XtoString</arg>
+                <arg>-Xequals</arg>
+                <arg>-XhashCode</arg>
+                <arg>-Xcopyable</arg>
               </args>
               <schemaDirectory>src/main/schemas</schemaDirectory>
               <bindingDirectory>src/main/jaxb</bindingDirectory>
@@ -386,6 +438,10 @@
                 <arg>-copy-constructor</arg>
                 <arg>-cc-visibility</arg>
                 <arg>public</arg>
+                <arg>-XtoString</arg>
+                <arg>-Xequals</arg>
+                <arg>-XhashCode</arg>
+                <arg>-Xcopyable</arg>
               </args>
               <schemaDirectory>src/main/schemas</schemaDirectory>
               <bindingDirectory>src/main/jaxb</bindingDirectory>
@@ -408,6 +464,10 @@
                 <arg>-copy-constructor</arg>
                 <arg>-cc-visibility</arg>
                 <arg>public</arg>
+                <arg>-XtoString</arg>
+                <arg>-Xequals</arg>
+                <arg>-XhashCode</arg>
+                <arg>-Xcopyable</arg>
               </args>
               <schemaDirectory>src/main/schemas</schemaDirectory>
               <bindingDirectory>src/main/jaxb</bindingDirectory>
@@ -430,6 +490,10 @@
                 <arg>-copy-constructor</arg>
                 <arg>-cc-visibility</arg>
                 <arg>public</arg>
+                <arg>-XtoString</arg>
+                <arg>-Xequals</arg>
+                <arg>-XhashCode</arg>
+                <arg>-Xcopyable</arg>
               </args>
               <schemaDirectory>src/main/schemas</schemaDirectory>
               <bindingDirectory>src/main/jaxb</bindingDirectory>
@@ -463,6 +527,11 @@
     <dependency>
       <groupId>commons-lang</groupId>
       <artifactId>commons-lang</artifactId>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.jvnet.jaxb2_commons</groupId>
+      <artifactId>basic</artifactId>
       <scope>compile</scope>
     </dependency>
     <dependency>

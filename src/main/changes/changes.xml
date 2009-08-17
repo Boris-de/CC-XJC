@@ -105,6 +105,10 @@
       <code>QName</code> to the list of immutable types.]]>
       </action>
       <action dev="schulte2005" type="update"><![CDATA[
+      Removed generated <code>copyOfDuration</code> methods and added
+      <code>Duration</code> to the list of immutable types.]]>
+      </action>
+      <action dev="schulte2005" type="update"><![CDATA[
       Added support for <code>@XmlAnyAttribute</code>.]]>
       </action>
       <action dev="schulte2005" type="update"><![CDATA[

@@ -72,6 +72,8 @@
   <!--                                                                       -->
   <!-- SimpleTypeAttributes                                                  -->
   <!--                                                                       -->
+  <xsd:element name="simple-type-attibutes-test"
+               type="ccxjcit:SimpleTypeAttributes"/>
   <xsd:complexType name="SimpleTypeAttributes">
     <xsd:annotation>
       <xsd:documentation><![CDATA[
@@ -129,11 +131,15 @@
   <!--                                                                       -->
   <!-- ChoiceComplexType                                                     -->
   <!--                                                                       -->
+  <xsd:element name="choice-complex-type-test"
+               type="ccxjcit:ChoiceComplexType"/>
   <xsd:complexType name="ChoiceComplexType">
-    <xsd:choice>
-      <xsd:element name="string" type="xsd:string" minOccurs="0" maxOccurs="1"/>
-      <xsd:any namespace="##other" minOccurs="0" maxOccurs="1" processContents="lax"/>
-      <xsd:element name="int" type="xsd:int" minOccurs="0" maxOccurs="1"/>
+    <xsd:choice minOccurs="0" maxOccurs="unbounded">
+      <xsd:element name="stringItem" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+      <xsd:element name="intItem" type="xsd:int" minOccurs="0" maxOccurs="unbounded"/>
+      <xsd:element name="base64BinaryItem" type="xsd:base64Binary" minOccurs="0" maxOccurs="unbounded"/>
+      <xsd:element name="choiceItem" type="ccxjcit:ChoiceComplexType" minOccurs="0" maxOccurs="unbounded"/>
+      <xsd:any namespace="##other" minOccurs="0" maxOccurs="unbounded"/>
     </xsd:choice>
   </xsd:complexType>
   <!--                                                                       -->

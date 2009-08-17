@@ -32,7 +32,6 @@ package net.sourceforge.ccxjc.it;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Arrays;
-import java.util.List;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.Duration;
@@ -311,6 +310,26 @@ public class SimpleTypeAttributesIndexedTest
         System.gc();
         System.gc();
 
+        /*
+
+        java.lang.ClassCastException: [Ljava.lang.Object;
+        at net.sourceforge.ccxjc.it.model.priv.indexed.valueclass.ccxjcit.SimpleTypeAttributes.copyTo(SimpleTypeAttributes.java:2463)
+        at net.sourceforge.ccxjc.it.model.priv.indexed.valueclass.ccxjcit.SimpleTypeAttributes.copyTo(SimpleTypeAttributes.java:2483)
+        at net.sourceforge.ccxjc.it.SimpleTypeAttributesIndexedTest.testSerializable(SimpleTypeAttributesIndexedTest.java:316)
+
+        start = System.currentTimeMillis();
+        for ( int i = runs; i >= 0; i-- )
+        {
+        this.assertTestSimpleTypeAttributes( (SimpleTypeAttributes) a.copyTo( null ) );
+        }
+        final long jaxbMillis = System.currentTimeMillis() - start;
+
+        System.gc();
+        System.gc();
+        System.gc();
+
+         */
+
         start = System.currentTimeMillis();
         for ( int i = runs; i >= 0; i-- )
         {
@@ -324,6 +343,9 @@ public class SimpleTypeAttributesIndexedTest
 
         System.out.println( "Creating " + runs + " copies using serialization took " + serializableMillis +
                             "ms. (100%)" );
+
+//        System.out.println( "Creating " + runs + " copies using jaxb2_commons took " + jaxbMillis + "ms. (" +
+//                            ( 100L * jaxbMillis / serializableMillis ) + "%)" );
 
         System.out.println( "Creating " + runs + " copies using copy constructor took " + copyMillis + "ms. (" +
                             ( 100L * copyMillis / serializableMillis ) + "%)" );
