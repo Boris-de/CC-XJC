@@ -60,7 +60,16 @@ import com.sun.tools.xjc.outline.Aspect;
 import com.sun.tools.xjc.outline.ClassOutline;
 import com.sun.tools.xjc.outline.FieldOutline;
 import com.sun.tools.xjc.outline.Outline;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InvalidClassException;
+import java.io.NotSerializableException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.OptionalDataException;
+import java.io.Serializable;
+import java.io.StreamCorruptedException;
 import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
 import java.math.BigInteger;
@@ -155,7 +164,13 @@ public final class PluginImpl extends Plugin
     @Override
     public String getUsage()
     {
-        return this.getMessage( "usage", null );
+        return new StringBuffer().append( "  -" ).append( OPTION_NAME ).append( "  :  " ).
+            append( this.getMessage( "usage", null ) ).append( System.getProperty( "line.separator" ) ).
+            append( "  " ).append( VISIBILITY_OPTION_NAME ).append( "     :  " ).
+            append( this.getMessage( "visibilityUsage", null ) ).append( System.getProperty( "line.separator" ) ).
+            append( "  " ).append( TARGET_OPTION_NAME ).append( "         :  " ).
+            append( this.getMessage( "targetUsage", null ) ).toString();
+
     }
 
     @Override
@@ -433,57 +448,6 @@ public final class PluginImpl extends Plugin
         return null;
     }
 
-    private JInvocation getIsImmutableObjectInvocation( final ClassOutline clazz )
-    {
-        final int mod = this.getVisibilityModifier();
-        final String methodName = "isImmutableObject";
-
-        if ( mod != JMod.PRIVATE )
-        {
-            for ( JMethod m : clazz._package().objectFactory().methods() )
-            {
-                if ( m.name().equals( methodName ) )
-                {
-                    return clazz._package().objectFactory().staticInvoke( m );
-                }
-            }
-        }
-        else
-        {
-            for ( JMethod m : clazz.implClass.methods() )
-            {
-                if ( m.name().equals( methodName ) )
-                {
-                    return JExpr.invoke( m );
-                }
-            }
-        }
-
-        final JMethod m =
-            ( mod != JMod.PRIVATE
-              ? clazz._package().objectFactory().method( JMod.STATIC | mod, boolean.class, methodName )
-              : clazz.implClass.method( JMod.STATIC | mod, boolean.class, methodName ) );
-
-        final JVar o = m.param( JMod.FINAL, Object.class, "o" );
-
-        m.javadoc().append( "Tests a given object against a list of known immutable types." );
-        m.javadoc().addParam( o ).append( "The object to test." );
-        m.javadoc().addReturn().append( "{@code true} if {@code o} is a known immutable type; {@code false} else." );
-
-        m.body().directStatement( "// " + this.getMessage( "title", null ) );
-
-        for ( String immutableName : IMMUTABLE_NAMES )
-        {
-            m.body()._if( o._instanceof( clazz.parent().getCodeModel().ref( immutableName ) ) ).
-                _then()._return( JExpr.TRUE );
-
-        }
-
-        m.body()._return( JExpr.FALSE );
-        this.methodCount = this.methodCount.add( BigInteger.ONE );
-        return ( mod != JMod.PRIVATE ? clazz._package().objectFactory().staticInvoke( m ) : JExpr.invoke( m ) );
-    }
-
     private JInvocation getCopyOfJaxbElementInvocation( final ClassOutline clazz )
     {
         final JClass jaxbElement = clazz.parent().getCodeModel().ref( JAXBElement.class );
@@ -548,10 +512,87 @@ public final class PluginImpl extends Plugin
         return ( mod != JMod.PRIVATE ? clazz._package().objectFactory().staticInvoke( m ) : JExpr.invoke( m ) );
     }
 
+    private JInvocation getCopyOfBytesInvocation( final ClassOutline classOutline )
+    {
+        final JClass byteArray = classOutline.parent().getCodeModel().ref( byte[].class );
+        final JClass array = classOutline.parent().getCodeModel().ref( Array.class );
+        final JClass system = classOutline.parent().getCodeModel().ref( System.class );
+
+        final JType[] signature =
+        {
+            byteArray
+        };
+
+        final String methodName = "copyOfBytes";
+        final int mod = this.getVisibilityModifier();
+
+        if ( mod != JMod.PRIVATE )
+        {
+            for ( JMethod m : classOutline._package().objectFactory().methods() )
+            {
+                if ( m.name().equals( methodName ) && m.hasSignature( signature ) )
+                {
+                    return classOutline._package().objectFactory().staticInvoke( m );
+                }
+            }
+        }
+        else
+        {
+            for ( JMethod m : classOutline.implClass.methods() )
+            {
+                if ( m.name().equals( methodName ) && m.hasSignature( signature ) )
+                {
+                    return JExpr.invoke( m );
+                }
+            }
+        }
+
+        final JMethod m =
+            ( mod != JMod.PRIVATE
+              ? classOutline._package().objectFactory().method( JMod.STATIC | mod, byteArray, methodName )
+              : classOutline.implClass.method( JMod.STATIC | mod, byteArray, methodName ) );
+
+        final JVar bytes = m.param( JMod.FINAL, byteArray, "bytes" );
+
+        m.javadoc().append( "Creates and returns a copy of a given array of bytes." );
+        m.javadoc().addParam( bytes ).append( "The array to copy or {@code null}." );
+        m.javadoc().addReturn().append(
+            "A copy of {@code bytes} or {@code null} if {@code bytes} is {@code null}." );
+
+        m.body().directStatement( "// " + this.getMessage( "title", null ) );
+
+        if ( this.isTargetSupported( TARGET_1_6 ) )
+        {
+            final JClass arrays = classOutline.parent().getCodeModel().ref( Arrays.class );
+            m.body()._return( JOp.cond( bytes.eq( JExpr._null() ), JExpr._null(), arrays.staticInvoke( "copyOf" ).
+                arg( bytes ).arg( bytes.ref( "length" ) ) ) );
+
+        }
+        else
+        {
+            final JConditional bytesNotNull = m.body()._if( bytes.ne( JExpr._null() ) );
+            final JVar copy = bytesNotNull._then().decl(
+                JMod.FINAL, byteArray, "copy", JExpr.cast( byteArray, array.staticInvoke( "newInstance" ).arg(
+                bytes.invoke( "getClass" ).invoke( "getComponentType" ) ).arg( bytes.ref( "length" ) ) ) );
+
+            bytesNotNull._then().add( system.staticInvoke( "arraycopy" ).arg( bytes ).arg( JExpr.lit( 0 ) ).
+                arg( copy ).arg( JExpr.lit( 0 ) ).arg( bytes.ref( "length" ) ) );
+
+            bytesNotNull._then()._return( copy );
+
+            m.body()._return( JExpr._null() );
+        }
+
+        this.methodCount = this.methodCount.add( BigInteger.ONE );
+        return ( mod != JMod.PRIVATE ? classOutline._package().objectFactory().staticInvoke( m ) : JExpr.invoke( m ) );
+    }
+
     private JInvocation getCopyOfArrayInvocation( final ClassOutline clazz )
     {
         final JClass object = clazz.parent().getCodeModel().ref( Object.class );
         final JClass array = clazz.parent().getCodeModel().ref( Array.class );
+        final JClass byteArray = clazz.parent().getCodeModel().ref( byte[].class );
+
         final JType[] signature =
         {
             object
@@ -594,13 +635,19 @@ public final class PluginImpl extends Plugin
         m.body().directStatement( "// " + this.getMessage( "title", null ) );
 
         final JConditional arrayNotNull = m.body()._if( arrayArg.ne( JExpr._null() ) );
-        final JVar len = arrayNotNull._then().decl( JMod.FINAL, clazz.parent().getCodeModel().INT, "len",
-                                                    array.staticInvoke( "getLength" ).arg( arrayArg ) );
+        final JConditional isArrayOfBytes =
+            arrayNotNull._then()._if( arrayArg.invoke( "getClass" ).eq( byteArray.dotclass() ) );
 
-        final JVar copy = arrayNotNull._then().decl( JMod.FINAL, object, "copy", array.staticInvoke( "newInstance" ).
+        isArrayOfBytes._then()._return(
+            this.getCopyOfBytesInvocation( clazz ).arg( JExpr.cast( byteArray, arrayArg ) ) );
+
+        final JVar len = isArrayOfBytes._else().decl(
+            JMod.FINAL, clazz.parent().getCodeModel().INT, "len", array.staticInvoke( "getLength" ).arg( arrayArg ) );
+
+        final JVar copy = isArrayOfBytes._else().decl( JMod.FINAL, object, "copy", array.staticInvoke( "newInstance" ).
             arg( arrayArg.invoke( "getClass" ).invoke( "getComponentType" ) ).arg( len ) );
 
-        final JForLoop forEachRef = arrayNotNull._then()._for();
+        final JForLoop forEachRef = isArrayOfBytes._else()._for();
         final JVar i = forEachRef.init( clazz.parent().getCodeModel().INT, "i", len.minus( JExpr.lit( 1 ) ) );
         forEachRef.test( i.gte( JExpr.lit( 0 ) ) );
         forEachRef.update( i.decr() );
@@ -608,7 +655,122 @@ public final class PluginImpl extends Plugin
             arg( this.getCopyOfObjectInvocation( clazz ).arg( array.staticInvoke( "get" ).
             arg( arrayArg ).arg( i ) ) ) );
 
-        arrayNotNull._then()._return( copy );
+        isArrayOfBytes._else()._return( copy );
+        m.body()._return( JExpr._null() );
+        this.methodCount = this.methodCount.add( BigInteger.ONE );
+        return ( mod != JMod.PRIVATE ? clazz._package().objectFactory().staticInvoke( m ) : JExpr.invoke( m ) );
+    }
+
+    private JInvocation getCopyOfSerializableInvocation( final ClassOutline clazz )
+    {
+        final JClass serializable = clazz.parent().getCodeModel().ref( Serializable.class );
+        final JClass byteArrayOutputStream = clazz.parent().getCodeModel().ref( ByteArrayOutputStream.class );
+        final JClass byteArrayInputStream = clazz.parent().getCodeModel().ref( ByteArrayInputStream.class );
+        final JClass objectOutputStream = clazz.parent().getCodeModel().ref( ObjectOutputStream.class );
+        final JClass objectInputStream = clazz.parent().getCodeModel().ref( ObjectInputStream.class );
+        final JClass ioException = clazz.parent().getCodeModel().ref( IOException.class );
+        final JClass invalidClass = clazz.parent().getCodeModel().ref( InvalidClassException.class );
+        final JClass notSerializable = clazz.parent().getCodeModel().ref( NotSerializableException.class );
+        final JClass streamCorrupted = clazz.parent().getCodeModel().ref( StreamCorruptedException.class );
+        final JClass securityException = clazz.parent().getCodeModel().ref( SecurityException.class );
+        final JClass optionalData = clazz.parent().getCodeModel().ref( OptionalDataException.class );
+        final JClass classNotFound = clazz.parent().getCodeModel().ref( ClassNotFoundException.class );
+        final JClass assertionError = clazz.parent().getCodeModel().ref( AssertionError.class );
+        final JType[] signature =
+        {
+            serializable
+        };
+
+        final String methodName = "copyOfSerializable";
+        final int mod = this.getVisibilityModifier();
+
+        if ( mod != JMod.PRIVATE )
+        {
+            for ( JMethod m : clazz._package().objectFactory().methods() )
+            {
+                if ( m.name().equals( methodName ) && m.hasSignature( signature ) )
+                {
+                    return clazz._package().objectFactory().staticInvoke( m );
+                }
+            }
+        }
+        else
+        {
+            for ( JMethod m : clazz.implClass.methods() )
+            {
+                if ( m.name().equals( methodName ) && m.hasSignature( signature ) )
+                {
+                    return JExpr.invoke( m );
+                }
+            }
+        }
+
+        final JMethod m =
+            ( mod != JMod.PRIVATE
+              ? clazz._package().objectFactory().method( JMod.STATIC | mod, serializable, methodName )
+              : clazz.implClass.method( JMod.STATIC | mod, serializable, methodName ) );
+
+        final JVar s = m.param( JMod.FINAL, serializable, "serializable" );
+
+        m.javadoc().append( "Creates and returns a copy of a given {@code Serializable}." );
+        m.javadoc().addParam( s ).append( "The instance to copy or {@code null}." );
+        m.javadoc().addReturn().append(
+            "A copy of {@code serializable} or {@code null} if {@code serializable} is {@code null}." );
+
+        m.body().directStatement( "// " + this.getMessage( "title", null ) );
+
+        final JConditional sNotNull = m.body()._if( s.ne( JExpr._null() ) );
+        final JTryBlock tryClone = sNotNull._then()._try();
+
+        final JVar byteArrayOutput = tryClone.body().decl(
+            JMod.FINAL, byteArrayOutputStream, "byteArrayOutput", JExpr._new( byteArrayOutputStream ) );
+
+        final JVar objectOutput = tryClone.body().decl(
+            JMod.FINAL, objectOutputStream, "out", JExpr._new( objectOutputStream ).arg( byteArrayOutput ) );
+
+        tryClone.body().add( objectOutput.invoke( "writeObject" ).arg( s ) );
+        tryClone.body().add( objectOutput.invoke( "close" ) );
+
+        final JVar byteArrayInput = tryClone.body().decl(
+            JMod.FINAL, byteArrayInputStream, "byteArrayInput",
+            JExpr._new( byteArrayInputStream ).arg( byteArrayOutput.invoke( "toByteArray" ) ) );
+
+        final JVar objectInput = tryClone.body().decl(
+            JMod.FINAL, objectInputStream, "in", JExpr._new( objectInputStream ).arg( byteArrayInput ) );
+
+        tryClone.body()._return( JExpr.cast( serializable, objectInput.invoke( "readObject" ) ) );
+
+        final JExpression assertionErrorMsg =
+            JExpr.lit( "Unexpected instance during copying object '" ).plus( s ).plus( JExpr.lit( "'." ) );
+
+        final JCatchBlock catchSecurityException = tryClone._catch( securityException );
+        catchSecurityException.body()._throw( JExpr.cast( assertionError, JExpr._new( assertionError ).
+            arg( assertionErrorMsg ).invoke( "initCause" ).arg( catchSecurityException.param( "e" ) ) ) );
+
+        final JCatchBlock catchClassNotFound = tryClone._catch( classNotFound );
+        catchClassNotFound.body()._throw( JExpr.cast( assertionError, JExpr._new( assertionError ).
+            arg( assertionErrorMsg ).invoke( "initCause" ).arg( catchClassNotFound.param( "e" ) ) ) );
+
+        final JCatchBlock catchInvalidClass = tryClone._catch( invalidClass );
+        catchInvalidClass.body()._throw( JExpr.cast( assertionError, JExpr._new( assertionError ).
+            arg( assertionErrorMsg ).invoke( "initCause" ).arg( catchInvalidClass.param( "e" ) ) ) );
+
+        final JCatchBlock catchNotSerializable = tryClone._catch( notSerializable );
+        catchNotSerializable.body()._throw( JExpr.cast( assertionError, JExpr._new( assertionError ).
+            arg( assertionErrorMsg ).invoke( "initCause" ).arg( catchNotSerializable.param( "e" ) ) ) );
+
+        final JCatchBlock catchStreamCorrupted = tryClone._catch( streamCorrupted );
+        catchStreamCorrupted.body()._throw( JExpr.cast( assertionError, JExpr._new( assertionError ).
+            arg( assertionErrorMsg ).invoke( "initCause" ).arg( catchStreamCorrupted.param( "e" ) ) ) );
+
+        final JCatchBlock catchOptionalData = tryClone._catch( optionalData );
+        catchOptionalData.body()._throw( JExpr.cast( assertionError, JExpr._new( assertionError ).
+            arg( assertionErrorMsg ).invoke( "initCause" ).arg( catchOptionalData.param( "e" ) ) ) );
+
+        final JCatchBlock catchIOException = tryClone._catch( ioException );
+        catchIOException.body()._throw( JExpr.cast( assertionError, JExpr._new( assertionError ).
+            arg( assertionErrorMsg ).invoke( "initCause" ).arg( catchIOException.param( "e" ) ) ) );
+
         m.body()._return( JExpr._null() );
         this.methodCount = this.methodCount.add( BigInteger.ONE );
         return ( mod != JMod.PRIVATE ? clazz._package().objectFactory().staticInvoke( m ) : JExpr.invoke( m ) );
@@ -628,6 +790,7 @@ public final class PluginImpl extends Plugin
         final JClass assertionError = clazz.parent().getCodeModel().ref( AssertionError.class );
         final JClass classArray = clazz.parent().getCodeModel().ref( Class[].class );
         final JClass objectArray = clazz.parent().getCodeModel().ref( Object[].class );
+        final JClass serializable = clazz.parent().getCodeModel().ref( Serializable.class );
 
         final String methodName = "copyOfObject";
         final int mod = this.getVisibilityModifier();
@@ -678,10 +841,12 @@ public final class PluginImpl extends Plugin
 
         isArray._then()._return( this.getCopyOfArrayInvocation( clazz ).arg( o ) );
 
-        final JConditional isImmutable = objectNotNull._then()._if(
-            this.getIsImmutableObjectInvocation( clazz ).arg( o ) );
+        for ( String immutableName : IMMUTABLE_NAMES )
+        {
+            objectNotNull._then()._if( o._instanceof( clazz.parent().getCodeModel().ref( immutableName ) ) ).
+                _then()._return( o );
 
-        isImmutable._then()._return( o );
+        }
 
         final JConditional instanceOfDOMElement = objectNotNull._then()._if( o._instanceof( element ) );
         instanceOfDOMElement._then()._return( JExpr.cast( element, JExpr.invoke(
@@ -700,6 +865,10 @@ public final class PluginImpl extends Plugin
             JExpr.lit( "Unexpected instance during copying object '" ).plus( o ).plus( JExpr.lit( "'." ) );
 
         final JCatchBlock catchNoSuchMethod = tryCloneMethod._catch( noSuchMethod );
+        final JConditional instanceOfSerializable = catchNoSuchMethod.body()._if( o._instanceof( serializable ) );
+        instanceOfSerializable._then()._return( this.getCopyOfSerializableInvocation( clazz ).
+            arg( JExpr.cast( serializable, o ) ) );
+
         catchNoSuchMethod.body().directStatement( "// Please report this at " +
                                                   this.getMessage( "bugtrackerUrl", null ) );
 
@@ -746,10 +915,10 @@ public final class PluginImpl extends Plugin
         return ( mod != JMod.PRIVATE ? clazz._package().objectFactory().staticInvoke( m ) : JExpr.invoke( m ) );
     }
 
-    private JInvocation getCopyOfClassInfoElementInvocation( final ClassOutline clazz, final CNonElement type )
+    private JInvocation getCopyOfClassInfoElementInvocation( final FieldOutline fieldOutline, final CNonElement type )
     {
-        final JType jaxbElement = clazz.parent().getCodeModel().ref( JAXBElement.class );
-        final JType javaType = type.toType( clazz.parent(), Aspect.IMPLEMENTATION );
+        final JType jaxbElement = fieldOutline.parent().parent().getCodeModel().ref( JAXBElement.class );
+        final JType javaType = type.toType( fieldOutline.parent().parent(), Aspect.IMPLEMENTATION );
         final JType[] signature =
         {
             jaxbElement
@@ -760,17 +929,17 @@ public final class PluginImpl extends Plugin
 
         if ( mod != JMod.PRIVATE )
         {
-            for ( JMethod m : clazz._package().objectFactory().methods() )
+            for ( JMethod m : fieldOutline.parent()._package().objectFactory().methods() )
             {
                 if ( m.name().equals( methodName ) && m.hasSignature( signature ) )
                 {
-                    return clazz._package().objectFactory().staticInvoke( m );
+                    return fieldOutline.parent()._package().objectFactory().staticInvoke( m );
                 }
             }
         }
         else
         {
-            for ( JMethod m : clazz.implClass.methods() )
+            for ( JMethod m : fieldOutline.parent().implClass.methods() )
             {
                 if ( m.name().equals( methodName ) && m.hasSignature( signature ) )
                 {
@@ -781,8 +950,8 @@ public final class PluginImpl extends Plugin
 
         final JMethod m =
             ( mod != JMod.PRIVATE
-              ? clazz._package().objectFactory().method( JMod.STATIC | mod, jaxbElement, methodName )
-              : clazz.implClass.method( JMod.STATIC | mod, jaxbElement, methodName ) );
+              ? fieldOutline.parent()._package().objectFactory().method( JMod.STATIC | mod, jaxbElement, methodName )
+              : fieldOutline.parent().implClass.method( JMod.STATIC | mod, jaxbElement, methodName ) );
 
         final JVar e = m.param( JMod.FINAL, jaxbElement, "e" );
 
@@ -805,21 +974,25 @@ public final class PluginImpl extends Plugin
         final JVar copy = elementNotNull._then().decl( jaxbElement, "copy", newElement );
         elementNotNull._then().add( copy.invoke( "setNil" ).arg( e.invoke( "isNil" ) ) );
         elementNotNull._then().add( copy.invoke( "setValue" ).arg( this.getCopyExpression(
-            clazz, type, elementNotNull._then(), JExpr.cast( javaType, copy.invoke( "getValue" ) ) ) ) );
+            fieldOutline, type, elementNotNull._then(), JExpr.cast( javaType, copy.invoke( "getValue" ) ) ) ) );
 
         elementNotNull._then()._return( copy );
         m.body()._return( JExpr._null() );
         this.methodCount = this.methodCount.add( BigInteger.ONE );
-        return ( mod != JMod.PRIVATE ? clazz._package().objectFactory().staticInvoke( m ) : JExpr.invoke( m ) );
+        return ( mod != JMod.PRIVATE
+                 ? fieldOutline.parent()._package().objectFactory().staticInvoke( m ) : JExpr.invoke( m ) );
+
     }
 
-    private JInvocation getCopyOfArrayInfoInvocation( final ClassOutline clazz, final CArrayInfo array )
+    private JInvocation getCopyOfArrayInfoInvocation( final FieldOutline fieldOutline, final CArrayInfo array )
     {
         final JType arrayType =
-            ( array.getAdapterUse() != null ? clazz.parent().getModel().getTypeInfo( array.getAdapterUse().customType ).
-            toType( clazz.parent(), Aspect.IMPLEMENTATION ) : array.toType( clazz.parent(), Aspect.IMPLEMENTATION ) );
+            ( array.getAdapterUse() != null
+              ? fieldOutline.parent().parent().getModel().getTypeInfo( array.getAdapterUse().customType ).
+            toType( fieldOutline.parent().parent(), Aspect.IMPLEMENTATION )
+              : array.toType( fieldOutline.parent().parent(), Aspect.IMPLEMENTATION ) );
 
-        final JType itemType = array.getItemType().toType( clazz.parent(), Aspect.IMPLEMENTATION );
+        final JType itemType = array.getItemType().toType( fieldOutline.parent().parent(), Aspect.IMPLEMENTATION );
         final JType[] signature =
         {
             arrayType
@@ -830,17 +1003,17 @@ public final class PluginImpl extends Plugin
 
         if ( mod != JMod.PRIVATE )
         {
-            for ( JMethod m : clazz._package().objectFactory().methods() )
+            for ( JMethod m : fieldOutline.parent()._package().objectFactory().methods() )
             {
                 if ( m.name().equals( methodName ) && m.hasSignature( signature ) )
                 {
-                    return clazz._package().objectFactory().staticInvoke( m );
+                    return fieldOutline.parent()._package().objectFactory().staticInvoke( m );
                 }
             }
         }
         else
         {
-            for ( JMethod m : clazz.implClass.methods() )
+            for ( JMethod m : fieldOutline.parent().implClass.methods() )
             {
                 if ( m.name().equals( methodName ) && m.hasSignature( signature ) )
                 {
@@ -851,8 +1024,8 @@ public final class PluginImpl extends Plugin
 
         final JMethod m =
             ( mod != JMod.PRIVATE
-              ? clazz._package().objectFactory().method( JMod.STATIC | mod, arrayType, methodName )
-              : clazz.implClass.method( JMod.STATIC | mod, arrayType, methodName ) );
+              ? fieldOutline.parent()._package().objectFactory().method( JMod.STATIC | mod, arrayType, methodName )
+              : fieldOutline.parent().implClass.method( JMod.STATIC | mod, arrayType, methodName ) );
 
         final JVar a = m.param( JMod.FINAL, arrayType, "array" );
 
@@ -866,19 +1039,201 @@ public final class PluginImpl extends Plugin
         final JVar copy = arrayNotNull._then().decl( arrayType, "copy", JExpr.newArray( itemType, a.ref( "length" ) ) );
         final JForLoop forEachItem = arrayNotNull._then()._for();
         final JVar i = forEachItem.init(
-            clazz.parent().getCodeModel().INT, "i", a.ref( "length" ).minus( JExpr.lit( 1 ) ) );
+            fieldOutline.parent().parent().getCodeModel().INT, "i", a.ref( "length" ).minus( JExpr.lit( 1 ) ) );
 
         forEachItem.test( i.gte( JExpr.lit( 0 ) ) );
         forEachItem.update( i.decr() );
 
         final JExpression copyExpr =
-            this.getCopyExpression( clazz, array.getItemType(), forEachItem.body(), a.component( i ) );
+            this.getCopyExpression( fieldOutline, array.getItemType(), forEachItem.body(), a.component( i ) );
 
         forEachItem.body().assign( copy.component( i ), copyExpr );
         arrayNotNull._then()._return( copy );
         m.body()._return( JExpr._null() );
         this.methodCount = this.methodCount.add( BigInteger.ONE );
-        return ( mod != JMod.PRIVATE ? clazz._package().objectFactory().staticInvoke( m ) : JExpr.invoke( m ) );
+        return ( mod != JMod.PRIVATE
+                 ? fieldOutline.parent()._package().objectFactory().staticInvoke( m ) : JExpr.invoke( m ) );
+
+    }
+
+    private JMethod getCopyOfPropertyMethod( final FieldOutline field )
+    {
+        final String methodName = "copy" + field.getPropertyInfo().getName( true );
+        for ( JMethod m : field.parent().implClass.methods() )
+        {
+            if ( m.name().equals( methodName ) )
+            {
+                return m;
+            }
+        }
+
+        final JClass jaxbElement = field.parent().parent().getCodeModel().ref( JAXBElement.class );
+        final JClass assertionError = field.parent().parent().getCodeModel().ref( AssertionError.class );
+        final JMethod m = field.parent().implClass.method(
+            this.getVisibilityModifier() | JMod.STATIC, field.getRawType(), methodName );
+
+        final JVar source = m.param( JMod.FINAL, field.getRawType(), "source" );
+
+        m.javadoc().append( "Copies property {@code " + field.getPropertyInfo().getName( true ) + "}." );
+        m.javadoc().addParam( source ).append( "The source to copy from or {@code null}." );
+        m.javadoc().addReturn().append( "A copy of {@code source} or {@code null} if {@code source} is {@code null}." );
+        m.body().directStatement( "// " + this.getMessage( "title", null ) );
+
+        final JConditional sourceNotNull = m.body()._if( source.ne( JExpr._null() ) );
+
+//        m.body()._if( source.eq( JExpr._null() ) )._then()._throw( JExpr._new( nullPointerException ).arg( "source" ) );
+//        m.body()._if( target.eq( JExpr._null() ) )._then()._throw( JExpr._new( nullPointerException ).arg( "target" ) );
+
+        final List<CClassInfo> referencedClassInfos =
+            new ArrayList<CClassInfo>( field.getPropertyInfo().ref().size() );
+
+        final List<CElementInfo> referencedElementInfos =
+            new ArrayList<CElementInfo>( field.getPropertyInfo().ref().size() );
+
+        final List<CTypeInfo> referencedTypeInfos =
+            new ArrayList<CTypeInfo>( field.getPropertyInfo().ref().size() );
+
+        final List<JType> referencedClassTypes =
+            new ArrayList<JType>( field.getPropertyInfo().ref().size() );
+
+        final List<JType> referencedContentTypes =
+            new ArrayList<JType>( field.getPropertyInfo().ref().size() );
+
+        final List<JType> referencedTypes =
+            new ArrayList<JType>( field.getPropertyInfo().ref().size() );
+
+        for ( CTypeInfo type : field.getPropertyInfo().ref() )
+        {
+            if ( type instanceof CElementInfo )
+            {
+                final CElementInfo e = (CElementInfo) type;
+                final JType contentType = e.getContentType().toType( field.parent().parent(), Aspect.IMPLEMENTATION );
+
+                if ( !referencedContentTypes.contains( contentType ) )
+                {
+                    referencedContentTypes.add( contentType );
+                    referencedElementInfos.add( e );
+                }
+            }
+            else if ( type instanceof CClassInfo )
+            {
+                final CClassInfo c = (CClassInfo) type;
+                final JClass classType = c.toType( field.parent().parent(), Aspect.IMPLEMENTATION );
+
+                if ( !referencedClassTypes.contains( classType ) )
+                {
+                    referencedClassTypes.add( classType );
+                    referencedClassInfos.add( c );
+                }
+            }
+            else
+            {
+                final JType javaType = type.toType( field.parent().parent(), Aspect.IMPLEMENTATION );
+                if ( !referencedTypes.contains( javaType ) )
+                {
+                    referencedTypes.add( javaType );
+                    referencedTypeInfos.add( type );
+                }
+            }
+        }
+
+        Collections.sort( referencedClassInfos, new CClassInfoComparator( field.parent().parent() ) );
+        Collections.sort( referencedElementInfos, new CElementInfoComparator( field.parent().parent() ) );
+        Collections.sort( referencedTypeInfos, new CTypeInfoComparator( field.parent().parent() ) );
+        Collections.reverse( referencedClassInfos );
+        Collections.reverse( referencedElementInfos );
+        Collections.reverse( referencedTypeInfos );
+
+        if ( !referencedElementInfos.isEmpty() )
+        {
+            final JBlock elementBlock = sourceNotNull._then()._if( source._instanceof( jaxbElement ) )._then();
+
+            for ( CElementInfo elementInfo : referencedElementInfos )
+            {
+                final JType contentType =
+                    ( elementInfo.getAdapterUse() != null ? field.parent().parent().getModel().getTypeInfo(
+                    elementInfo.getAdapterUse().customType ).toType( field.parent().parent(), Aspect.IMPLEMENTATION )
+                      : elementInfo.getContentType().toType( field.parent().parent(), Aspect.IMPLEMENTATION ) );
+
+                final JConditional ifInstanceOf = elementBlock._if( JExpr.invoke( JExpr.cast(
+                    jaxbElement, source ), "getValue" )._instanceof( contentType ) );
+
+                final JExpression copyExpr = this.getCopyExpression( field, elementInfo, ifInstanceOf._then(),
+                                                                     JExpr.cast( jaxbElement, source ) );
+
+                if ( copyExpr == null )
+                {
+                    this.log( Level.SEVERE, this.getMessage( "cannotCopyProperty", new Object[]
+                        {
+                            field.getPropertyInfo().getName( true ),
+                            field.parent().implClass.binaryName()
+                        } ), null );
+
+                }
+                else
+                {
+                    ifInstanceOf._then()._return( copyExpr );
+                }
+            }
+        }
+
+        for ( CClassInfo classInfo : referencedClassInfos )
+        {
+            final JType javaType =
+                ( classInfo.getAdapterUse() != null ? field.parent().parent().getModel().getTypeInfo(
+                classInfo.getAdapterUse().customType ).toType( field.parent().parent(), Aspect.IMPLEMENTATION )
+                  : classInfo.toType( field.parent().parent(), Aspect.IMPLEMENTATION ) );
+
+            final JConditional ifInstanceOf = sourceNotNull._then()._if( source._instanceof( javaType ) );
+
+            final JExpression copyExpr =
+                this.getCopyExpression( field, classInfo, ifInstanceOf._then(), JExpr.cast( javaType, source ) );
+
+            if ( copyExpr == null )
+            {
+                this.log( Level.SEVERE, this.getMessage( "cannotCopyProperty", new Object[]
+                    {
+                        field.getPropertyInfo().getName( true ),
+                        field.parent().implClass.binaryName()
+                    } ), null );
+
+            }
+            else
+            {
+                ifInstanceOf._then()._return( copyExpr );
+            }
+        }
+
+        for ( CTypeInfo typeInfo : referencedTypeInfos )
+        {
+            final JType javaType = typeInfo.toType( field.parent().parent(), Aspect.IMPLEMENTATION );
+            final JConditional ifInstanceOf = sourceNotNull._then()._if( source._instanceof( javaType ) );
+            final JExpression copyExpr =
+                this.getCopyExpression( field, typeInfo, ifInstanceOf._then(), JExpr.cast( javaType, source ) );
+
+            if ( copyExpr == null )
+            {
+                this.log( Level.SEVERE, this.getMessage( "cannotCopyProperty", new Object[]
+                    {
+                        field.getPropertyInfo().getName( true ),
+                        field.parent().implClass.binaryName()
+                    } ), null );
+
+            }
+            else
+            {
+                ifInstanceOf._then()._return( copyExpr );
+            }
+        }
+
+        sourceNotNull._then().directStatement( "// Please report this at " + this.getMessage( "bugtrackerUrl", null ) );
+        sourceNotNull._then()._throw( JExpr._new( assertionError ).arg( JExpr.lit( "Unexpected instance '" ).
+            plus( source ).plus( JExpr.lit( "' for property '" + field.getPropertyInfo().getName( true ) +
+                                            "' of class '" + field.parent().implClass.binaryName() + "'." ) ) ) );
+
+        m.body()._return( JExpr._null() );
+        this.methodCount = this.methodCount.add( BigInteger.ONE );
+        return m;
     }
 
     private JMethod getCopyOfCollectionMethod( final FieldOutline field )
@@ -980,6 +1335,9 @@ public final class PluginImpl extends Plugin
         Collections.sort( referencedClassInfos, new CClassInfoComparator( field.parent().parent() ) );
         Collections.sort( referencedElementInfos, new CElementInfoComparator( field.parent().parent() ) );
         Collections.sort( referencedTypeInfos, new CTypeInfoComparator( field.parent().parent() ) );
+        Collections.reverse( referencedClassInfos );
+        Collections.reverse( referencedElementInfos );
+        Collections.reverse( referencedTypeInfos );
 
         final JForLoop copyLoop;
         final JVar it;
@@ -1016,42 +1374,6 @@ public final class PluginImpl extends Plugin
             copy = null;
         }
 
-        for ( CClassInfo classInfo : referencedClassInfos )
-        {
-            final JType javaType =
-                ( classInfo.getAdapterUse() != null ? field.parent().parent().getModel().getTypeInfo( classInfo.
-                getAdapterUse().customType ).toType( field.parent().parent(), Aspect.IMPLEMENTATION )
-                  : classInfo.toType( field.parent().parent(), Aspect.IMPLEMENTATION ) );
-
-            final JConditional ifInstanceOf = copyLoop.body()._if( next._instanceof( javaType ) );
-
-            final JExpression copyExpr = this.getCopyExpression(
-                field.parent(), classInfo, ifInstanceOf._then(), JExpr.cast( javaType, next ) );
-
-            if ( copyExpr == null )
-            {
-                this.log( Level.SEVERE, this.getMessage( "cannotCopyProperty", new Object[]
-                    {
-                        field.getPropertyInfo().getName( true ),
-                        field.parent().implClass.binaryName()
-                    } ), null );
-
-            }
-            else
-            {
-                if ( field.getRawType().isArray() )
-                {
-                    ifInstanceOf._then().assign( copy.component( it ), copyExpr );
-                }
-                else
-                {
-                    ifInstanceOf._then().invoke( target, "add" ).arg( copyExpr );
-                }
-            }
-
-            ifInstanceOf._then()._continue();
-        }
-
         if ( !referencedElementInfos.isEmpty() )
         {
             final JBlock copyBlock = copyLoop.body()._if( next._instanceof( jaxbElement ) )._then();
@@ -1066,8 +1388,8 @@ public final class PluginImpl extends Plugin
                 final JConditional ifInstanceOf = copyBlock._if( JExpr.invoke( JExpr.cast(
                     jaxbElement, next ), "getValue" )._instanceof( contentType ) );
 
-                final JExpression copyExpr = this.getCopyExpression(
-                    field.parent(), elementInfo, ifInstanceOf._then(), JExpr.cast( jaxbElement, next ) );
+                final JExpression copyExpr =
+                    this.getCopyExpression( field, elementInfo, ifInstanceOf._then(), JExpr.cast( jaxbElement, next ) );
 
                 if ( copyExpr == null )
                 {
@@ -1094,12 +1416,48 @@ public final class PluginImpl extends Plugin
             }
         }
 
+        for ( CClassInfo classInfo : referencedClassInfos )
+        {
+            final JType javaType =
+                ( classInfo.getAdapterUse() != null ? field.parent().parent().getModel().getTypeInfo( classInfo.
+                getAdapterUse().customType ).toType( field.parent().parent(), Aspect.IMPLEMENTATION )
+                  : classInfo.toType( field.parent().parent(), Aspect.IMPLEMENTATION ) );
+
+            final JConditional ifInstanceOf = copyLoop.body()._if( next._instanceof( javaType ) );
+
+            final JExpression copyExpr =
+                this.getCopyExpression( field, classInfo, ifInstanceOf._then(), JExpr.cast( javaType, next ) );
+
+            if ( copyExpr == null )
+            {
+                this.log( Level.SEVERE, this.getMessage( "cannotCopyProperty", new Object[]
+                    {
+                        field.getPropertyInfo().getName( true ),
+                        field.parent().implClass.binaryName()
+                    } ), null );
+
+            }
+            else
+            {
+                if ( field.getRawType().isArray() )
+                {
+                    ifInstanceOf._then().assign( copy.component( it ), copyExpr );
+                }
+                else
+                {
+                    ifInstanceOf._then().invoke( target, "add" ).arg( copyExpr );
+                }
+            }
+
+            ifInstanceOf._then()._continue();
+        }
+
         for ( CTypeInfo typeInfo : referencedTypeInfos )
         {
             final JType javaType = typeInfo.toType( field.parent().parent(), Aspect.IMPLEMENTATION );
             final JConditional ifInstanceOf = copyLoop.body()._if( next._instanceof( javaType ) );
-            final JExpression copyExpr = this.getCopyExpression(
-                field.parent(), typeInfo, ifInstanceOf._then(), JExpr.cast( javaType, next ) );
+            final JExpression copyExpr =
+                this.getCopyExpression( field, typeInfo, ifInstanceOf._then(), JExpr.cast( javaType, next ) );
 
             if ( copyExpr == null )
             {
@@ -1139,38 +1497,38 @@ public final class PluginImpl extends Plugin
         return m;
     }
 
-    private JExpression getCopyExpression( final ClassOutline classOutline, final CTypeInfo type,
+    private JExpression getCopyExpression( final FieldOutline fieldOutline, final CTypeInfo type,
                                            final JBlock block, final JExpression source )
     {
         JExpression expr = null;
 
         if ( type instanceof CBuiltinLeafInfo )
         {
-            expr = this.getBuiltinCopyExpression( classOutline, (CBuiltinLeafInfo) type, block, source );
+            expr = this.getBuiltinCopyExpression( fieldOutline, (CBuiltinLeafInfo) type, block, source );
         }
         else if ( type instanceof CWildcardTypeInfo )
         {
-            expr = this.getWildcardCopyExpression( classOutline, (CWildcardTypeInfo) type, block, source );
+            expr = this.getWildcardCopyExpression( fieldOutline, (CWildcardTypeInfo) type, block, source );
         }
         else if ( type instanceof CClassInfo )
         {
-            expr = this.getClassInfoCopyExpression( classOutline, (CClassInfo) type, block, source );
+            expr = this.getClassInfoCopyExpression( fieldOutline, (CClassInfo) type, block, source );
         }
         else if ( type instanceof CEnumLeafInfo )
         {
-            expr = this.getEnumLeafInfoCopyExpression( classOutline, (CEnumLeafInfo) type, block, source );
+            expr = this.getEnumLeafInfoCopyExpression( fieldOutline, (CEnumLeafInfo) type, block, source );
         }
         else if ( type instanceof CArrayInfo )
         {
-            expr = this.getArrayCopyExpression( classOutline, (CArrayInfo) type, block, source );
+            expr = this.getArrayCopyExpression( fieldOutline, (CArrayInfo) type, block, source );
         }
         else if ( type instanceof CElementInfo )
         {
-            expr = this.getElementCopyExpression( classOutline, (CElementInfo) type, block, source );
+            expr = this.getElementCopyExpression( fieldOutline, (CElementInfo) type, block, source );
         }
         else if ( type instanceof CNonElement )
         {
-            expr = this.getNonElementCopyExpression( classOutline, (CNonElement) type, block, source );
+            expr = this.getNonElementCopyExpression( fieldOutline, (CNonElement) type, block, source );
         }
 
         if ( expr != null )
@@ -1181,93 +1539,21 @@ public final class PluginImpl extends Plugin
         return expr;
     }
 
-    private JExpression getBuiltinCopyExpression( final ClassOutline classOutline, final CBuiltinLeafInfo type,
+    private JExpression getBuiltinCopyExpression( final FieldOutline fieldOutline, final CBuiltinLeafInfo type,
                                                   final JBlock block, final JExpression source )
     {
         JExpression expr = null;
 
-        block.directStatement(
-            "// CBuiltinLeafInfo: " + type.toType( classOutline.parent(), Aspect.IMPLEMENTATION ).binaryName() );
+        block.directStatement( "// CBuiltinLeafInfo: " +
+                               type.toType( fieldOutline.parent().parent(), Aspect.IMPLEMENTATION ).binaryName() );
 
         if ( type == CBuiltinLeafInfo.ANYTYPE )
         {
-            expr = this.getCopyOfObjectInvocation( classOutline ).arg( source );
+            expr = this.getCopyOfObjectInvocation( fieldOutline.parent() ).arg( source );
         }
         else if ( type == CBuiltinLeafInfo.BASE64_BYTE_ARRAY )
         {
-            if ( this.isTargetSupported( TARGET_1_6 ) )
-            {
-                final JClass arrays = classOutline.parent().getCodeModel().ref( Arrays.class );
-                expr = JOp.cond( source.eq( JExpr._null() ), JExpr._null(), arrays.staticInvoke( "copyOf" ).
-                    arg( source ).arg( source.ref( "length" ) ) );
-
-            }
-            else
-            {
-                final JClass byteArray = classOutline.parent().getCodeModel().ref( byte[].class );
-                final JClass array = classOutline.parent().getCodeModel().ref( Array.class );
-                final JClass system = classOutline.parent().getCodeModel().ref( System.class );
-
-                final JType[] signature =
-                {
-                    byteArray
-                };
-
-                final String methodName = "copyOfBytes";
-                final int mod = this.getVisibilityModifier();
-
-                if ( mod != JMod.PRIVATE )
-                {
-                    for ( JMethod m : classOutline._package().objectFactory().methods() )
-                    {
-                        if ( m.name().equals( methodName ) && m.hasSignature( signature ) )
-                        {
-                            return classOutline._package().objectFactory().staticInvoke( m ).arg( source );
-                        }
-                    }
-                }
-                else
-                {
-                    for ( JMethod m : classOutline.implClass.methods() )
-                    {
-                        if ( m.name().equals( methodName ) && m.hasSignature( signature ) )
-                        {
-                            return JExpr.invoke( m ).arg( source );
-                        }
-                    }
-                }
-
-                final JMethod m =
-                    ( mod != JMod.PRIVATE
-                      ? classOutline._package().objectFactory().method( JMod.STATIC | mod, byteArray, methodName )
-                      : classOutline.implClass.method( JMod.STATIC | mod, byteArray, methodName ) );
-
-                final JVar bytes = m.param( JMod.FINAL, byteArray, "bytes" );
-
-                m.javadoc().append( "Creates and returns a copy of a given array of bytes." );
-                m.javadoc().addParam( bytes ).append( "The array to copy or {@code null}." );
-                m.javadoc().addReturn().append(
-                    "A copy of {@code bytes} or {@code null} if {@code bytes} is {@code null}." );
-
-                m.body().directStatement( "// " + this.getMessage( "title", null ) );
-
-                final JConditional bytesNotNull = m.body()._if( bytes.ne( JExpr._null() ) );
-                final JVar copy = bytesNotNull._then().decl(
-                    JMod.FINAL, byteArray, "copy", JExpr.cast( byteArray, array.staticInvoke( "newInstance" ).arg(
-                    bytes.invoke( "getClass" ).invoke( "getComponentType" ) ).arg( bytes.ref( "length" ) ) ) );
-
-                bytesNotNull._then().add( system.staticInvoke( "arraycopy" ).arg( bytes ).arg( JExpr.lit( 0 ) ).
-                    arg( copy ).arg( JExpr.lit( 0 ) ).arg( bytes.ref( "length" ) ) );
-
-                bytesNotNull._then()._return( copy );
-
-                m.body()._return( JExpr._null() );
-                this.methodCount = this.methodCount.add( BigInteger.ONE );
-                expr = ( mod != JMod.PRIVATE
-                         ? classOutline._package().objectFactory().staticInvoke( m ).arg( source )
-                         : JExpr.invoke( m ).arg( source ) );
-
-            }
+            expr = this.getCopyOfBytesInvocation( fieldOutline.parent() ).arg( source );
         }
         else if ( type == CBuiltinLeafInfo.BIG_DECIMAL || type == CBuiltinLeafInfo.BIG_INTEGER ||
                   type == CBuiltinLeafInfo.STRING || type == CBuiltinLeafInfo.BOOLEAN || type == CBuiltinLeafInfo.INT ||
@@ -1282,7 +1568,7 @@ public final class PluginImpl extends Plugin
         }
         else if ( type == CBuiltinLeafInfo.CALENDAR )
         {
-            final JClass xmlCal = classOutline.parent().getCodeModel().ref( XMLGregorianCalendar.class );
+            final JClass xmlCal = fieldOutline.parent().parent().getCodeModel().ref( XMLGregorianCalendar.class );
             expr = JOp.cond( source.eq( JExpr._null() ), JExpr._null(),
                              JExpr.cast( xmlCal, source.invoke( "clone" ) ) );
 
@@ -1294,63 +1580,69 @@ public final class PluginImpl extends Plugin
         else if ( type == CBuiltinLeafInfo.DATA_HANDLER || type == CBuiltinLeafInfo.IMAGE ||
                   type == CBuiltinLeafInfo.XML_SOURCE )
         {
+            this.log( Level.WARNING, "cannotCopyType", new Object[]
+                {
+                    type.toType( fieldOutline.parent().parent(), Aspect.IMPLEMENTATION ).fullName(),
+                    fieldOutline.getPropertyInfo().getName( true ), fieldOutline.parent().implClass.fullName()
+                } );
+
             expr = source;
         }
 
         return expr;
     }
 
-    private JExpression getWildcardCopyExpression( final ClassOutline classOutline, final CWildcardTypeInfo type,
+    private JExpression getWildcardCopyExpression( final FieldOutline fieldOutline, final CWildcardTypeInfo type,
                                                    final JBlock block, final JExpression source )
     {
         block.directStatement( "// CWildcardTypeInfo: " +
-                               type.toType( classOutline.parent(), Aspect.IMPLEMENTATION ).binaryName() );
+                               type.toType( fieldOutline.parent().parent(), Aspect.IMPLEMENTATION ).binaryName() );
 
         return JOp.cond( source.eq( JExpr._null() ), JExpr._null(),
-                         JExpr.cast( classOutline.parent().getCodeModel().ref( Element.class ),
+                         JExpr.cast( fieldOutline.parent().parent().getCodeModel().ref( Element.class ),
                                      source.invoke( "cloneNode" ).arg( JExpr.TRUE ) ) );
 
     }
 
-    private JExpression getClassInfoCopyExpression( final ClassOutline classOutline, final CClassInfo type,
+    private JExpression getClassInfoCopyExpression( final FieldOutline fieldOutline, final CClassInfo type,
                                                     final JBlock block, final JExpression source )
     {
         block.directStatement(
-            "// CClassInfo: " + type.toType( classOutline.parent(), Aspect.IMPLEMENTATION ).binaryName() );
+            "// CClassInfo: " + type.toType( fieldOutline.parent().parent(), Aspect.IMPLEMENTATION ).binaryName() );
 
         return JOp.cond( source.eq( JExpr._null() ), JExpr._null(), source.invoke( "clone" ) );
     }
 
-    private JExpression getNonElementCopyExpression( final ClassOutline classOutline, final CNonElement type,
+    private JExpression getNonElementCopyExpression( final FieldOutline fieldOutline, final CNonElement type,
                                                      final JBlock block, final JExpression source )
     {
         block.directStatement(
-            "// CNonElement: " + type.toType( classOutline.parent(), Aspect.IMPLEMENTATION ).binaryName() );
+            "// CNonElement: " + type.toType( fieldOutline.parent().parent(), Aspect.IMPLEMENTATION ).binaryName() );
 
         return null;
     }
 
-    private JExpression getArrayCopyExpression( final ClassOutline classOutline, final CArrayInfo type,
+    private JExpression getArrayCopyExpression( final FieldOutline fieldOutline, final CArrayInfo type,
                                                 final JBlock block, final JExpression source )
     {
         block.directStatement( "// CArrayInfo: " + type.fullName() );
-        return this.getCopyOfArrayInfoInvocation( classOutline, type ).arg( source );
+        return this.getCopyOfArrayInfoInvocation( fieldOutline, type ).arg( source );
     }
 
-    private JExpression getElementCopyExpression( final ClassOutline classOutline, final CElementInfo type,
+    private JExpression getElementCopyExpression( final FieldOutline fieldOutline, final CElementInfo type,
                                                   final JBlock block, final JExpression source )
     {
         block.directStatement(
-            "// CElementInfo: " + type.toType( classOutline.parent(), Aspect.IMPLEMENTATION ).binaryName() );
+            "// CElementInfo: " + type.toType( fieldOutline.parent().parent(), Aspect.IMPLEMENTATION ).binaryName() );
 
-        return this.getCopyOfClassInfoElementInvocation( classOutline, type.getContentType() ).arg( source );
+        return this.getCopyOfClassInfoElementInvocation( fieldOutline, type.getContentType() ).arg( source );
     }
 
-    private JExpression getEnumLeafInfoCopyExpression( final ClassOutline classOutline, final CEnumLeafInfo type,
+    private JExpression getEnumLeafInfoCopyExpression( final FieldOutline fieldOutline, final CEnumLeafInfo type,
                                                        final JBlock block, final JExpression source )
     {
         block.directStatement(
-            "// CEnumLeafInfo: " + type.toType( classOutline.parent(), Aspect.IMPLEMENTATION ).binaryName() );
+            "// CEnumLeafInfo: " + type.toType( fieldOutline.parent().parent(), Aspect.IMPLEMENTATION ).binaryName() );
 
         return source;
     }
@@ -1422,6 +1714,11 @@ public final class PluginImpl extends Plugin
                         }
                         else
                         {
+                            this.log( Level.WARNING, "fieldWithoutProperties", new Object[]
+                                {
+                                    field.name(), clazz.implClass.name()
+                                } );
+
                             paramNotNullBlock.assign( JExpr.refthis( field.name() ), JExpr.cast(
                                 field.type(), this.getCopyOfObjectInvocation( clazz ).arg( o.ref( field ) ) ) );
 
@@ -1488,13 +1785,24 @@ public final class PluginImpl extends Plugin
             }
             else
             {
-                final CTypeInfo typeInfo =
-                    ( field.getPropertyInfo().getAdapter() != null ? field.parent().parent().getModel().getTypeInfo(
-                    field.getPropertyInfo().getAdapter().customType ) : field.getPropertyInfo().ref().iterator().next() );
+                final JExpression copyExpr;
+                if ( field.getPropertyInfo().ref().size() != 1 )
+                {
+                    block.directStatement( "// '" + field.getPropertyInfo().getName( true ) + "' property." );
+                    copyExpr = JExpr.invoke( this.getCopyOfPropertyMethod( field ) ).arg( o.invoke( getter ) );
+                }
+                else
+                {
+                    final CTypeInfo typeInfo =
+                        ( field.getPropertyInfo().getAdapter() != null ? field.parent().parent().getModel().getTypeInfo(
+                        field.getPropertyInfo().getAdapter().customType ) : field.getPropertyInfo().ref().iterator().
+                        next() );
 
-                final JType javaType = typeInfo.toType( field.parent().parent(), Aspect.IMPLEMENTATION );
-                final JExpression copyExpr = this.getCopyExpression( field.parent(), typeInfo, block, JExpr.cast(
-                    javaType, JExpr.invoke( o, getter ) ) );
+                    final JType javaType = typeInfo.toType( field.parent().parent(), Aspect.IMPLEMENTATION );
+                    copyExpr = this.getCopyExpression( field, typeInfo, block,
+                                                       JExpr.cast( javaType, JExpr.invoke( o, getter ) ) );
+
+                }
 
                 if ( copyExpr == null )
                 {
@@ -1546,19 +1854,28 @@ public final class PluginImpl extends Plugin
         final StringBuffer b = new StringBuffer().append( "[" ).append( MESSAGE_PREFIX ).append( "] [" ).
             append( level.getLocalizedName() ).append( "] " ).append( this.getMessage( key, args ) );
 
+        int logLevel = Level.WARNING.intValue();
         if ( this.options != null && !this.options.quiet )
         {
-            final int l = this.options != null && this.options.debugMode ? Level.ALL.intValue() : Level.INFO.intValue();
-            if ( level.intValue() >= l )
+            if ( this.options.verbose )
             {
-                if ( level.intValue() <= Level.INFO.intValue() )
-                {
-                    System.out.println( b.toString() );
-                }
-                else
-                {
-                    System.err.println( b.toString() );
-                }
+                logLevel = Level.INFO.intValue();
+            }
+            if ( this.options.debugMode )
+            {
+                logLevel = Level.ALL.intValue();
+            }
+        }
+
+        if ( level.intValue() >= logLevel )
+        {
+            if ( level.intValue() <= Level.INFO.intValue() )
+            {
+                System.out.println( b.toString() );
+            }
+            else
+            {
+                System.err.println( b.toString() );
             }
         }
     }
@@ -1575,26 +1892,25 @@ class CClassInfoComparator implements Comparator<CClassInfo>
         this.outline = outline;
     }
 
-    private int recurse( final JClass o1, final JClass o2, final int hierarchy )
-    {
-        if ( o1.binaryName().equals( o2.binaryName() ) )
-        {
-            return hierarchy;
-        }
-        if ( o2._extends() != null && !o2._extends().binaryName().equals( "java.lang.Object" ) )
-        {
-            return this.recurse( o1, o2._extends(), hierarchy + 1 );
-        }
-
-        return 0;
-    }
-
     public int compare( final CClassInfo o1, final CClassInfo o2 )
     {
         final JClass javaClass1 = o1.toType( this.outline, Aspect.IMPLEMENTATION );
         final JClass javaClass2 = o2.toType( this.outline, Aspect.IMPLEMENTATION );
 
-        final int ret = this.recurse( javaClass1, javaClass2, 0 );
+        int ret = 0;
+
+        if ( !javaClass1.binaryName().equals( javaClass2.binaryName() ) )
+        {
+            if ( javaClass1.isAssignableFrom( javaClass2 ) )
+            {
+                ret = -1;
+            }
+            else if ( javaClass2.isAssignableFrom( javaClass1 ) )
+            {
+                ret = 1;
+            }
+        }
+
         return ret;
     }
 
@@ -1610,26 +1926,25 @@ class CElementInfoComparator implements Comparator<CElementInfo>
         this.outline = outline;
     }
 
-    private int recurse( final JClass o1, final JClass o2, final int hierarchy )
-    {
-        if ( o1.binaryName().equals( o2.binaryName() ) )
-        {
-            return hierarchy;
-        }
-        if ( o2._extends() != null && !o2._extends().binaryName().equals( "java.lang.Object" ) )
-        {
-            return this.recurse( o1, o2._extends(), hierarchy + 1 );
-        }
-
-        return 0;
-    }
-
     public int compare( final CElementInfo o1, final CElementInfo o2 )
     {
         final JClass javaClass1 = (JClass) o1.getContentType().toType( this.outline, Aspect.IMPLEMENTATION );
         final JClass javaClass2 = (JClass) o2.getContentType().toType( this.outline, Aspect.IMPLEMENTATION );
 
-        final int ret = this.recurse( javaClass1, javaClass2, 0 );
+        int ret = 0;
+
+        if ( !javaClass1.binaryName().equals( javaClass2.binaryName() ) )
+        {
+            if ( javaClass1.isAssignableFrom( javaClass2 ) )
+            {
+                ret = -1;
+            }
+            else if ( javaClass2.isAssignableFrom( javaClass1 ) )
+            {
+                ret = 1;
+            }
+        }
+
         return ret;
     }
 
@@ -1645,29 +1960,24 @@ class CTypeInfoComparator implements Comparator<CTypeInfo>
         this.outline = outline;
     }
 
-    private int recurse( final JClass o1, final JClass o2, final int hierarchy )
-    {
-        if ( o1.binaryName().equals( o2.binaryName() ) )
-        {
-            return hierarchy;
-        }
-        if ( o2._extends() != null && !o2._extends().binaryName().equals( "java.lang.Object" ) )
-        {
-            return this.recurse( o1, o2._extends(), hierarchy + 1 );
-        }
-
-        return 0;
-    }
-
     public int compare( final CTypeInfo o1, final CTypeInfo o2 )
     {
         final JType javaType1 = o1.toType( this.outline, Aspect.IMPLEMENTATION );
         final JType javaType2 = o2.toType( this.outline, Aspect.IMPLEMENTATION );
 
         int ret = 0;
-        if ( javaType1 instanceof JClass && javaType2 instanceof JClass )
+
+        if ( !javaType1.binaryName().equals( javaType2.binaryName() ) &&
+             javaType1 instanceof JClass && javaType2 instanceof JClass )
         {
-            ret = this.recurse( (JClass) javaType1, (JClass) javaType2, 0 );
+            if ( ( (JClass) javaType1 ).isAssignableFrom( (JClass) javaType2 ) )
+            {
+                ret = -1;
+            }
+            else if ( ( (JClass) javaType2 ).isAssignableFrom( (JClass) javaType1 ) )
+            {
+                ret = 1;
+            }
         }
 
         return ret;

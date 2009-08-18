@@ -208,6 +208,8 @@
             <configuration>
               <args>
                 <arg>-copy-constructor</arg>
+                <arg>-cc-visibility</arg>
+                <arg>package</arg>
                 <arg>-XtoString</arg>
                 <arg>-Xequals</arg>
                 <arg>-XhashCode</arg>
@@ -232,6 +234,8 @@
             <configuration>
               <args>
                 <arg>-copy-constructor</arg>
+                <arg>-cc-visibility</arg>
+                <arg>package</arg>
                 <arg>-XtoString</arg>
                 <arg>-Xequals</arg>
                 <arg>-XhashCode</arg>
@@ -256,6 +260,8 @@
             <configuration>
               <args>
                 <arg>-copy-constructor</arg>
+                <arg>-cc-visibility</arg>
+                <arg>package</arg>
                 <arg>-XtoString</arg>
                 <arg>-Xequals</arg>
                 <arg>-XhashCode</arg>
@@ -280,6 +286,8 @@
             <configuration>
               <args>
                 <arg>-copy-constructor</arg>
+                <arg>-cc-visibility</arg>
+                <arg>package</arg>
                 <arg>-XtoString</arg>
                 <arg>-Xequals</arg>
                 <arg>-XhashCode</arg>

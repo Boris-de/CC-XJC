@@ -33,6 +33,7 @@
 <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
             targetNamespace="http://sourceforge.net/ccxjc/it"
             xmlns:ccxjcit="http://sourceforge.net/ccxjc/it"
+            xmlns:xmime="http://www.w3.org/2005/05/xmlmime"
             elementFormDefault="qualified"
             attributeFormDefault="unqualified">
   <xsd:annotation>
@@ -141,6 +142,151 @@
       <xsd:element name="choiceItem" type="ccxjcit:ChoiceComplexType" minOccurs="0" maxOccurs="unbounded"/>
       <xsd:any namespace="##other" minOccurs="0" maxOccurs="unbounded"/>
     </xsd:choice>
+  </xsd:complexType>
+  <!--                                                                       -->
+  <!-- SkipBoundedAnyComplexType                                             -->
+  <!--                                                                       -->
+  <xsd:element name="skip-bounded-any-complex-type-test"
+               type="ccxjcit:SkipBoundedAnyComplexType"/>
+  <xsd:complexType name="SkipBoundedAnyComplexType">
+    <xsd:sequence>
+      <xsd:any minOccurs="0" maxOccurs="1" processContents="skip"/>
+    </xsd:sequence>
+  </xsd:complexType>
+  <!--                                                                       -->
+  <!-- SkipUnboundedAnyComplexType                                           -->
+  <!--                                                                       -->
+  <xsd:element name="skip-unbounded-any-complex-type-test"
+               type="ccxjcit:SkipUnboundedAnyComplexType"/>
+  <xsd:complexType name="SkipUnboundedAnyComplexType">
+    <xsd:sequence>
+      <xsd:any minOccurs="0" maxOccurs="unbounded" processContents="skip"/>
+    </xsd:sequence>
+  </xsd:complexType>
+  <!--                                                                       -->
+  <!-- StrictBoundedAnyComplexType                                           -->
+  <!--                                                                       -->
+  <xsd:element name="strict-bounded-any-complex-type-test"
+               type="ccxjcit:StrictBoundedAnyComplexType"/>
+  <xsd:complexType name="StrictBoundedAnyComplexType">
+    <xsd:sequence>
+      <xsd:any minOccurs="0" maxOccurs="1" processContents="strict"/>
+    </xsd:sequence>
+  </xsd:complexType>
+  <!--                                                                       -->
+  <!-- StrictUnboundedAnyComplexType                                         -->
+  <!--                                                                       -->
+  <xsd:element name="strict-unbounded-any-complex-type-test"
+               type="ccxjcit:StrictUnboundedAnyComplexType"/>
+  <xsd:complexType name="StrictUnboundedAnyComplexType">
+    <xsd:sequence>
+      <xsd:any minOccurs="0" maxOccurs="unbounded" processContents="strict"/>
+    </xsd:sequence>
+  </xsd:complexType>
+  <!--                                                                       -->
+  <!-- LaxBoundedAnyComplexType                                              -->
+  <!--                                                                       -->
+  <xsd:element name="lax-bounded-any-complex-type-test"
+               type="ccxjcit:LaxBoundedAnyComplexType"/>
+  <xsd:complexType name="LaxBoundedAnyComplexType">
+    <xsd:sequence>
+      <xsd:any minOccurs="0" maxOccurs="1" processContents="lax"/>
+    </xsd:sequence>
+  </xsd:complexType>
+  <!--                                                                       -->
+  <!-- LaxUnboundedAnyComplexType                                            -->
+  <!--                                                                       -->
+  <xsd:element name="lax-unbounded-any-complex-type-test"
+               type="ccxjcit:LaxUnboundedAnyComplexType"/>
+  <xsd:complexType name="LaxUnboundedAnyComplexType">
+    <xsd:sequence>
+      <xsd:any minOccurs="0" maxOccurs="unbounded" processContents="lax"/>
+    </xsd:sequence>
+  </xsd:complexType>
+  <!--                                                                       -->
+  <!-- ParentComplexType                                                     -->
+  <!--                                                                       -->
+  <xsd:complexType name="ParentComplexType"/>
+  <!--                                                                       -->
+  <!-- ChildOfParentComplexType                                              -->
+  <!--                                                                       -->
+  <xsd:complexType name="ChildOfParentComplexType">
+    <xsd:complexContent>
+      <xsd:extension base="ccxjcit:ParentComplexType"/>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <!--                                                                       -->
+  <!-- ChildOfChildOfParentComplexType                                       -->
+  <!--                                                                       -->
+  <xsd:complexType name="ChildOfChildOfParentComplexType">
+    <xsd:complexContent>
+      <xsd:extension base="ccxjcit:ChildOfParentComplexType"/>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <!--                                                                       -->
+  <!-- ChildOfChildOfChildOfParentComplexType                                -->
+  <!--                                                                       -->
+  <xsd:complexType name="ChildOfChildOfChildOfParentComplexType">
+    <xsd:complexContent>
+      <xsd:extension base="ccxjcit:ChildOfChildOfParentComplexType"/>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <!--                                                                       -->
+  <!-- ChildOfChildOfChildOfChildOfParentComplexType                         -->
+  <!--                                                                       -->
+  <xsd:complexType name="ChildOfChildOfChildOfChildOfParentComplexType">
+    <xsd:complexContent>
+      <xsd:extension base="ccxjcit:ChildOfChildOfChildOfParentComplexType"/>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <!--                                                                       -->
+  <!-- HierarchicalChoiceComplexType                                         -->
+  <!--                                                                       -->
+  <xsd:element name="hierarchical-choice-complex-type-test"
+               type="ccxjcit:HierarchicalChoiceComplexType"/>
+  <xsd:complexType name="HierarchicalChoiceComplexType">
+    <xsd:choice maxOccurs="unbounded">
+      <xsd:element name="childOfChildOfChildOfChildOfParent" type="ccxjcit:ChildOfChildOfChildOfChildOfParentComplexType"/>
+      <xsd:element name="childOfChildOfChildOfParent" type="ccxjcit:ChildOfChildOfChildOfParentComplexType"/>
+      <xsd:element name="parent" type="ccxjcit:ParentComplexType"/>
+      <xsd:element name="childOfChildOfParent" type="ccxjcit:ChildOfChildOfParentComplexType"/>
+      <xsd:element name="childOfParent" type="ccxjcit:ChildOfParentComplexType"/>
+    </xsd:choice>
+  </xsd:complexType>
+  <!--                                                                       -->
+  <!-- MixedComplexType                                                      -->
+  <!--                                                                       -->
+  <xsd:element name="mixed-complex-type-test"
+               type="ccxjcit:MixedComplexType"/>
+  <xsd:complexType name="MixedComplexType" mixed="true">
+    <xsd:sequence>
+      <xsd:element name="string" type="xsd:string"/>
+      <xsd:element name="positiveInteger" type="xsd:positiveInteger"/>
+      <xsd:element name="anyURI" type="xsd:anyURI"/>
+      <xsd:any processContents="lax"/>
+    </xsd:sequence>
+  </xsd:complexType>
+  <!--                                                                       -->
+  <!-- XMimeComplexType                                                      -->
+  <!--                                                                       -->
+  <xsd:element name="xmime-complex-type-test"
+               type="ccxjcit:XMimeComplexType"/>
+  <xsd:complexType name="XMimeComplexType" mixed="true">
+    <xsd:sequence>
+      <xsd:element name="jpegImage" type="xsd:base64Binary"
+                   xmime:expectedContentTypes="image/jpeg"/>
+      <xsd:element name="gifImage" type="xsd:base64Binary"
+                   xmime:expectedContentTypes="image/gif"/>
+      <xsd:element name="textXml" type="xsd:base64Binary"
+                   xmime:expectedContentTypes="text/xml"/>
+      <xsd:element name="applicationXml" type="xsd:base64Binary"
+                   xmime:expectedContentTypes="application/xml"/>
+      <xsd:element name="applicationOctetStream" type="xsd:base64Binary"
+                   xmime:expectedContentTypes="application/octet-stream"/>
+      <xsd:element name="applicationPdf" type="xsd:base64Binary"
+                   xmime:expectedContentTypes="application/pdf"/>
+      <xsd:any processContents="lax"/>
+    </xsd:sequence>
   </xsd:complexType>
   <!--                                                                       -->
   <!-- Test simple types.                                                    -->
