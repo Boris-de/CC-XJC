@@ -1652,7 +1652,7 @@ public final class PluginImpl extends Plugin
         final JMethod ctor = clazz.implClass.constructor( JMod.PUBLIC );
         ctor.body().directStatement( " // " + this.getMessage( "title", null ) );
         ctor.body().invoke( "super" );
-        ctor.javadoc().add( "Creates a new {@code " + clazz.implClass.fullName() + "} instance." );
+        ctor.javadoc().add( "Creates a new {@code " + clazz.implClass.name() + "} instance." );
         this.constructorCount = this.constructorCount.add( BigInteger.ONE );
         return ctor;
     }
@@ -1662,8 +1662,8 @@ public final class PluginImpl extends Plugin
         final JMethod ctor = clazz.implClass.constructor( JMod.PUBLIC );
         final JVar o = ctor.param( JMod.FINAL, clazz.implClass, "o" );
 
-        ctor.javadoc().add( "Creates a new {@code " + clazz.implClass.fullName() +
-                            "} instance by copying a given instance." );
+        ctor.javadoc().add( "Creates a new {@code " + clazz.implClass.name() +
+                            "} instance by deeply copying a given instance." );
 
         ctor.javadoc().addParam( o ).add( "The instance to copy or {@code null}." );
 
@@ -1754,8 +1754,8 @@ public final class PluginImpl extends Plugin
 
         cloneMethod.annotate( Override.class );
         clazz.implClass._implements( clazz.parent().getCodeModel().ref( Cloneable.class ) );
-        cloneMethod.javadoc().append( "Creates and returns a copy of this object.\n" );
-        cloneMethod.javadoc().addReturn().append( "A clone of this instance." );
+        cloneMethod.javadoc().append( "Creates and returns a deep copy of this object.\n" );
+        cloneMethod.javadoc().addReturn().append( "A deep copy of this instance." );
         this.methodCount = this.methodCount.add( BigInteger.ONE );
         return cloneMethod;
     }

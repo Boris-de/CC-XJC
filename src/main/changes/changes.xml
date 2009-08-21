@@ -134,5 +134,12 @@
       </action>
     </release>
 
+    <!-- ******************************************************************* -->
+    <release version="1.0-beta-10" date="2009-08-21">
+      <action dev="schulte2005" type="fix"><![CDATA[
+      Updated generated javadoc.]]>
+      </action>
+    </release>
+
   </body>
 </document>
