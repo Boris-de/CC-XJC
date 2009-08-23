@@ -34,8 +34,10 @@
             targetNamespace="http://sourceforge.net/ccxjc/it"
             xmlns:ccxjcit="http://sourceforge.net/ccxjc/it"
             xmlns:xmime="http://www.w3.org/2005/05/xmlmime"
+            xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
             elementFormDefault="qualified"
-            attributeFormDefault="unqualified">
+            attributeFormDefault="unqualified"
+            jaxb:version="2.0">
   <xsd:annotation>
     <xsd:documentation xml:lang="en"><![CDATA[
 
@@ -286,6 +288,25 @@
       <xsd:element name="applicationPdf" type="xsd:base64Binary"
                    xmime:expectedContentTypes="application/pdf"/>
       <xsd:any processContents="lax"/>
+    </xsd:sequence>
+  </xsd:complexType>
+  <!--                                                                       -->
+  <!-- ElementClasses                                                        -->
+  <!--                                                                       -->
+  <xsd:element name="element-class-test"
+               type="ccxjcit:ElementClassComplexType"/>
+  <xsd:complexType name="ElementClassComplexType">
+    <xsd:sequence>
+      <xsd:element name="string" type="xsd:string" minOccurs="0"
+                   maxOccurs="unbounded">
+        <xsd:annotation>
+          <xsd:appinfo>
+            <jaxb:class>
+              <jaxb:javadoc>Test class customization.</jaxb:javadoc>
+            </jaxb:class>
+          </xsd:appinfo>
+        </xsd:annotation>
+      </xsd:element>
     </xsd:sequence>
   </xsd:complexType>
   <!--                                                                       -->

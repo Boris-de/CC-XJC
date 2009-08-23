@@ -971,16 +971,26 @@ public final class PluginImpl extends Plugin
         return ( mod != JMod.PRIVATE ? clazz._package().objectFactory().staticInvoke( m ) : JExpr.invoke( m ) );
     }
 
-    private JInvocation getCopyOfClassInfoElementInvocation( final FieldOutline fieldOutline, final CNonElement type )
+    private JInvocation getCopyOfElementInfoInvocation( final FieldOutline fieldOutline, final CElementInfo element )
     {
-        final JType jaxbElement = fieldOutline.parent().parent().getCodeModel().ref( JAXBElement.class );
-        final JType javaType = type.toType( fieldOutline.parent().parent(), Aspect.IMPLEMENTATION );
+        final JType elementType = element.toType( fieldOutline.parent().parent(), Aspect.IMPLEMENTATION );
         final JType[] signature =
         {
-            jaxbElement
+            elementType
         };
 
-        final String methodName = "copyOf" + this.getMethodNamePart( javaType ) + "Element";
+        final String methodName;
+        if ( element.hasClass() )
+        {
+            methodName = "copyOf" + element.shortName();
+        }
+        else
+        {
+            methodName = "copyOf" + this.getMethodNamePart(
+                element.getContentType().toType( fieldOutline.parent().parent(), Aspect.IMPLEMENTATION ) ) + "Element";
+
+        }
+
         final int mod = this.getVisibilityModifier();
 
         if ( mod != JMod.PRIVATE )
@@ -1006,13 +1016,13 @@ public final class PluginImpl extends Plugin
 
         final JMethod m =
             ( mod != JMod.PRIVATE
-              ? fieldOutline.parent()._package().objectFactory().method( JMod.STATIC | mod, jaxbElement, methodName )
-              : fieldOutline.parent().implClass.method( JMod.STATIC | mod, jaxbElement, methodName ) );
+              ? fieldOutline.parent()._package().objectFactory().method( JMod.STATIC | mod, elementType, methodName )
+              : fieldOutline.parent().implClass.method( JMod.STATIC | mod, elementType, methodName ) );
 
-        final JVar e = m.param( JMod.FINAL, jaxbElement, "e" );
+        final JVar e = m.param( JMod.FINAL, elementType, "e" );
 
-        m.javadoc().append( "Creates and returns a copy of a given {@code JAXBElement<" + javaType.binaryName() +
-                            ">} instance." );
+        m.javadoc().append( "Creates and returns a copy of a given {@code " + elementType.binaryName() +
+                            "} instance." );
 
         m.javadoc().addParam( e ).append( "The instance to copy or {@code null}." );
         m.javadoc().addReturn().append( "A copy of {@code e} or {@code null} if {@code e} is {@code null}." );
@@ -1021,16 +1031,36 @@ public final class PluginImpl extends Plugin
 
         final JConditional elementNotNull = m.body()._if( e.ne( JExpr._null() ) );
 
-        final JExpression newElement = JExpr._new( jaxbElement ).
-            arg( JExpr.invoke( e, "getName" ) ).
-            arg( JExpr.invoke( e, "getDeclaredType" ) ).
-            arg( JExpr.invoke( e, "getScope" ) ).
-            arg( JExpr.invoke( e, "getValue" ) );
+        final JExpression newElement;
+        if ( element.hasClass() )
+        {
+            newElement = JExpr._new( elementType ).arg( this.getCopyExpression(
+                fieldOutline, element.getContentType(), elementNotNull._then(),
+                JExpr.cast( element.getContentType().toType( fieldOutline.parent().parent(), Aspect.IMPLEMENTATION ),
+                            JExpr.invoke( e, "getValue" ) ) ) );
 
-        final JVar copy = elementNotNull._then().decl( jaxbElement, "copy", newElement );
+        }
+        else
+        {
+            newElement = JExpr._new( elementType ).
+                arg( JExpr.invoke( e, "getName" ) ).
+                arg( JExpr.invoke( e, "getDeclaredType" ) ).
+                arg( JExpr.invoke( e, "getScope" ) ).
+                arg( JExpr.invoke( e, "getValue" ) );
+
+        }
+
+        final JVar copy = elementNotNull._then().decl( JMod.FINAL, elementType, "copy", newElement );
         elementNotNull._then().add( copy.invoke( "setNil" ).arg( e.invoke( "isNil" ) ) );
-        elementNotNull._then().add( copy.invoke( "setValue" ).arg( this.getCopyExpression(
-            fieldOutline, type, elementNotNull._then(), JExpr.cast( javaType, copy.invoke( "getValue" ) ) ) ) );
+
+        if ( !element.hasClass() )
+        {
+            elementNotNull._then().add( copy.invoke( "setValue" ).arg( this.getCopyExpression(
+                fieldOutline, element.getContentType(), elementNotNull._then(),
+                JExpr.cast( element.getContentType().toType( fieldOutline.parent().parent(), Aspect.IMPLEMENTATION ),
+                            copy.invoke( "getValue" ) ) ) ) );
+
+        }
 
         elementNotNull._then()._return( copy );
         m.body()._return( JExpr._null() );
@@ -1054,7 +1084,7 @@ public final class PluginImpl extends Plugin
             arrayType
         };
 
-        final String methodName = "copyOf" + this.getMethodNamePart( arrayType );
+        final String methodName = "copyOf" + fieldOutline.getPropertyInfo().getName( true );
         final int mod = this.getVisibilityModifier();
 
         if ( mod != JMod.PRIVATE )
@@ -1146,6 +1176,9 @@ public final class PluginImpl extends Plugin
         final List<CElementInfo> referencedElementInfos =
             new ArrayList<CElementInfo>( field.getPropertyInfo().ref().size() );
 
+        final List<CElementInfo> referencedElementInfosWithClass =
+            new ArrayList<CElementInfo>( field.getPropertyInfo().ref().size() );
+
         final List<CTypeInfo> referencedTypeInfos =
             new ArrayList<CTypeInfo>( field.getPropertyInfo().ref().size() );
 
@@ -1163,12 +1196,20 @@ public final class PluginImpl extends Plugin
             if ( type instanceof CElementInfo )
             {
                 final CElementInfo e = (CElementInfo) type;
-                final JType contentType = e.getContentType().toType( field.parent().parent(), Aspect.IMPLEMENTATION );
-
-                if ( !referencedContentTypes.contains( contentType ) )
+                if ( e.hasClass() )
                 {
-                    referencedContentTypes.add( contentType );
-                    referencedElementInfos.add( e );
+                    referencedElementInfosWithClass.add( e );
+                }
+                else
+                {
+                    final JType contentType =
+                        e.getContentType().toType( field.parent().parent(), Aspect.IMPLEMENTATION );
+
+                    if ( !referencedContentTypes.contains( contentType ) )
+                    {
+                        referencedContentTypes.add( contentType );
+                        referencedElementInfos.add( e );
+                    }
                 }
             }
             else if ( type instanceof CClassInfo )
@@ -1194,41 +1235,72 @@ public final class PluginImpl extends Plugin
         }
 
         Collections.sort( referencedClassInfos, new CClassInfoComparator( field.parent().parent() ) );
-        Collections.sort( referencedElementInfos, new CElementInfoComparator( field.parent().parent() ) );
+        Collections.sort( referencedElementInfos, new CElementInfoComparator( field.parent().parent(), false ) );
+        Collections.sort( referencedElementInfosWithClass, new CElementInfoComparator( field.parent().parent(), true ) );
         Collections.sort( referencedTypeInfos, new CTypeInfoComparator( field.parent().parent() ) );
         Collections.reverse( referencedClassInfos );
         Collections.reverse( referencedElementInfos );
+        Collections.reverse( referencedElementInfosWithClass );
         Collections.reverse( referencedTypeInfos );
 
-        if ( !referencedElementInfos.isEmpty() )
+        if ( !( referencedElementInfos.isEmpty() && referencedElementInfosWithClass.isEmpty() ) )
         {
             final JBlock elementBlock = sourceNotNull._then()._if( source._instanceof( jaxbElement ) )._then();
-
-            for ( CElementInfo elementInfo : referencedElementInfos )
+            if ( !referencedElementInfosWithClass.isEmpty() )
             {
-                final JType contentType =
-                    ( elementInfo.getAdapterUse() != null ? field.parent().parent().getModel().getTypeInfo(
-                    elementInfo.getAdapterUse().customType ).toType( field.parent().parent(), Aspect.IMPLEMENTATION )
-                      : elementInfo.getContentType().toType( field.parent().parent(), Aspect.IMPLEMENTATION ) );
-
-                final JConditional ifInstanceOf = elementBlock._if( JExpr.invoke( JExpr.cast(
-                    jaxbElement, source ), "getValue" )._instanceof( contentType ) );
-
-                final JExpression copyExpr = this.getCopyExpression( field, elementInfo, ifInstanceOf._then(),
-                                                                     JExpr.cast( jaxbElement, source ) );
-
-                if ( copyExpr == null )
+                elementBlock.directStatement( "// Referenced elements with classes." );
+                for ( CElementInfo elementInfo : referencedElementInfosWithClass )
                 {
-                    this.log( Level.SEVERE, this.getMessage( "cannotCopyProperty", new Object[]
-                        {
-                            field.getPropertyInfo().getName( true ),
-                            field.parent().implClass.binaryName()
-                        } ), null );
+                    final JType elementType = elementInfo.toType( field.parent().parent(), Aspect.IMPLEMENTATION );
+                    final JConditional ifInstanceOf = elementBlock._if( source._instanceof( elementType ) );
+                    final JExpression copyExpr = this.getCopyExpression(
+                        field, elementInfo, ifInstanceOf._then(), JExpr.cast( elementType, source ) );
 
+                    if ( copyExpr == null )
+                    {
+                        this.log( Level.SEVERE, this.getMessage( "cannotCopyProperty", new Object[]
+                            {
+                                field.getPropertyInfo().getName( true ),
+                                field.parent().implClass.binaryName()
+                            } ), null );
+
+                    }
+                    else
+                    {
+                        ifInstanceOf._then()._return( copyExpr );
+                    }
                 }
-                else
+            }
+
+            if ( !referencedElementInfos.isEmpty() )
+            {
+                elementBlock.directStatement( "// Referenced elements without classes." );
+                for ( CElementInfo elementInfo : referencedElementInfos )
                 {
-                    ifInstanceOf._then()._return( copyExpr );
+                    final JType contentType =
+                        ( elementInfo.getAdapterUse() != null ? field.parent().parent().getModel().getTypeInfo(
+                        elementInfo.getAdapterUse().customType ).toType( field.parent().parent(), Aspect.IMPLEMENTATION )
+                          : elementInfo.getContentType().toType( field.parent().parent(), Aspect.IMPLEMENTATION ) );
+
+                    final JConditional ifInstanceOf = elementBlock._if( JExpr.invoke( JExpr.cast(
+                        jaxbElement, source ), "getValue" )._instanceof( contentType ) );
+
+                    final JExpression copyExpr = this.getCopyExpression(
+                        field, elementInfo, ifInstanceOf._then(), JExpr.cast( jaxbElement, source ) );
+
+                    if ( copyExpr == null )
+                    {
+                        this.log( Level.SEVERE, this.getMessage( "cannotCopyProperty", new Object[]
+                            {
+                                field.getPropertyInfo().getName( true ),
+                                field.parent().implClass.binaryName()
+                            } ), null );
+
+                    }
+                    else
+                    {
+                        ifInstanceOf._then()._return( copyExpr );
+                    }
                 }
             }
         }
@@ -1341,6 +1413,9 @@ public final class PluginImpl extends Plugin
         final List<CElementInfo> referencedElementInfos =
             new ArrayList<CElementInfo>( field.getPropertyInfo().ref().size() );
 
+        final List<CElementInfo> referencedElementInfosWithClass =
+            new ArrayList<CElementInfo>( field.getPropertyInfo().ref().size() );
+
         final List<CTypeInfo> referencedTypeInfos =
             new ArrayList<CTypeInfo>( field.getPropertyInfo().ref().size() );
 
@@ -1358,12 +1433,20 @@ public final class PluginImpl extends Plugin
             if ( type instanceof CElementInfo )
             {
                 final CElementInfo e = (CElementInfo) type;
-                final JType contentType = e.getContentType().toType( field.parent().parent(), Aspect.IMPLEMENTATION );
-
-                if ( !referencedContentTypes.contains( contentType ) )
+                if ( e.hasClass() )
                 {
-                    referencedContentTypes.add( contentType );
-                    referencedElementInfos.add( e );
+                    referencedElementInfosWithClass.add( e );
+                }
+                else
+                {
+                    final JType contentType =
+                        e.getContentType().toType( field.parent().parent(), Aspect.IMPLEMENTATION );
+
+                    if ( !referencedContentTypes.contains( contentType ) )
+                    {
+                        referencedContentTypes.add( contentType );
+                        referencedElementInfos.add( e );
+                    }
                 }
             }
             else if ( type instanceof CClassInfo )
@@ -1389,10 +1472,12 @@ public final class PluginImpl extends Plugin
         }
 
         Collections.sort( referencedClassInfos, new CClassInfoComparator( field.parent().parent() ) );
-        Collections.sort( referencedElementInfos, new CElementInfoComparator( field.parent().parent() ) );
+        Collections.sort( referencedElementInfos, new CElementInfoComparator( field.parent().parent(), false ) );
+        Collections.sort( referencedElementInfosWithClass, new CElementInfoComparator( field.parent().parent(), true ) );
         Collections.sort( referencedTypeInfos, new CTypeInfoComparator( field.parent().parent() ) );
         Collections.reverse( referencedClassInfos );
         Collections.reverse( referencedElementInfos );
+        Collections.reverse( referencedElementInfosWithClass );
         Collections.reverse( referencedTypeInfos );
 
         final JForLoop copyLoop;
@@ -1420,7 +1505,7 @@ public final class PluginImpl extends Plugin
         }
         else
         {
-            sourceNotEmpty = m.body()._if( JExpr.invoke( source, "isEmpty" ).ne( JExpr.TRUE ) );
+            sourceNotEmpty = m.body()._if( JExpr.invoke( source, "isEmpty" ).not() );
             copyLoop = sourceNotEmpty._then()._for();
             it = copyLoop.init( field.parent().parent().getCodeModel().ref( Iterator.class ),
                                 "it", source.invoke( "iterator" ) );
@@ -1430,45 +1515,84 @@ public final class PluginImpl extends Plugin
             copy = null;
         }
 
-        if ( !referencedElementInfos.isEmpty() )
+        if ( !( referencedElementInfos.isEmpty() && referencedElementInfosWithClass.isEmpty() ) )
         {
             final JBlock copyBlock = copyLoop.body()._if( next._instanceof( jaxbElement ) )._then();
-
-            for ( CElementInfo elementInfo : referencedElementInfos )
+            if ( !referencedElementInfosWithClass.isEmpty() )
             {
-                final JType contentType =
-                    ( elementInfo.getAdapterUse() != null ? field.parent().parent().getModel().getTypeInfo(
-                    elementInfo.getAdapterUse().customType ).toType( field.parent().parent(), Aspect.IMPLEMENTATION )
-                      : elementInfo.getContentType().toType( field.parent().parent(), Aspect.IMPLEMENTATION ) );
-
-                final JConditional ifInstanceOf = copyBlock._if( JExpr.invoke( JExpr.cast(
-                    jaxbElement, next ), "getValue" )._instanceof( contentType ) );
-
-                final JExpression copyExpr =
-                    this.getCopyExpression( field, elementInfo, ifInstanceOf._then(), JExpr.cast( jaxbElement, next ) );
-
-                if ( copyExpr == null )
+                copyBlock.directStatement( "// Referenced elements with classes." );
+                for ( CElementInfo elementInfo : referencedElementInfosWithClass )
                 {
-                    this.log( Level.SEVERE, this.getMessage( "cannotCopyProperty", new Object[]
-                        {
-                            field.getPropertyInfo().getName( true ),
-                            field.parent().implClass.binaryName()
-                        } ), null );
+                    final JType elementType = elementInfo.toType( field.parent().parent(), Aspect.IMPLEMENTATION );
+                    final JConditional ifInstanceOf = copyBlock._if( next._instanceof( elementType ) );
+                    final JExpression copyExpr = this.getCopyExpression(
+                        field, elementInfo, ifInstanceOf._then(), JExpr.cast( elementType, next ) );
 
-                }
-                else
-                {
-                    if ( field.getRawType().isArray() )
+                    if ( copyExpr == null )
                     {
-                        ifInstanceOf._then().assign( copy.component( it ), copyExpr );
+                        this.log( Level.SEVERE, this.getMessage( "cannotCopyProperty", new Object[]
+                            {
+                                field.getPropertyInfo().getName( true ),
+                                field.parent().implClass.binaryName()
+                            } ), null );
+
                     }
                     else
                     {
-                        ifInstanceOf._then().invoke( target, "add" ).arg( copyExpr );
+                        if ( field.getRawType().isArray() )
+                        {
+                            ifInstanceOf._then().assign( copy.component( it ), copyExpr );
+                        }
+                        else
+                        {
+                            ifInstanceOf._then().invoke( target, "add" ).arg( copyExpr );
+                        }
+
+                        ifInstanceOf._then()._continue();
                     }
                 }
+            }
 
-                ifInstanceOf._then()._continue();
+            if ( !referencedElementInfos.isEmpty() )
+            {
+                copyBlock.directStatement( "// Referenced elements without classes." );
+                for ( CElementInfo elementInfo : referencedElementInfos )
+                {
+                    final JType contentType =
+                        ( elementInfo.getAdapterUse() != null ? field.parent().parent().getModel().getTypeInfo(
+                        elementInfo.getAdapterUse().customType ).toType( field.parent().parent(), Aspect.IMPLEMENTATION )
+                          : elementInfo.getContentType().toType( field.parent().parent(), Aspect.IMPLEMENTATION ) );
+
+                    final JConditional ifInstanceOf = copyBlock._if( JExpr.invoke( JExpr.cast(
+                        jaxbElement, next ), "getValue" )._instanceof( contentType ) );
+
+                    final JExpression copyExpr =
+                        this.getCopyExpression( field, elementInfo, ifInstanceOf._then(),
+                                                JExpr.cast( jaxbElement, next ) );
+
+                    if ( copyExpr == null )
+                    {
+                        this.log( Level.SEVERE, this.getMessage( "cannotCopyProperty", new Object[]
+                            {
+                                field.getPropertyInfo().getName( true ),
+                                field.parent().implClass.binaryName()
+                            } ), null );
+
+                    }
+                    else
+                    {
+                        if ( field.getRawType().isArray() )
+                        {
+                            ifInstanceOf._then().assign( copy.component( it ), copyExpr );
+                        }
+                        else
+                        {
+                            ifInstanceOf._then().invoke( target, "add" ).arg( copyExpr );
+                        }
+                    }
+
+                    ifInstanceOf._then()._continue();
+                }
             }
         }
 
@@ -1692,7 +1816,7 @@ public final class PluginImpl extends Plugin
         block.directStatement(
             "// CElementInfo: " + type.toType( fieldOutline.parent().parent(), Aspect.IMPLEMENTATION ).binaryName() );
 
-        return this.getCopyOfClassInfoElementInvocation( fieldOutline, type.getContentType() ).arg( source );
+        return this.getCopyOfElementInfoInvocation( fieldOutline, type ).arg( source );
     }
 
     private JExpression getEnumLeafInfoCopyExpression( final FieldOutline fieldOutline, final CEnumLeafInfo type,
@@ -1899,6 +2023,8 @@ public final class PluginImpl extends Plugin
         {
             methodName = methodName.replace( "[]", "s" );
         }
+
+        methodName = methodName.replace( ".", "" );
         final char[] c = methodName.toCharArray();
         c[0] = Character.toUpperCase( c[0] );
         methodName = String.valueOf( c );
@@ -1983,15 +2109,29 @@ class CElementInfoComparator implements Comparator<CElementInfo>
 
     private final Outline outline;
 
-    CElementInfoComparator( final Outline outline )
+    private final boolean hasClass;
+
+    CElementInfoComparator( final Outline outline, final boolean hasClass )
     {
         this.outline = outline;
+        this.hasClass = hasClass;
     }
 
     public int compare( final CElementInfo o1, final CElementInfo o2 )
     {
-        final JClass javaClass1 = (JClass) o1.getContentType().toType( this.outline, Aspect.IMPLEMENTATION );
-        final JClass javaClass2 = (JClass) o2.getContentType().toType( this.outline, Aspect.IMPLEMENTATION );
+        final JClass javaClass1;
+        final JClass javaClass2;
+
+        if ( this.hasClass )
+        {
+            javaClass1 = (JClass) o1.toType( this.outline, Aspect.IMPLEMENTATION );
+            javaClass2 = (JClass) o2.toType( this.outline, Aspect.IMPLEMENTATION );
+        }
+        else
+        {
+            javaClass1 = (JClass) o1.getContentType().toType( this.outline, Aspect.IMPLEMENTATION );
+            javaClass2 = (JClass) o2.getContentType().toType( this.outline, Aspect.IMPLEMENTATION );
+        }
 
         int ret = 0;
 
