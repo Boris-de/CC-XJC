@@ -72,6 +72,7 @@ import java.io.Serializable;
 import java.io.StreamCorruptedException;
 import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -81,9 +82,12 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.UUID;
 import java.util.logging.Level;
 import javax.xml.bind.JAXBElement;
+import javax.xml.datatype.Duration;
 import javax.xml.datatype.XMLGregorianCalendar;
+import javax.xml.namespace.QName;
 import org.w3c.dom.Element;
 import org.xml.sax.ErrorHandler;
 
@@ -106,23 +110,40 @@ public final class PluginImpl extends Plugin
 
     private static final String TARGET_OPTION_NAME = "-cc-target";
 
-    private static final String[] IMMUTABLE_NAMES =
+    private static final Class[] IMMUTABLE_TYPES =
     {
-        "java.lang.Boolean",
-        "java.lang.Byte",
-        "java.lang.Character",
-        "java.lang.Double",
-        "java.lang.Enum",
-        "java.lang.Float",
-        "java.lang.Integer",
-        "java.lang.Long",
-        "java.lang.Short",
-        "java.lang.String",
-        "java.math.BigDecimal",
-        "java.math.BigInteger",
-        "java.util.UUID",
-        "javax.xml.namespace.QName",
-        "javax.xml.datatype.Duration"
+        Boolean.class,
+        Byte.class,
+        Character.class,
+        Double.class,
+        Enum.class,
+        Float.class,
+        Integer.class,
+        Long.class,
+        Short.class,
+        String.class,
+        BigDecimal.class,
+        BigInteger.class,
+        UUID.class,
+        QName.class,
+        Duration.class
+    };
+
+    private static final Class[] CLONEABLE_TYPES =
+    {
+        XMLGregorianCalendar.class
+    };
+
+    private static final Class[] PRIMITIVE_ARRAY_TYPES =
+    {
+        boolean[].class,
+        byte[].class,
+        char[].class,
+        double[].class,
+        float[].class,
+        int[].class,
+        long[].class,
+        short[].class
     };
 
     private static final String[] VISIBILITY_ARGUMENTS =
@@ -201,11 +222,17 @@ public final class PluginImpl extends Plugin
         {
             if ( i + 1 >= args.length )
             {
-                throw new BadCommandLineException( this.getMessage( "badOption", new Object[]
+                final String missingOptionArgument = this.getMessage( "missingOptionArgument", new Object[]
                     {
-                        VISIBILITY_OPTION_NAME, supportedVisibilities.append( ']' ).toString()
-                    } ) );
+                        VISIBILITY_OPTION_NAME
+                    } );
 
+                final String expectedOptionArgument = this.getMessage( "expectedOptionArgument", new Object[]
+                    {
+                        supportedVisibilities.append( ']' ).toString()
+                    } );
+
+                throw new BadCommandLineException( missingOptionArgument + " " + expectedOptionArgument );
             }
 
             this.visibility = args[i + 1].trim();
@@ -222,11 +249,12 @@ public final class PluginImpl extends Plugin
 
             if ( !supported )
             {
-                throw new BadCommandLineException( this.getMessage( "badOption", new Object[]
+                final String expectedOptionArgument = this.getMessage( "expectedOptionArgument", new Object[]
                     {
-                        VISIBILITY_OPTION_NAME, supportedVisibilities.append( ']' ).toString()
-                    } ) );
+                        supportedVisibilities.append( ']' ).toString()
+                    } );
 
+                throw new BadCommandLineException( expectedOptionArgument );
             }
 
             return 2;
@@ -236,11 +264,17 @@ public final class PluginImpl extends Plugin
         {
             if ( i + 1 >= args.length )
             {
-                throw new BadCommandLineException( this.getMessage( "badOption", new Object[]
+                final String missingOptionArgument = this.getMessage( "missingOptionArgument", new Object[]
                     {
-                        TARGET_OPTION_NAME, supportedTargets.append( ']' ).toString()
-                    } ) );
+                        TARGET_OPTION_NAME
+                    } );
 
+                final String expectedOptionArgument = this.getMessage( "expectedOptionArgument", new Object[]
+                    {
+                        supportedTargets.append( ']' ).toString()
+                    } );
+
+                throw new BadCommandLineException( missingOptionArgument + " " + expectedOptionArgument );
             }
 
             final String targetArg = args[i + 1].trim();
@@ -257,11 +291,12 @@ public final class PluginImpl extends Plugin
 
             if ( !supported )
             {
-                throw new BadCommandLineException( this.getMessage( "badOption", new Object[]
+                final String expectedOptionArgument = this.getMessage( "expectedOptionArgument", new Object[]
                     {
-                        TARGET_OPTION_NAME, supportedTargets.append( ']' ).toString()
-                    } ) );
+                        supportedTargets.append( ']' ).toString()
+                    } );
 
+                throw new BadCommandLineException( expectedOptionArgument );
             }
 
             if ( targetArg.equals( "1.5" ) )
@@ -512,27 +547,34 @@ public final class PluginImpl extends Plugin
         return ( mod != JMod.PRIVATE ? clazz._package().objectFactory().staticInvoke( m ) : JExpr.invoke( m ) );
     }
 
-    private JInvocation getCopyOfBytesInvocation( final ClassOutline classOutline )
+    private JExpression getCopyOfPrimitiveArrayExpression( final ClassOutline classOutline, final JClass arrayType,
+                                                           final JExpression source )
     {
-        final JClass byteArray = classOutline.parent().getCodeModel().ref( byte[].class );
+        if ( this.isTargetSupported( TARGET_1_6 ) )
+        {
+            final JClass arrays = classOutline.parent().getCodeModel().ref( Arrays.class );
+            return JOp.cond( source.eq( JExpr._null() ), JExpr._null(), arrays.staticInvoke( "copyOf" ).
+                arg( source ).arg( source.ref( "length" ) ) );
+
+        }
+
         final JClass array = classOutline.parent().getCodeModel().ref( Array.class );
         final JClass system = classOutline.parent().getCodeModel().ref( System.class );
 
-        final JType[] signature =
-        {
-            byteArray
-        };
-
-        final String methodName = "copyOfBytes";
         final int mod = this.getVisibilityModifier();
+        final String methodName = "copyOf";
 
         if ( mod != JMod.PRIVATE )
         {
             for ( JMethod m : classOutline._package().objectFactory().methods() )
             {
-                if ( m.name().equals( methodName ) && m.hasSignature( signature ) )
+                if ( m.name().equals( methodName ) )
                 {
-                    return classOutline._package().objectFactory().staticInvoke( m );
+                    final JType[] signature = m.listParamTypes();
+                    if ( signature.length == 1 && signature[0].binaryName().equals( arrayType.binaryName() ) )
+                    {
+                        return classOutline._package().objectFactory().staticInvoke( m ).arg( source );
+                    }
                 }
             }
         }
@@ -540,58 +582,53 @@ public final class PluginImpl extends Plugin
         {
             for ( JMethod m : classOutline.implClass.methods() )
             {
-                if ( m.name().equals( methodName ) && m.hasSignature( signature ) )
+                if ( m.name().equals( methodName ) )
                 {
-                    return JExpr.invoke( m );
+                    final JType[] signature = m.listParamTypes();
+                    if ( signature.length == 1 && signature[0].binaryName().equals( arrayType.binaryName() ) )
+                    {
+                        return JExpr.invoke( m ).arg( source );
+                    }
                 }
             }
         }
 
         final JMethod m =
             ( mod != JMod.PRIVATE
-              ? classOutline._package().objectFactory().method( JMod.STATIC | mod, byteArray, methodName )
-              : classOutline.implClass.method( JMod.STATIC | mod, byteArray, methodName ) );
+              ? classOutline._package().objectFactory().method( JMod.STATIC | mod, arrayType, methodName )
+              : classOutline.implClass.method( JMod.STATIC | mod, arrayType, methodName ) );
 
-        final JVar bytes = m.param( JMod.FINAL, byteArray, "bytes" );
+        final JVar arrayParam = m.param( JMod.FINAL, arrayType, "array" );
 
-        m.javadoc().append( "Creates and returns a copy of a given array of bytes." );
-        m.javadoc().addParam( bytes ).append( "The array to copy or {@code null}." );
+        m.javadoc().append( "Creates and returns a copy of a given array." );
+        m.javadoc().addParam( arrayParam ).append( "The array to copy or {@code null}." );
         m.javadoc().addReturn().append(
-            "A copy of {@code bytes} or {@code null} if {@code bytes} is {@code null}." );
+            "A copy of {@code array} or {@code null} if {@code array} is {@code null}." );
 
         m.body().directStatement( "// " + this.getMessage( "title", null ) );
 
-        if ( this.isTargetSupported( TARGET_1_6 ) )
-        {
-            final JClass arrays = classOutline.parent().getCodeModel().ref( Arrays.class );
-            m.body()._return( JOp.cond( bytes.eq( JExpr._null() ), JExpr._null(), arrays.staticInvoke( "copyOf" ).
-                arg( bytes ).arg( bytes.ref( "length" ) ) ) );
+        final JConditional arrayNotNull = m.body()._if( arrayParam.ne( JExpr._null() ) );
+        final JVar copy = arrayNotNull._then().decl(
+            JMod.FINAL, arrayType, "copy", JExpr.cast( arrayType, array.staticInvoke( "newInstance" ).arg(
+            arrayParam.invoke( "getClass" ).invoke( "getComponentType" ) ).arg( arrayParam.ref( "length" ) ) ) );
 
-        }
-        else
-        {
-            final JConditional bytesNotNull = m.body()._if( bytes.ne( JExpr._null() ) );
-            final JVar copy = bytesNotNull._then().decl(
-                JMod.FINAL, byteArray, "copy", JExpr.cast( byteArray, array.staticInvoke( "newInstance" ).arg(
-                bytes.invoke( "getClass" ).invoke( "getComponentType" ) ).arg( bytes.ref( "length" ) ) ) );
+        arrayNotNull._then().add( system.staticInvoke( "arraycopy" ).arg( arrayParam ).arg( JExpr.lit( 0 ) ).
+            arg( copy ).arg( JExpr.lit( 0 ) ).arg( arrayParam.ref( "length" ) ) );
 
-            bytesNotNull._then().add( system.staticInvoke( "arraycopy" ).arg( bytes ).arg( JExpr.lit( 0 ) ).
-                arg( copy ).arg( JExpr.lit( 0 ) ).arg( bytes.ref( "length" ) ) );
+        arrayNotNull._then()._return( copy );
 
-            bytesNotNull._then()._return( copy );
-
-            m.body()._return( JExpr._null() );
-        }
+        m.body()._return( JExpr._null() );
 
         this.methodCount = this.methodCount.add( BigInteger.ONE );
-        return ( mod != JMod.PRIVATE ? classOutline._package().objectFactory().staticInvoke( m ) : JExpr.invoke( m ) );
+        return ( mod != JMod.PRIVATE ? classOutline._package().objectFactory().staticInvoke( m ).arg( source )
+                 : JExpr.invoke( m ).arg( source ) );
+
     }
 
     private JInvocation getCopyOfArrayInvocation( final ClassOutline clazz )
     {
         final JClass object = clazz.parent().getCodeModel().ref( Object.class );
         final JClass array = clazz.parent().getCodeModel().ref( Array.class );
-        final JClass byteArray = clazz.parent().getCodeModel().ref( byte[].class );
 
         final JType[] signature =
         {
@@ -635,19 +672,26 @@ public final class PluginImpl extends Plugin
         m.body().directStatement( "// " + this.getMessage( "title", null ) );
 
         final JConditional arrayNotNull = m.body()._if( arrayArg.ne( JExpr._null() ) );
-        final JConditional isArrayOfBytes =
-            arrayNotNull._then()._if( arrayArg.invoke( "getClass" ).eq( byteArray.dotclass() ) );
 
-        isArrayOfBytes._then()._return(
-            this.getCopyOfBytesInvocation( clazz ).arg( JExpr.cast( byteArray, arrayArg ) ) );
+        for ( Class a : PRIMITIVE_ARRAY_TYPES )
+        {
+            final JClass primitiveArray = clazz.parent().getCodeModel().ref( a );
+            final JConditional isArrayOfPrimitive =
+                arrayNotNull._then()._if( arrayArg.invoke( "getClass" ).eq( primitiveArray.dotclass() ) );
 
-        final JVar len = isArrayOfBytes._else().decl(
-            JMod.FINAL, clazz.parent().getCodeModel().INT, "len", array.staticInvoke( "getLength" ).arg( arrayArg ) );
+            isArrayOfPrimitive._then()._return( this.getCopyOfPrimitiveArrayExpression(
+                clazz, primitiveArray, JExpr.cast( primitiveArray, arrayArg ) ) );
 
-        final JVar copy = isArrayOfBytes._else().decl( JMod.FINAL, object, "copy", array.staticInvoke( "newInstance" ).
+        }
+
+        final JVar len = arrayNotNull._then().decl(
+            JMod.FINAL, clazz.parent().getCodeModel().INT, "len", array.staticInvoke( "getLength" ).
+            arg( arrayArg ) );
+
+        final JVar copy = arrayNotNull._then().decl( JMod.FINAL, object, "copy", array.staticInvoke( "newInstance" ).
             arg( arrayArg.invoke( "getClass" ).invoke( "getComponentType" ) ).arg( len ) );
 
-        final JForLoop forEachRef = isArrayOfBytes._else()._for();
+        final JForLoop forEachRef = arrayNotNull._then()._for();
         final JVar i = forEachRef.init( clazz.parent().getCodeModel().INT, "i", len.minus( JExpr.lit( 1 ) ) );
         forEachRef.test( i.gte( JExpr.lit( 0 ) ) );
         forEachRef.update( i.decr() );
@@ -655,7 +699,7 @@ public final class PluginImpl extends Plugin
             arg( this.getCopyOfObjectInvocation( clazz ).arg( array.staticInvoke( "get" ).
             arg( arrayArg ).arg( i ) ) ) );
 
-        isArrayOfBytes._else()._return( copy );
+        arrayNotNull._then()._return( copy );
         m.body()._return( JExpr._null() );
         this.methodCount = this.methodCount.add( BigInteger.ONE );
         return ( mod != JMod.PRIVATE ? clazz._package().objectFactory().staticInvoke( m ) : JExpr.invoke( m ) );
@@ -738,7 +782,11 @@ public final class PluginImpl extends Plugin
         final JVar objectInput = tryClone.body().decl(
             JMod.FINAL, objectInputStream, "in", JExpr._new( objectInputStream ).arg( byteArrayInput ) );
 
-        tryClone.body()._return( JExpr.cast( serializable, objectInput.invoke( "readObject" ) ) );
+        final JVar copy = tryClone.body().decl(
+            JMod.FINAL, serializable, "copy", JExpr.cast( serializable, objectInput.invoke( "readObject" ) ) );
+
+        tryClone.body().invoke( objectInput, "close" );
+        tryClone.body()._return( copy );
 
         final JExpression assertionErrorMsg =
             JExpr.lit( "Unexpected instance during copying object '" ).plus( s ).plus( JExpr.lit( "'." ) );
@@ -841,10 +889,18 @@ public final class PluginImpl extends Plugin
 
         isArray._then()._return( this.getCopyOfArrayInvocation( clazz ).arg( o ) );
 
-        for ( String immutableName : IMMUTABLE_NAMES )
+        for ( Class immutableType : IMMUTABLE_TYPES )
         {
-            objectNotNull._then()._if( o._instanceof( clazz.parent().getCodeModel().ref( immutableName ) ) ).
+            objectNotNull._then()._if( o._instanceof( clazz.parent().getCodeModel().ref( immutableType ) ) ).
                 _then()._return( o );
+
+        }
+
+        for ( Class cloneableType : CLONEABLE_TYPES )
+        {
+            final JClass cloneable = clazz.parent().getCodeModel().ref( cloneableType );
+            objectNotNull._then()._if( o._instanceof( cloneable ) )._then()._return(
+                JExpr.invoke( JExpr.cast( cloneable, o ), ( "clone" ) ) );
 
         }
 
@@ -1553,7 +1609,8 @@ public final class PluginImpl extends Plugin
         }
         else if ( type == CBuiltinLeafInfo.BASE64_BYTE_ARRAY )
         {
-            expr = this.getCopyOfBytesInvocation( fieldOutline.parent() ).arg( source );
+            final JClass byteArray = fieldOutline.parent().parent().getCodeModel().ref( byte[].class );
+            expr = this.getCopyOfPrimitiveArrayExpression( fieldOutline.parent(), byteArray, source );
         }
         else if ( type == CBuiltinLeafInfo.BIG_DECIMAL || type == CBuiltinLeafInfo.BIG_INTEGER ||
                   type == CBuiltinLeafInfo.STRING || type == CBuiltinLeafInfo.BOOLEAN || type == CBuiltinLeafInfo.INT ||
@@ -1703,6 +1760,11 @@ public final class PluginImpl extends Plugin
                     if ( field.type().isPrimitive() )
                     {
                         paramNotNullBlock.assign( JExpr.refthis( field.name() ), o.ref( field ) );
+                        this.log( Level.WARNING, "fieldWithoutProperties", new Object[]
+                            {
+                                field.name(), clazz.implClass.name()
+                            } );
+
                     }
                     else
                     {
@@ -1714,13 +1776,13 @@ public final class PluginImpl extends Plugin
                         }
                         else
                         {
+                            paramNotNullBlock.assign( JExpr.refthis( field.name() ), JExpr.cast(
+                                field.type(), this.getCopyOfObjectInvocation( clazz ).arg( o.ref( field ) ) ) );
+
                             this.log( Level.WARNING, "fieldWithoutProperties", new Object[]
                                 {
                                     field.name(), clazz.implClass.name()
                                 } );
-
-                            paramNotNullBlock.assign( JExpr.refthis( field.name() ), JExpr.cast(
-                                field.type(), this.getCopyOfObjectInvocation( clazz ).arg( o.ref( field ) ) ) );
 
                         }
                     }

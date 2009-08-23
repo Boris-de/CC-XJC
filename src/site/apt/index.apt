@@ -47,9 +47,9 @@ CC-XJC
     * -cc-visibility
 
     The '-cc-visibility' option can be used to specify the visibility of
-    generated helper methods. It takes one argument from the list
+    generated copy methods. It takes one argument from the list
     [private, package, protected, public]. This option impacts the number of
-    generated helper methods. Default: private.
+    generated methods. Default: private.
 
     * -cc-target
 

@@ -40,24 +40,8 @@ Examples
 * Maven
 
     Maven users simply add the CC-XJC plugin as a dependency to a JAXB plugin of
-    choice. For this to work, the CC-XJC repository needs to be put in a POM or
-    the Maven settings.
-
----
-<repository>
-  <id>http://ccxjc.sourceforge.net/maven2/releases</id>
-  <url>http://ccxjc.sourceforge.net/maven2/releases</url>
-  <releases>
-    <enabled>true</enabled>
-  </releases>
-  <snapshots>
-    <enabled>false</enabled>
-  </snapshots>
-</repository>
----
-
-    The following example demonstrates the use of the CC-XJC plugin with the
-    Java.net maven-jaxb-plugin.
+    choice. The following example demonstrates the use of the CC-XJC plugin with
+    the Java.net maven-jaxb-plugin.
 
 ---
 <plugin>
@@ -68,12 +52,12 @@ Examples
     <dependency>
       <groupId>net.sourceforge.ccxjc</groupId>
       <artifactId>cc-xjc-plugin</artifactId>
-      <version>1.0-beta-10</version>
+      <version>1.0-beta-11</version>
     </dependency>
   </dependencies>
   <executions>
     <execution>
-      <id>generate</id>
+      <id>xjc</id>
       <phase>generate-sources</phase>
       <goals>
         <goal>generate</goal>
@@ -88,8 +72,8 @@ Examples
 </plugin>
 ---
 
-    Note: To use the Java.net maven-jaxb-plugin, the Java.net repositories
-    need to be used in addition to the CC-XJC repository.
+    Note: To use the Java.net maven-jaxb-plugin the Java.net repositories
+    need to be configured in a POM or the Maven settings.
 
 ---
 <repositories>
