@@ -77,11 +77,16 @@ import java.math.BigInteger;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Currency;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.ResourceBundle;
+import java.util.TimeZone;
 import java.util.UUID;
 import java.util.logging.Level;
 import javax.xml.bind.JAXBElement;
@@ -126,12 +131,17 @@ public final class PluginImpl extends Plugin
         BigInteger.class,
         UUID.class,
         QName.class,
-        Duration.class
+        Duration.class,
+        Currency.class
     };
 
     private static final Class[] CLONEABLE_TYPES =
     {
-        XMLGregorianCalendar.class
+        XMLGregorianCalendar.class,
+        Date.class,
+        Calendar.class,
+        TimeZone.class,
+        Locale.class
     };
 
     private static final Class[] PRIMITIVE_ARRAY_TYPES =
@@ -166,7 +176,7 @@ public final class PluginImpl extends Plugin
 
     private Options options;
 
-    private String visibility = "package";
+    private String visibility = "private";
 
     private int targetJdk = TARGET_1_5;
 
@@ -522,10 +532,10 @@ public final class PluginImpl extends Plugin
 
         final JVar element = m.param( JMod.FINAL, jaxbElement, "element" );
 
-        m.javadoc().append( "Creates and returns a copy of a given {@code JAXBElement} instance." );
+        m.javadoc().append( "Creates and returns a deep copy of a given {@code JAXBElement} instance." );
         m.javadoc().addParam( element ).append( "The instance to copy or {@code null}." );
         m.javadoc().addReturn().append(
-            "A copy of {@code element} or {@code null} if {@code element} is {@code null}." );
+            "A deep copy of {@code element} or {@code null} if {@code element} is {@code null}." );
 
         m.body().directStatement( "// " + this.getMessage( "title", null ) );
 
@@ -600,10 +610,10 @@ public final class PluginImpl extends Plugin
 
         final JVar arrayParam = m.param( JMod.FINAL, arrayType, "array" );
 
-        m.javadoc().append( "Creates and returns a copy of a given array." );
+        m.javadoc().append( "Creates and returns a deep copy of a given array." );
         m.javadoc().addParam( arrayParam ).append( "The array to copy or {@code null}." );
         m.javadoc().addReturn().append(
-            "A copy of {@code array} or {@code null} if {@code array} is {@code null}." );
+            "A deep copy of {@code array} or {@code null} if {@code array} is {@code null}." );
 
         m.body().directStatement( "// " + this.getMessage( "title", null ) );
 
@@ -666,9 +676,11 @@ public final class PluginImpl extends Plugin
 
         final JVar arrayArg = m.param( JMod.FINAL, object, "array" );
 
-        m.javadoc().append( "Creates and returns a copy of a given array." );
+        m.javadoc().append( "Creates and returns a deep copy of a given array." );
         m.javadoc().addParam( arrayArg ).append( "The array to copy or {@code null}." );
-        m.javadoc().addReturn().append( "A copy of {@code array} or {@code null} if {@code array} is {@code null}." );
+        m.javadoc().addReturn().append(
+            "A deep copy of {@code array} or {@code null} if {@code array} is {@code null}." );
+
         m.body().directStatement( "// " + this.getMessage( "title", null ) );
 
         final JConditional arrayNotNull = m.body()._if( arrayArg.ne( JExpr._null() ) );
@@ -756,10 +768,10 @@ public final class PluginImpl extends Plugin
 
         final JVar s = m.param( JMod.FINAL, serializable, "serializable" );
 
-        m.javadoc().append( "Creates and returns a copy of a given {@code Serializable}." );
+        m.javadoc().append( "Creates and returns a deep copy of a given {@code Serializable}." );
         m.javadoc().addParam( s ).append( "The instance to copy or {@code null}." );
         m.javadoc().addReturn().append(
-            "A copy of {@code serializable} or {@code null} if {@code serializable} is {@code null}." );
+            "A deep copy of {@code serializable} or {@code null} if {@code serializable} is {@code null}." );
 
         m.body().directStatement( "// " + this.getMessage( "title", null ) );
 
@@ -871,9 +883,9 @@ public final class PluginImpl extends Plugin
 
         final JVar o = m.param( JMod.FINAL, object, "o" );
 
-        m.javadoc().append( "Creates and returns a copy of a given object." );
+        m.javadoc().append( "Creates and returns a deep copy of a given object." );
         m.javadoc().addParam( o ).append( "The instance to copy or {@code null}." );
-        m.javadoc().addReturn().append( "A copy of {@code o} or {@code null} if {@code o} is {@code null}." );
+        m.javadoc().addReturn().append( "A deep copy of {@code o} or {@code null} if {@code o} is {@code null}." );
 
         m.body().directStatement( "// " + this.getMessage( "title", null ) );
 
@@ -1021,11 +1033,11 @@ public final class PluginImpl extends Plugin
 
         final JVar e = m.param( JMod.FINAL, elementType, "e" );
 
-        m.javadoc().append( "Creates and returns a copy of a given {@code " + elementType.binaryName() +
+        m.javadoc().append( "Creates and returns a deep copy of a given {@code " + elementType.binaryName() +
                             "} instance." );
 
         m.javadoc().addParam( e ).append( "The instance to copy or {@code null}." );
-        m.javadoc().addReturn().append( "A copy of {@code e} or {@code null} if {@code e} is {@code null}." );
+        m.javadoc().addReturn().append( "A deep copy of {@code e} or {@code null} if {@code e} is {@code null}." );
 
         m.body().directStatement( "// " + this.getMessage( "title", null ) );
 
@@ -1115,9 +1127,12 @@ public final class PluginImpl extends Plugin
 
         final JVar a = m.param( JMod.FINAL, arrayType, "array" );
 
-        m.javadoc().append( "Creates and returns a copy of a given {@code " + arrayType.binaryName() + "} instance." );
+        m.javadoc().append(
+            "Creates and returns a deep copy of a given {@code " + arrayType.binaryName() + "} instance." );
+
         m.javadoc().addParam( a ).append( "The instance to copy or {@code null}." );
-        m.javadoc().addReturn().append( "A copy of {@code array} or {@code null} if {@code array} is {@code null}." );
+        m.javadoc().addReturn().append(
+            "A deep copy of {@code array} or {@code null} if {@code array} is {@code null}." );
 
         m.body().directStatement( "// " + this.getMessage( "title", null ) );
 
@@ -1160,9 +1175,13 @@ public final class PluginImpl extends Plugin
 
         final JVar source = m.param( JMod.FINAL, field.getRawType(), "source" );
 
-        m.javadoc().append( "Copies property {@code " + field.getPropertyInfo().getName( true ) + "}." );
+        m.javadoc().append( "Creates and returns a deep copy of property {@code " +
+                            field.getPropertyInfo().getName( true ) + "}." );
+
         m.javadoc().addParam( source ).append( "The source to copy from or {@code null}." );
-        m.javadoc().addReturn().append( "A copy of {@code source} or {@code null} if {@code source} is {@code null}." );
+        m.javadoc().addReturn().append(
+            "A deep copy of {@code source} or {@code null} if {@code source} is {@code null}." );
+
         m.body().directStatement( "// " + this.getMessage( "title", null ) );
 
         final JConditional sourceNotNull = m.body()._if( source.ne( JExpr._null() ) );
@@ -1387,7 +1406,9 @@ public final class PluginImpl extends Plugin
         final JVar source = m.param( JMod.FINAL, field.getRawType(), "source" );
         final JVar target = field.getRawType().isArray() ? null : m.param( JMod.FINAL, field.getRawType(), "target" );
 
-        m.javadoc().append( "Copies all values of property {@code " + field.getPropertyInfo().getName( true ) + "}." );
+        m.javadoc().append( "Copies all values of property {@code " + field.getPropertyInfo().getName( true ) +
+                            "} deeply." );
+
         m.javadoc().addParam( source ).append( "The source to copy from." );
 
         if ( !field.getRawType().isArray() )
@@ -1941,7 +1962,7 @@ public final class PluginImpl extends Plugin
         cloneMethod.annotate( Override.class );
         clazz.implClass._implements( clazz.parent().getCodeModel().ref( Cloneable.class ) );
         cloneMethod.javadoc().append( "Creates and returns a deep copy of this object.\n" );
-        cloneMethod.javadoc().addReturn().append( "A deep copy of this instance." );
+        cloneMethod.javadoc().addReturn().append( "A deep copy of this object." );
         this.methodCount = this.methodCount.add( BigInteger.ONE );
         return cloneMethod;
     }

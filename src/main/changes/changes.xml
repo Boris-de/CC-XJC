@@ -160,5 +160,21 @@
       </action>
     </release>
 
+    <!-- ******************************************************************* -->
+    <release version="1.0-beta-12" date="2009-08-25">
+      <action dev="schulte2005" type="fix"><![CDATA[
+      Updated default visibility to 'private' as stated in the documentation.]]>
+      </action>
+      <action dev="schulte2005" type="update"><![CDATA[
+      Added class <code>java.util.Currency</code> to the list of immutable
+      types.]]>
+      </action>
+      <action dev="schulte2005" type="update"><![CDATA[
+      Added classes <code>java.util.Date</code>, <code>java.util.Calendar</code>,
+      <code>java.util.TimeZone</code> and <code>java.util.Locale</code> to the
+      list of cloneable types.]]>
+      </action>
+    </release>
+
   </body>
 </document>
