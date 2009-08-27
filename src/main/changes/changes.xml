@@ -161,7 +161,7 @@
     </release>
 
     <!-- ******************************************************************* -->
-    <release version="1.0-beta-12" date="2009-08-25">
+    <release version="1.0-beta-13" date="2009-08-25">
       <action dev="schulte2005" type="fix"><![CDATA[
       Updated default visibility to 'private' as stated in the documentation.]]>
       </action>
@@ -173,6 +173,13 @@
       Added classes <code>java.util.Date</code>, <code>java.util.Calendar</code>,
       <code>java.util.TimeZone</code> and <code>java.util.Locale</code> to the
       list of cloneable types.]]>
+      </action>
+    </release>
+
+    <!-- ******************************************************************* -->
+    <release version="1.0-beta-14" date="2009-08-27">
+      <action dev="schulte2005" type="fix"><![CDATA[
+      Moved java.net repositories from parent POM to cc-xjc-it POM.]]>
       </action>
     </release>
 
