@@ -34,7 +34,7 @@
   <parent>
     <groupId>net.sourceforge.ccxjc</groupId>
     <artifactId>cc-xjc</artifactId>
-    <version>1.0-beta-15-SNAPSHOT</version>
+    <version>1.0</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <artifactId>cc-xjc-it</artifactId>
