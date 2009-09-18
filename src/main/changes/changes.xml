@@ -183,5 +183,10 @@
       </action>
     </release>
 
+    <!-- ******************************************************************* -->
+    <release version="1.0" date="2009-09-18">
+      <action dev="schulte2005" type="update"><![CDATA[First stable release.]]></action>
+    </release>
+
   </body>
 </document>

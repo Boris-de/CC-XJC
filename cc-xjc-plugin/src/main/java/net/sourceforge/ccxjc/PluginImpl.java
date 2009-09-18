@@ -1049,7 +1049,7 @@ public final class PluginImpl extends Plugin
             newElement = JExpr._new( elementType ).arg( this.getCopyExpression(
                 fieldOutline, element.getContentType(), elementNotNull._then(),
                 JExpr.cast( element.getContentType().toType( fieldOutline.parent().parent(), Aspect.IMPLEMENTATION ),
-                            JExpr.invoke( e, "getValue" ) ) ) );
+                            JExpr.invoke( e, "getValue" ) ), true ) );
 
         }
         else
@@ -1070,7 +1070,7 @@ public final class PluginImpl extends Plugin
             elementNotNull._then().add( copy.invoke( "setValue" ).arg( this.getCopyExpression(
                 fieldOutline, element.getContentType(), elementNotNull._then(),
                 JExpr.cast( element.getContentType().toType( fieldOutline.parent().parent(), Aspect.IMPLEMENTATION ),
-                            copy.invoke( "getValue" ) ) ) ) );
+                            copy.invoke( "getValue" ) ), true ) ) );
 
         }
 
@@ -1146,7 +1146,7 @@ public final class PluginImpl extends Plugin
         forEachItem.update( i.decr() );
 
         final JExpression copyExpr =
-            this.getCopyExpression( fieldOutline, array.getItemType(), forEachItem.body(), a.component( i ) );
+            this.getCopyExpression( fieldOutline, array.getItemType(), forEachItem.body(), a.component( i ), true );
 
         forEachItem.body().assign( copy.component( i ), copyExpr );
         arrayNotNull._then()._return( copy );
@@ -1273,7 +1273,7 @@ public final class PluginImpl extends Plugin
                     final JType elementType = elementInfo.toType( field.parent().parent(), Aspect.IMPLEMENTATION );
                     final JConditional ifInstanceOf = elementBlock._if( source._instanceof( elementType ) );
                     final JExpression copyExpr = this.getCopyExpression(
-                        field, elementInfo, ifInstanceOf._then(), JExpr.cast( elementType, source ) );
+                        field, elementInfo, ifInstanceOf._then(), JExpr.cast( elementType, source ), false );
 
                     if ( copyExpr == null )
                     {
@@ -1305,7 +1305,7 @@ public final class PluginImpl extends Plugin
                         jaxbElement, source ), "getValue" )._instanceof( contentType ) );
 
                     final JExpression copyExpr = this.getCopyExpression(
-                        field, elementInfo, ifInstanceOf._then(), JExpr.cast( jaxbElement, source ) );
+                        field, elementInfo, ifInstanceOf._then(), JExpr.cast( jaxbElement, source ), false );
 
                     if ( copyExpr == null )
                     {
@@ -1334,7 +1334,7 @@ public final class PluginImpl extends Plugin
             final JConditional ifInstanceOf = sourceNotNull._then()._if( source._instanceof( javaType ) );
 
             final JExpression copyExpr =
-                this.getCopyExpression( field, classInfo, ifInstanceOf._then(), JExpr.cast( javaType, source ) );
+                this.getCopyExpression( field, classInfo, ifInstanceOf._then(), JExpr.cast( javaType, source ), false );
 
             if ( copyExpr == null )
             {
@@ -1356,7 +1356,7 @@ public final class PluginImpl extends Plugin
             final JType javaType = typeInfo.toType( field.parent().parent(), Aspect.IMPLEMENTATION );
             final JConditional ifInstanceOf = sourceNotNull._then()._if( source._instanceof( javaType ) );
             final JExpression copyExpr =
-                this.getCopyExpression( field, typeInfo, ifInstanceOf._then(), JExpr.cast( javaType, source ) );
+                this.getCopyExpression( field, typeInfo, ifInstanceOf._then(), JExpr.cast( javaType, source ), false );
 
             if ( copyExpr == null )
             {
@@ -1547,7 +1547,7 @@ public final class PluginImpl extends Plugin
                     final JType elementType = elementInfo.toType( field.parent().parent(), Aspect.IMPLEMENTATION );
                     final JConditional ifInstanceOf = copyBlock._if( next._instanceof( elementType ) );
                     final JExpression copyExpr = this.getCopyExpression(
-                        field, elementInfo, ifInstanceOf._then(), JExpr.cast( elementType, next ) );
+                        field, elementInfo, ifInstanceOf._then(), JExpr.cast( elementType, next ), false );
 
                     if ( copyExpr == null )
                     {
@@ -1589,7 +1589,7 @@ public final class PluginImpl extends Plugin
 
                     final JExpression copyExpr =
                         this.getCopyExpression( field, elementInfo, ifInstanceOf._then(),
-                                                JExpr.cast( jaxbElement, next ) );
+                                                JExpr.cast( jaxbElement, next ), false );
 
                     if ( copyExpr == null )
                     {
@@ -1627,7 +1627,7 @@ public final class PluginImpl extends Plugin
             final JConditional ifInstanceOf = copyLoop.body()._if( next._instanceof( javaType ) );
 
             final JExpression copyExpr =
-                this.getCopyExpression( field, classInfo, ifInstanceOf._then(), JExpr.cast( javaType, next ) );
+                this.getCopyExpression( field, classInfo, ifInstanceOf._then(), JExpr.cast( javaType, next ), false );
 
             if ( copyExpr == null )
             {
@@ -1658,7 +1658,7 @@ public final class PluginImpl extends Plugin
             final JType javaType = typeInfo.toType( field.parent().parent(), Aspect.IMPLEMENTATION );
             final JConditional ifInstanceOf = copyLoop.body()._if( next._instanceof( javaType ) );
             final JExpression copyExpr =
-                this.getCopyExpression( field, typeInfo, ifInstanceOf._then(), JExpr.cast( javaType, next ) );
+                this.getCopyExpression( field, typeInfo, ifInstanceOf._then(), JExpr.cast( javaType, next ), false );
 
             if ( copyExpr == null )
             {
@@ -1699,21 +1699,26 @@ public final class PluginImpl extends Plugin
     }
 
     private JExpression getCopyExpression( final FieldOutline fieldOutline, final CTypeInfo type,
-                                           final JBlock block, final JExpression source )
+                                           final JBlock block, final JExpression source,
+                                           final boolean sourceMaybeNull )
     {
         JExpression expr = null;
 
         if ( type instanceof CBuiltinLeafInfo )
         {
-            expr = this.getBuiltinCopyExpression( fieldOutline, (CBuiltinLeafInfo) type, block, source );
+            expr = this.getBuiltinCopyExpression(
+                fieldOutline, (CBuiltinLeafInfo) type, block, source, sourceMaybeNull );
+
         }
         else if ( type instanceof CWildcardTypeInfo )
         {
-            expr = this.getWildcardCopyExpression( fieldOutline, (CWildcardTypeInfo) type, block, source );
+            expr = this.getWildcardCopyExpression(
+                fieldOutline, (CWildcardTypeInfo) type, block, source, sourceMaybeNull );
+
         }
         else if ( type instanceof CClassInfo )
         {
-            expr = this.getClassInfoCopyExpression( fieldOutline, (CClassInfo) type, block, source );
+            expr = this.getClassInfoCopyExpression( fieldOutline, (CClassInfo) type, block, source, sourceMaybeNull );
         }
         else if ( type instanceof CEnumLeafInfo )
         {
@@ -1741,7 +1746,8 @@ public final class PluginImpl extends Plugin
     }
 
     private JExpression getBuiltinCopyExpression( final FieldOutline fieldOutline, final CBuiltinLeafInfo type,
-                                                  final JBlock block, final JExpression source )
+                                                  final JBlock block, final JExpression source,
+                                                  final boolean sourceMaybeNull )
     {
         JExpression expr = null;
 
@@ -1771,9 +1777,16 @@ public final class PluginImpl extends Plugin
         else if ( type == CBuiltinLeafInfo.CALENDAR )
         {
             final JClass xmlCal = fieldOutline.parent().parent().getCodeModel().ref( XMLGregorianCalendar.class );
-            expr = JOp.cond( source.eq( JExpr._null() ), JExpr._null(),
-                             JExpr.cast( xmlCal, source.invoke( "clone" ) ) );
+            if ( sourceMaybeNull )
+            {
+                expr = JOp.cond( source.eq( JExpr._null() ), JExpr._null(),
+                                 JExpr.cast( xmlCal, source.invoke( "clone" ) ) );
 
+            }
+            else
+            {
+                expr = JExpr.cast( xmlCal, source.invoke( "clone" ) );
+            }
         }
         else if ( type == CBuiltinLeafInfo.DURATION )
         {
@@ -1795,24 +1808,43 @@ public final class PluginImpl extends Plugin
     }
 
     private JExpression getWildcardCopyExpression( final FieldOutline fieldOutline, final CWildcardTypeInfo type,
-                                                   final JBlock block, final JExpression source )
+                                                   final JBlock block, final JExpression source,
+                                                   final boolean sourceMaybeNull )
     {
         block.directStatement( "// CWildcardTypeInfo: " +
                                type.toType( fieldOutline.parent().parent(), Aspect.IMPLEMENTATION ).binaryName() );
 
-        return JOp.cond( source.eq( JExpr._null() ), JExpr._null(),
-                         JExpr.cast( fieldOutline.parent().parent().getCodeModel().ref( Element.class ),
-                                     source.invoke( "cloneNode" ).arg( JExpr.TRUE ) ) );
+        if ( sourceMaybeNull )
+        {
 
+            return JOp.cond( source.eq( JExpr._null() ), JExpr._null(),
+                             JExpr.cast( fieldOutline.parent().parent().getCodeModel().ref( Element.class ),
+                                         source.invoke( "cloneNode" ).arg( JExpr.TRUE ) ) );
+
+        }
+        else
+        {
+            return JExpr.cast( fieldOutline.parent().parent().getCodeModel().ref( Element.class ),
+                               source.invoke( "cloneNode" ).arg( JExpr.TRUE ) );
+
+        }
     }
 
     private JExpression getClassInfoCopyExpression( final FieldOutline fieldOutline, final CClassInfo type,
-                                                    final JBlock block, final JExpression source )
+                                                    final JBlock block, final JExpression source,
+                                                    final boolean sourceMaybeNull )
     {
         block.directStatement(
             "// CClassInfo: " + type.toType( fieldOutline.parent().parent(), Aspect.IMPLEMENTATION ).binaryName() );
 
-        return JOp.cond( source.eq( JExpr._null() ), JExpr._null(), source.invoke( "clone" ) );
+        if ( sourceMaybeNull )
+        {
+            return JOp.cond( source.eq( JExpr._null() ), JExpr._null(), source.invoke( "clone" ) );
+        }
+        else
+        {
+            return source.invoke( "clone" );
+        }
     }
 
     private JExpression getNonElementCopyExpression( final FieldOutline fieldOutline, final CNonElement type,
@@ -1904,6 +1936,7 @@ public final class PluginImpl extends Plugin
                 {
                     if ( field.type().isPrimitive() )
                     {
+                        paramNotNullBlock.directStatement( "// Unknown primitive field '" + field.name() + "'." );
                         paramNotNullBlock.assign( JExpr.refthis( field.name() ), o.ref( field ) );
                         this.log( Level.WARNING, "fieldWithoutProperties", new Object[]
                             {
@@ -1915,12 +1948,14 @@ public final class PluginImpl extends Plugin
                     {
                         if ( field.name().equals( "otherAttributes" ) && clazz.target.declaresAttributeWildcard() )
                         {
+                            paramNotNullBlock.directStatement( "// Other attributes." );
                             paramNotNullBlock.add(
                                 JExpr.refthis( field.name() ).invoke( "putAll" ).arg( o.ref( field ) ) );
 
                         }
                         else
                         {
+                            paramNotNullBlock.directStatement( "// Unknown reference field '" + field.name() + "'." );
                             paramNotNullBlock.assign( JExpr.refthis( field.name() ), JExpr.cast(
                                 field.type(), this.getCopyOfObjectInvocation( clazz ).arg( o.ref( field ) ) ) );
 
@@ -2007,7 +2042,7 @@ public final class PluginImpl extends Plugin
 
                     final JType javaType = typeInfo.toType( field.parent().parent(), Aspect.IMPLEMENTATION );
                     copyExpr = this.getCopyExpression( field, typeInfo, block,
-                                                       JExpr.cast( javaType, JExpr.invoke( o, getter ) ) );
+                                                       JExpr.cast( javaType, JExpr.invoke( o, getter ) ), true );
 
                 }
 
