@@ -188,5 +188,14 @@
       <action dev="schulte2005" type="update"><![CDATA[First stable release.]]></action>
     </release>
 
+    <!-- ******************************************************************* -->
+    <release version="1.0.1" date="2009-10-12" description="Bugfix release.">
+      <action dev="schulte2005" type="fix" issue="4"><![CDATA[
+      Corrected <code>MissingResourceException</code>s thrown when copying
+      properties is not possible and corresponding messages are logged.
+      Added support for JAXB class customizations using a <code>ref</code>
+      attribute (<code>CNonElement</code>).]]></action>
+    </release>
+
   </body>
 </document>

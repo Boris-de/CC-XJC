@@ -43,6 +43,9 @@
     <jaxb:schemaBindings>
       <jaxb:package name="net.sourceforge.ccxjc.it.model.pkg.indexed.valueclass.ccxjcit"/>
     </jaxb:schemaBindings>
+    <jaxb:bindings node="xs:complexType[@name='RefClassCustomizationType']">
+      <jaxb:class ref="net.sourceforge.ccxjc.it.ReferencedClass"/>
+    </jaxb:bindings>
   </jaxb:bindings>
 
   <jaxb:bindings schemaLocation="../schemas/javaee_5.xsd">

@@ -1277,11 +1277,11 @@ public final class PluginImpl extends Plugin
 
                     if ( copyExpr == null )
                     {
-                        this.log( Level.SEVERE, this.getMessage( "cannotCopyProperty", new Object[]
+                        this.log( Level.SEVERE, "cannotCopyProperty", new Object[]
                             {
                                 field.getPropertyInfo().getName( true ),
                                 field.parent().implClass.binaryName()
-                            } ), null );
+                            } );
 
                     }
                     else
@@ -1309,11 +1309,11 @@ public final class PluginImpl extends Plugin
 
                     if ( copyExpr == null )
                     {
-                        this.log( Level.SEVERE, this.getMessage( "cannotCopyProperty", new Object[]
+                        this.log( Level.SEVERE, "cannotCopyProperty", new Object[]
                             {
                                 field.getPropertyInfo().getName( true ),
                                 field.parent().implClass.binaryName()
-                            } ), null );
+                            } );
 
                     }
                     else
@@ -1338,11 +1338,11 @@ public final class PluginImpl extends Plugin
 
             if ( copyExpr == null )
             {
-                this.log( Level.SEVERE, this.getMessage( "cannotCopyProperty", new Object[]
+                this.log( Level.SEVERE, "cannotCopyProperty", new Object[]
                     {
                         field.getPropertyInfo().getName( true ),
                         field.parent().implClass.binaryName()
-                    } ), null );
+                    } );
 
             }
             else
@@ -1360,11 +1360,11 @@ public final class PluginImpl extends Plugin
 
             if ( copyExpr == null )
             {
-                this.log( Level.SEVERE, this.getMessage( "cannotCopyProperty", new Object[]
+                this.log( Level.SEVERE, "cannotCopyProperty", new Object[]
                     {
                         field.getPropertyInfo().getName( true ),
                         field.parent().implClass.binaryName()
-                    } ), null );
+                    } );
 
             }
             else
@@ -1551,11 +1551,11 @@ public final class PluginImpl extends Plugin
 
                     if ( copyExpr == null )
                     {
-                        this.log( Level.SEVERE, this.getMessage( "cannotCopyProperty", new Object[]
+                        this.log( Level.SEVERE, "cannotCopyProperty", new Object[]
                             {
                                 field.getPropertyInfo().getName( true ),
                                 field.parent().implClass.binaryName()
-                            } ), null );
+                            } );
 
                     }
                     else
@@ -1593,11 +1593,11 @@ public final class PluginImpl extends Plugin
 
                     if ( copyExpr == null )
                     {
-                        this.log( Level.SEVERE, this.getMessage( "cannotCopyProperty", new Object[]
+                        this.log( Level.SEVERE, "cannotCopyProperty", new Object[]
                             {
                                 field.getPropertyInfo().getName( true ),
                                 field.parent().implClass.binaryName()
-                            } ), null );
+                            } );
 
                     }
                     else
@@ -1631,11 +1631,11 @@ public final class PluginImpl extends Plugin
 
             if ( copyExpr == null )
             {
-                this.log( Level.SEVERE, this.getMessage( "cannotCopyProperty", new Object[]
+                this.log( Level.SEVERE, "cannotCopyProperty", new Object[]
                     {
                         field.getPropertyInfo().getName( true ),
                         field.parent().implClass.binaryName()
-                    } ), null );
+                    } );
 
             }
             else
@@ -1662,11 +1662,11 @@ public final class PluginImpl extends Plugin
 
             if ( copyExpr == null )
             {
-                this.log( Level.SEVERE, this.getMessage( "cannotCopyProperty", new Object[]
+                this.log( Level.SEVERE, "cannotCopyProperty", new Object[]
                     {
                         field.getPropertyInfo().getName( true ),
                         field.parent().implClass.binaryName()
-                    } ), null );
+                    } );
 
             }
             else
@@ -1734,7 +1734,7 @@ public final class PluginImpl extends Plugin
         }
         else if ( type instanceof CNonElement )
         {
-            expr = this.getNonElementCopyExpression( fieldOutline, (CNonElement) type, block, source );
+            expr = this.getNonElementCopyExpression( fieldOutline, (CNonElement) type, block, source, sourceMaybeNull );
         }
 
         if ( expr != null )
@@ -1848,12 +1848,20 @@ public final class PluginImpl extends Plugin
     }
 
     private JExpression getNonElementCopyExpression( final FieldOutline fieldOutline, final CNonElement type,
-                                                     final JBlock block, final JExpression source )
+                                                     final JBlock block, final JExpression source,
+                                                     final boolean sourceMaybeNull )
     {
-        block.directStatement(
-            "// CNonElement: " + type.toType( fieldOutline.parent().parent(), Aspect.IMPLEMENTATION ).binaryName() );
+        final JType jType = type.toType( fieldOutline.parent().parent(), Aspect.IMPLEMENTATION );
+        block.directStatement( "// CNonElement: " + jType.binaryName() );
 
-        return null;
+        if ( sourceMaybeNull )
+        {
+            return JOp.cond( source.eq( JExpr._null() ), JExpr._null(), JExpr.cast( jType, source.invoke( "clone" ) ) );
+        }
+        else
+        {
+            return JExpr.cast( jType, source.invoke( "clone" ) );
+        }
     }
 
     private JExpression getArrayCopyExpression( final FieldOutline fieldOutline, final CArrayInfo type,
@@ -2048,11 +2056,11 @@ public final class PluginImpl extends Plugin
 
                 if ( copyExpr == null )
                 {
-                    this.log( Level.SEVERE, this.getMessage( "cannotCopyProperty", new Object[]
+                    this.log( Level.SEVERE, "cannotCopyProperty", new Object[]
                         {
                             field.getPropertyInfo().getName( true ),
                             field.parent().implClass.binaryName()
-                        } ), null );
+                        } );
 
                 }
                 else

@@ -310,6 +310,18 @@
     </xsd:sequence>
   </xsd:complexType>
   <!--                                                                       -->
+  <!-- RefClassCustomization                                                 -->
+  <!--                                                                       -->
+  <xsd:element name="ref-class-customization"
+               type="ccxjcit:RefClassCustomizationType"/>
+  <xsd:complexType name="RefClassCustomizationType"/>
+  <xsd:complexType name="RefClassCustomizationListType">
+    <xsd:sequence>
+      <xsd:element ref="ccxjcit:ref-class-customization" minOccurs="1"
+                   maxOccurs="unbounded"/>
+    </xsd:sequence>
+  </xsd:complexType>
+  <!--                                                                       -->
   <!-- Test simple types.                                                    -->
   <!--                                                                       -->
   <xsd:notation name="gif" public="image/gif" system="test"/>

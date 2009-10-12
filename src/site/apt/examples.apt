@@ -52,7 +52,7 @@ Examples
     <dependency>
       <groupId>net.sourceforge.ccxjc</groupId>
       <artifactId>cc-xjc-plugin</artifactId>
-      <version>1.0-beta-14</version>
+      <version>1.0.1</version>
     </dependency>
   </dependencies>
   <executions>
@@ -64,7 +64,7 @@ Examples
       </goals>
       <configuration>
         <schemaDirectory>src/main/schemas</schemaDirectory>
-        <args>-copy-constructor -cc-visibility public -cc-target 1.6</args>
+        <args>-copy-constructor -cc-visibility private -cc-target 1.5</args>
         <extension>true</extension>
       </configuration>
     </execution>
