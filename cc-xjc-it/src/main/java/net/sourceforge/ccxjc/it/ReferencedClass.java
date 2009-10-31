@@ -29,6 +29,11 @@
  */
 package net.sourceforge.ccxjc.it;
 
+import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang.builder.HashCodeBuilder;
+import org.apache.commons.lang.builder.ToStringBuilder;
+import org.jvnet.jaxb2_commons.lang.builder.CopyBuilder;
+
 /**
  * Class referenced by {@code &lt;jaxb:class ref="net.sourceforge.ccxjc.it.ReferencedClass"&gt;} test customizations.
  *
@@ -37,6 +42,16 @@ package net.sourceforge.ccxjc.it;
  */
 public class ReferencedClass implements Cloneable
 {
+
+    public ReferencedClass()
+    {
+        super();
+    }
+
+    public ReferencedClass( final ReferencedClass o )
+    {
+        super();
+    }
 
     @Override
     public Object clone()
@@ -49,6 +64,23 @@ public class ReferencedClass implements Cloneable
         {
             throw new AssertionError( e );
         }
+    }
+
+    public void toString( final ToStringBuilder toStringBuilder )
+    {
+    }
+
+    public void equals( final Object object, final EqualsBuilder equalsBuilder )
+    {
+    }
+
+    public void hashCode( final HashCodeBuilder hashCodeBuilder )
+    {
+    }
+
+    public Object copyTo( final Object target, final CopyBuilder copyBuilder )
+    {
+        return target;
     }
 
 }

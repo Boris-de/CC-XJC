@@ -185,16 +185,28 @@
 
     <!-- ******************************************************************* -->
     <release version="1.0" date="2009-09-18">
-      <action dev="schulte2005" type="update"><![CDATA[First stable release.]]></action>
+      <action dev="schulte2005" type="update"><![CDATA[First stable release.]]>
+      </action>
     </release>
 
     <!-- ******************************************************************* -->
-    <release version="1.0.1" date="2009-10-12" description="Bugfix release.">
-      <action dev="schulte2005" type="fix" issue="4"><![CDATA[
+    <release version="1.0.1" date="2009-10-12">
+      <action dev="schulte2005" type="fix" issue="4" system="MantisBT"><![CDATA[
       Corrected <code>MissingResourceException</code>s thrown when copying
       properties is not possible and corresponding messages are logged.
       Added support for JAXB class customizations using a <code>ref</code>
-      attribute (<code>CNonElement</code>).]]></action>
+      attribute (<code>CNonElement</code>).]]>
+      </action>
+    </release>
+
+    <!-- ******************************************************************* -->
+    <release version="1.1" date="2009-11-01">
+      <action dev="schulte2005" type="update"><![CDATA[
+      Added a <code>-cc-nullable</code> option and changed the default
+      behavior of the generated copy constructors to throw a
+      <code>NullPointerException</code> when passed a <code>null</code>
+      reference.]]>
+      </action>
     </release>
 
   </body>

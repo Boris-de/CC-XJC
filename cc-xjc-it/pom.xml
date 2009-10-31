@@ -34,7 +34,7 @@
   <parent>
     <groupId>net.sourceforge.ccxjc</groupId>
     <artifactId>cc-xjc</artifactId>
-    <version>1.0.2-SNAPSHOT</version>
+    <version>1.1-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <artifactId>cc-xjc-it</artifactId>
@@ -117,6 +117,7 @@
                 <arg>-copy-constructor</arg>
                 <arg>-cc-visibility</arg>
                 <arg>private</arg>
+                <arg>-cc-nullable</arg>
                 <arg>-XtoString</arg>
                 <arg>-Xequals</arg>
                 <arg>-XhashCode</arg>
@@ -143,6 +144,7 @@
                 <arg>-copy-constructor</arg>
                 <arg>-cc-visibility</arg>
                 <arg>private</arg>
+                <arg>-cc-nullable</arg>
                 <arg>-XtoString</arg>
                 <arg>-Xequals</arg>
                 <arg>-XhashCode</arg>
@@ -169,6 +171,7 @@
                 <arg>-copy-constructor</arg>
                 <arg>-cc-visibility</arg>
                 <arg>private</arg>
+                <arg>-cc-nullable</arg>
                 <arg>-XtoString</arg>
                 <arg>-Xequals</arg>
                 <arg>-XhashCode</arg>
@@ -195,6 +198,7 @@
                 <arg>-copy-constructor</arg>
                 <arg>-cc-visibility</arg>
                 <arg>private</arg>
+                <arg>-cc-nullable</arg>
                 <arg>-XtoString</arg>
                 <arg>-Xequals</arg>
                 <arg>-XhashCode</arg>
@@ -222,6 +226,7 @@
                 <arg>-copy-constructor</arg>
                 <arg>-cc-visibility</arg>
                 <arg>package</arg>
+                <arg>-cc-nullable</arg>
                 <arg>-XtoString</arg>
                 <arg>-Xequals</arg>
                 <arg>-XhashCode</arg>
@@ -248,6 +253,7 @@
                 <arg>-copy-constructor</arg>
                 <arg>-cc-visibility</arg>
                 <arg>package</arg>
+                <arg>-cc-nullable</arg>
                 <arg>-XtoString</arg>
                 <arg>-Xequals</arg>
                 <arg>-XhashCode</arg>
@@ -274,6 +280,7 @@
                 <arg>-copy-constructor</arg>
                 <arg>-cc-visibility</arg>
                 <arg>package</arg>
+                <arg>-cc-nullable</arg>
                 <arg>-XtoString</arg>
                 <arg>-Xequals</arg>
                 <arg>-XhashCode</arg>
@@ -300,6 +307,7 @@
                 <arg>-copy-constructor</arg>
                 <arg>-cc-visibility</arg>
                 <arg>package</arg>
+                <arg>-cc-nullable</arg>
                 <arg>-XtoString</arg>
                 <arg>-Xequals</arg>
                 <arg>-XhashCode</arg>
@@ -327,6 +335,7 @@
                 <arg>-copy-constructor</arg>
                 <arg>-cc-visibility</arg>
                 <arg>protected</arg>
+                <arg>-cc-nullable</arg>
                 <arg>-XtoString</arg>
                 <arg>-Xequals</arg>
                 <arg>-XhashCode</arg>
@@ -353,6 +362,7 @@
                 <arg>-copy-constructor</arg>
                 <arg>-cc-visibility</arg>
                 <arg>protected</arg>
+                <arg>-cc-nullable</arg>
                 <arg>-XtoString</arg>
                 <arg>-Xequals</arg>
                 <arg>-XhashCode</arg>
@@ -379,6 +389,7 @@
                 <arg>-copy-constructor</arg>
                 <arg>-cc-visibility</arg>
                 <arg>protected</arg>
+                <arg>-cc-nullable</arg>
                 <arg>-XtoString</arg>
                 <arg>-Xequals</arg>
                 <arg>-XhashCode</arg>
@@ -405,6 +416,7 @@
                 <arg>-copy-constructor</arg>
                 <arg>-cc-visibility</arg>
                 <arg>protected</arg>
+                <arg>-cc-nullable</arg>
                 <arg>-XtoString</arg>
                 <arg>-Xequals</arg>
                 <arg>-XhashCode</arg>
@@ -432,6 +444,7 @@
                 <arg>-copy-constructor</arg>
                 <arg>-cc-visibility</arg>
                 <arg>public</arg>
+                <arg>-cc-nullable</arg>
                 <arg>-XtoString</arg>
                 <arg>-Xequals</arg>
                 <arg>-XhashCode</arg>
@@ -458,6 +471,7 @@
                 <arg>-copy-constructor</arg>
                 <arg>-cc-visibility</arg>
                 <arg>public</arg>
+                <arg>-cc-nullable</arg>
                 <arg>-XtoString</arg>
                 <arg>-Xequals</arg>
                 <arg>-XhashCode</arg>
@@ -484,6 +498,7 @@
                 <arg>-copy-constructor</arg>
                 <arg>-cc-visibility</arg>
                 <arg>public</arg>
+                <arg>-cc-nullable</arg>
                 <arg>-XtoString</arg>
                 <arg>-Xequals</arg>
                 <arg>-XhashCode</arg>
@@ -510,6 +525,7 @@
                 <arg>-copy-constructor</arg>
                 <arg>-cc-visibility</arg>
                 <arg>public</arg>
+                <arg>-cc-nullable</arg>
                 <arg>-XtoString</arg>
                 <arg>-Xequals</arg>
                 <arg>-XhashCode</arg>
@@ -595,3 +611,4 @@
     </pluginRepository>
   </pluginRepositories>
 </project>
+

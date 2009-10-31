@@ -242,6 +242,50 @@
     </xsd:complexContent>
   </xsd:complexType>
   <!--                                                                       -->
+  <!-- AbstractParentComplexType                                             -->
+  <!--                                                                       -->
+  <xsd:complexType name="AbstractParentComplexType" abstract="true"/>
+  <!--                                                                       -->
+  <!-- AbstractChildOfParentComplexType                                      -->
+  <!--                                                                       -->
+  <xsd:complexType name="AbstractChildOfParentComplexType" abstract="true">
+    <xsd:complexContent>
+      <xsd:extension base="ccxjcit:AbstractParentComplexType"/>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <!--                                                                       -->
+  <!-- AbstractChildOfChildOfParentComplexType                               -->
+  <!--                                                                       -->
+  <xsd:complexType name="AbstractChildOfChildOfParentComplexType" abstract="true">
+    <xsd:complexContent>
+      <xsd:extension base="ccxjcit:AbstractChildOfParentComplexType"/>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <!--                                                                       -->
+  <!-- AbstractChildOfChildOfChildOfParentComplexType                        -->
+  <!--                                                                       -->
+  <xsd:complexType name="AbstractChildOfChildOfChildOfParentComplexType" abstract="true">
+    <xsd:complexContent>
+      <xsd:extension base="ccxjcit:AbstractChildOfChildOfParentComplexType"/>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <!--                                                                       -->
+  <!-- AbstractChildOfChildOfChildOfChildOfParentComplexType                 -->
+  <!--                                                                       -->
+  <xsd:complexType name="AbstractChildOfChildOfChildOfChildOfParentComplexType" abstract="true">
+    <xsd:complexContent>
+      <xsd:extension base="ccxjcit:AbstractChildOfChildOfChildOfParentComplexType"/>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <!--                                                                       -->
+  <!-- AbstractChildOfReferencedClassComplexType                             -->
+  <!--                                                                       -->
+  <xsd:complexType name="AbstractChildOfReferencedClassComplexType" abstract="true">
+    <xsd:complexContent>
+      <xsd:extension base="ccxjcit:RefClassCustomizationType"/>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <!--                                                                       -->
   <!-- HierarchicalChoiceComplexType                                         -->
   <!--                                                                       -->
   <xsd:element name="hierarchical-choice-complex-type-test"

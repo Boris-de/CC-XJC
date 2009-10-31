@@ -48,6 +48,7 @@ import com.sun.codemodel.JVar;
 import com.sun.tools.xjc.BadCommandLineException;
 import com.sun.tools.xjc.Options;
 import com.sun.tools.xjc.Plugin;
+import com.sun.tools.xjc.generator.bean.ImplStructureStrategy;
 import com.sun.tools.xjc.model.CArrayInfo;
 import com.sun.tools.xjc.model.CBuiltinLeafInfo;
 import com.sun.tools.xjc.model.CClassInfo;
@@ -109,11 +110,15 @@ public final class PluginImpl extends Plugin
 
     private static final String MESSAGE_PREFIX = "CC-XJC";
 
+    private static final String WARNING_PREFIX = MESSAGE_PREFIX + " WARNING";
+
     private static final String OPTION_NAME = "copy-constructor";
 
     private static final String VISIBILITY_OPTION_NAME = "-cc-visibility";
 
     private static final String TARGET_OPTION_NAME = "-cc-target";
+
+    private static final String NULLABLE_OPTION_NAME = "-cc-nullable";
 
     private static final Class[] IMMUTABLE_TYPES =
     {
@@ -180,6 +185,8 @@ public final class PluginImpl extends Plugin
 
     private int targetJdk = TARGET_1_5;
 
+    private boolean nullable = false;
+
     private BigInteger methodCount;
 
     private BigInteger constructorCount;
@@ -200,7 +207,9 @@ public final class PluginImpl extends Plugin
             append( "  " ).append( VISIBILITY_OPTION_NAME ).append( "     :  " ).
             append( this.getMessage( "visibilityUsage", null ) ).append( System.getProperty( "line.separator" ) ).
             append( "  " ).append( TARGET_OPTION_NAME ).append( "         :  " ).
-            append( this.getMessage( "targetUsage", null ) ).toString();
+            append( this.getMessage( "targetUsage", null ) ).append( System.getProperty( "line.separator" ) ).
+            append( "  " ).append( NULLABLE_OPTION_NAME ).append( "       :  " ).
+            append( this.getMessage( "nullableUsage", null ) ).toString();
 
     }
 
@@ -325,6 +334,12 @@ public final class PluginImpl extends Plugin
             return 2;
         }
 
+        if ( args[i].startsWith( NULLABLE_OPTION_NAME ) )
+        {
+            this.nullable = true;
+            return 1;
+        }
+
         return 0;
     }
 
@@ -345,6 +360,8 @@ public final class PluginImpl extends Plugin
 
         for ( ClassOutline clazz : model.getClasses() )
         {
+            this.warnOnReferencedSupertypes( clazz );
+
             if ( this.getStandardConstructor( clazz ) == null )
             {
                 this.log( Level.WARNING, "couldNotAddStdCtor", new Object[]
@@ -379,6 +396,7 @@ public final class PluginImpl extends Plugin
                 this.methodCount, this.constructorCount, this.expressionCount
             } );
 
+        this.options = null;
         return this.success;
     }
 
@@ -1854,6 +1872,34 @@ public final class PluginImpl extends Plugin
         final JType jType = type.toType( fieldOutline.parent().parent(), Aspect.IMPLEMENTATION );
         block.directStatement( "// CNonElement: " + jType.binaryName() );
 
+        block.directStatement(
+            "// " + WARNING_PREFIX + ": " +
+            "The '" + jType.binaryName() + "' type was not part of the compilation unit." );
+
+        block.directStatement(
+            "// " + WARNING_PREFIX + ": " +
+            "The plugin assumes that type to declare a 'public Object clone()' method which " );
+
+        block.directStatement(
+            "// " + WARNING_PREFIX + ": " +
+            "does not throw a 'CloneNotSupportedException' and to have class" );
+
+        block.directStatement( "// " + WARNING_PREFIX + ": 'java.lang.Object' as its direct super-class." );
+
+        block.directStatement(
+            "// " + WARNING_PREFIX + ": " +
+            "If this warning is part of an 'if instanceof' block, the order of any" );
+
+        block.directStatement(
+            "// " + WARNING_PREFIX + ": " +
+            "other 'if instanceof' statements may be wrong and must be verified." );
+
+        this.log( Level.WARNING, "nonElementWarning", new Object[]
+            {
+                fieldOutline.parent().implClass.fullName(), fieldOutline.getPropertyInfo().getName( true ),
+                jType.binaryName(), WARNING_PREFIX
+            } );
+
         if ( sourceMaybeNull )
         {
             return JOp.cond( source.eq( JExpr._null() ), JExpr._null(), JExpr.cast( jType, source.invoke( "clone" ) ) );
@@ -1892,7 +1938,7 @@ public final class PluginImpl extends Plugin
     private JMethod generateStandardConstructor( final ClassOutline clazz )
     {
         final JMethod ctor = clazz.implClass.constructor( JMod.PUBLIC );
-        ctor.body().directStatement( " // " + this.getMessage( "title", null ) );
+        ctor.body().directStatement( "// " + this.getMessage( "title", null ) );
         ctor.body().invoke( "super" );
         ctor.javadoc().add( "Creates a new {@code " + clazz.implClass.name() + "} instance." );
         this.constructorCount = this.constructorCount.add( BigInteger.ONE );
@@ -1902,16 +1948,43 @@ public final class PluginImpl extends Plugin
     private JMethod generateCopyConstructor( final ClassOutline clazz )
     {
         final JMethod ctor = clazz.implClass.constructor( JMod.PUBLIC );
-        final JVar o = ctor.param( JMod.FINAL, clazz.implClass, "o" );
+        final JClass paramClass = clazz.implClass;
+        final JVar o = ctor.param( JMod.FINAL, paramClass, "o" );
 
         ctor.javadoc().add( "Creates a new {@code " + clazz.implClass.name() +
-                            "} instance by deeply copying a given instance." );
+                            "} instance by deeply copying a given {@code " + paramClass.name() +
+                            "} instance.\n" );
 
-        ctor.javadoc().addParam( o ).add( "The instance to copy or {@code null}." );
+        if ( !this.nullable )
+        {
+            ctor.javadoc().addParam( o ).add( "The instance to copy." );
+            ctor.javadoc().addThrows( NullPointerException.class ).append( "if {@code o} is {@code null}." );
+        }
+        else
+        {
+            ctor.javadoc().addParam( o ).add( "The instance to copy or {@code null}." );
+        }
 
-        ctor.body().directStatement( " // " + this.getMessage( "title", null ) );
+        ctor.body().directStatement( "// " + this.getMessage( "title", null ) );
 
-        if ( clazz.getSuperClass() != null )
+        if ( this.needsWarningOnReferencedSupertypes( clazz ) )
+        {
+            ctor.body().directStatement(
+                "// " + WARNING_PREFIX + ": A super-class of this class was not part of the compilation unit." );
+
+            ctor.body().directStatement(
+                "// " + WARNING_PREFIX + ": The plugin assumes this super-class to have class " +
+                "'java.lang.Object' as its direct super-class." );
+
+            ctor.body().directStatement(
+                "// " + WARNING_PREFIX + ": The constructors in the hierarchy this constructor is part of " +
+                "could be wrong and must be verified." );
+
+        }
+
+        if ( clazz.getSuperClass() != null ||
+             ( clazz.implClass._extends() != null &&
+               !clazz.implClass._extends().binaryName().equals( "java.lang.Object" ) ) )
         {
             ctor.body().invoke( "super" ).arg( o );
         }
@@ -1920,15 +1993,24 @@ public final class PluginImpl extends Plugin
             ctor.body().invoke( "super" );
         }
 
+        if ( !this.nullable )
+        {
+            ctor.body()._if( o.eq( JExpr._null() ) )._then()._throw(
+                JExpr._new( clazz.parent().getCodeModel().ref( NullPointerException.class ) ).
+                arg( "Cannot create a copy of '" + clazz.implClass.name() + "' from 'null'." ) );
+
+        }
+
         boolean hasFields = false;
         if ( !clazz.implClass.fields().isEmpty() )
         {
-            final JBlock paramNotNullBlock = new JBlock( true, true );
+            final JBlock copyBlock = new JBlock( false, false );
+            final JExpression source = o;
 
             for ( FieldOutline field : clazz.getDeclaredFields() )
             {
                 hasFields = true;
-                this.generateCopyOfProperty( field, o, paramNotNullBlock );
+                this.generateCopyOfProperty( field, source, copyBlock );
             }
 
             for ( JFieldVar field : clazz.implClass.fields().values() )
@@ -1944,8 +2026,8 @@ public final class PluginImpl extends Plugin
                 {
                     if ( field.type().isPrimitive() )
                     {
-                        paramNotNullBlock.directStatement( "// Unknown primitive field '" + field.name() + "'." );
-                        paramNotNullBlock.assign( JExpr.refthis( field.name() ), o.ref( field ) );
+                        copyBlock.directStatement( "// Unknown primitive field '" + field.name() + "'." );
+                        copyBlock.assign( JExpr.refthis( field.name() ), source.ref( field ) );
                         this.log( Level.WARNING, "fieldWithoutProperties", new Object[]
                             {
                                 field.name(), clazz.implClass.name()
@@ -1956,16 +2038,16 @@ public final class PluginImpl extends Plugin
                     {
                         if ( field.name().equals( "otherAttributes" ) && clazz.target.declaresAttributeWildcard() )
                         {
-                            paramNotNullBlock.directStatement( "// Other attributes." );
-                            paramNotNullBlock.add(
-                                JExpr.refthis( field.name() ).invoke( "putAll" ).arg( o.ref( field ) ) );
+                            copyBlock.directStatement( "// Other attributes." );
+                            copyBlock.add(
+                                JExpr.refthis( field.name() ).invoke( "putAll" ).arg( source.ref( field ) ) );
 
                         }
                         else
                         {
-                            paramNotNullBlock.directStatement( "// Unknown reference field '" + field.name() + "'." );
-                            paramNotNullBlock.assign( JExpr.refthis( field.name() ), JExpr.cast(
-                                field.type(), this.getCopyOfObjectInvocation( clazz ).arg( o.ref( field ) ) ) );
+                            copyBlock.directStatement( "// Unknown reference field '" + field.name() + "'." );
+                            copyBlock.assign( JExpr.refthis( field.name() ), JExpr.cast(
+                                field.type(), this.getCopyOfObjectInvocation( clazz ).arg( source.ref( field ) ) ) );
 
                             this.log( Level.WARNING, "fieldWithoutProperties", new Object[]
                                 {
@@ -1979,12 +2061,55 @@ public final class PluginImpl extends Plugin
 
             if ( hasFields )
             {
-                ctor.body()._if( o.ne( JExpr._null() ) )._then().add( paramNotNullBlock );
+                if ( this.nullable )
+                {
+                    ctor.body()._if( o.ne( JExpr._null() ) )._then().add( copyBlock );
+                }
+                else
+                {
+                    ctor.body().add( copyBlock );
+                }
             }
         }
 
         this.constructorCount = this.constructorCount.add( BigInteger.ONE );
         return ctor;
+    }
+
+    private void warnOnReferencedSupertypes( final ClassOutline clazz )
+    {
+        if ( clazz.getSuperClass() == null &&
+             ( clazz.implClass._extends() != null &&
+               !clazz.implClass._extends().binaryName().equals( "java.lang.Object" ) ) )
+        {
+            this.log( Level.WARNING, "referencedSupertypeWarning", new Object[]
+                {
+                    clazz.implClass.fullName(), clazz.implClass._extends().binaryName(), WARNING_PREFIX
+                } );
+
+        }
+
+        if ( clazz.getSuperClass() != null )
+        {
+            this.warnOnReferencedSupertypes( clazz.getSuperClass() );
+        }
+    }
+
+    private boolean needsWarningOnReferencedSupertypes( final ClassOutline clazz )
+    {
+        if ( clazz.getSuperClass() == null &&
+             ( clazz.implClass._extends() != null &&
+               !clazz.implClass._extends().binaryName().equals( "java.lang.Object" ) ) )
+        {
+            return true;
+        }
+
+        if ( clazz.getSuperClass() != null )
+        {
+            return this.needsWarningOnReferencedSupertypes( clazz.getSuperClass() );
+        }
+
+        return false;
     }
 
     private JMethod generateCloneMethod( final ClassOutline clazz )
@@ -1998,7 +2123,7 @@ public final class PluginImpl extends Plugin
         else
         {
             cloneMethod = clazz.implClass.method( JMod.PUBLIC, clazz.implClass, "clone" );
-            cloneMethod.body().directStatement( " // " + this.getMessage( "title", null ) );
+            cloneMethod.body().directStatement( "// " + this.getMessage( "title", null ) );
             cloneMethod.body()._return( JExpr._new( clazz.implClass ).arg( JExpr._this() ) );
         }
 
@@ -2010,7 +2135,7 @@ public final class PluginImpl extends Plugin
         return cloneMethod;
     }
 
-    private void generateCopyOfProperty( final FieldOutline field, final JVar o, final JBlock block )
+    private void generateCopyOfProperty( final FieldOutline field, final JExpression o, final JBlock block )
     {
         final JMethod getter = this.getPropertyGetter( field );
 
@@ -2049,9 +2174,12 @@ public final class PluginImpl extends Plugin
                         next() );
 
                     final JType javaType = typeInfo.toType( field.parent().parent(), Aspect.IMPLEMENTATION );
-                    copyExpr = this.getCopyExpression( field, typeInfo, block,
-                                                       JExpr.cast( javaType, JExpr.invoke( o, getter ) ), true );
+                    final JExpression source =
+                        field.parent().parent().getModel().strategy == ImplStructureStrategy.BEAN_ONLY
+                        ? JExpr.invoke( o, getter )
+                        : JExpr.cast( javaType, JExpr.invoke( o, getter ) );
 
+                    copyExpr = this.getCopyExpression( field, typeInfo, block, source, true );
                 }
 
                 if ( copyExpr == null )

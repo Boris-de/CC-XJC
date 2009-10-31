@@ -57,6 +57,14 @@ CC-XJC
     generated code. It takes one argument from the list [1.5, 1.6, 1.7].
     Default: 1.5.
 
+    * -cc-nullable (since 1.1)
+
+    The '-cc-nullable' option got introduced in version 1.1. It can be used
+    to instruct the plugin to allow passing 'null' references to copy
+    constructors as it was the default in versions prior to 1.1. Starting with
+    version 1.1, that default has been changed to throw a 'NullPointerException'
+    for any 'null' references passed to copy constructors.
+
   See the examples for further information.
 
 * Support
