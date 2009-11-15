@@ -342,17 +342,17 @@
   </reporting>
   <distributionManagement>
     <repository>
-      <id>http://ccxjc.sourceforge.net/maven2/releases</id>
+      <id>repository.ccxjc.sourceforge.net</id>
       <name>CC-XJC Release Repository</name>
       <url>scp://shell.sourceforge.net/home/groups/c/cc/ccxjc/htdocs/maven2/releases</url>
     </repository>
     <snapshotRepository>
-      <id>http://ccxjc.sourceforge.net/maven2/snapshots</id>
+      <id>snapshots.ccxjc.sourceforge.net</id>
       <name>CC-XJC Snapshot Repository</name>
       <url>scp://shell.sourceforge.net/home/groups/c/cc/ccxjc/htdocs/maven2/snapshots</url>
     </snapshotRepository>
     <site>
-      <id>http://ccxjc.sourceforge.net</id>
+      <id>ccxjc.sourceforge.net</id>
       <url>scp://shell.sourceforge.net/home/groups/c/cc/ccxjc/htdocs</url>
     </site>
   </distributionManagement>
