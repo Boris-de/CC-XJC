@@ -1435,6 +1435,7 @@ public final class PluginImpl extends Plugin
             m.javadoc().addThrows( nullPointerException ).
                 append( "if {@code source} or {@code target} is {@code null}." );
 
+            m.annotate( SuppressWarnings.class ).param( "value", "unchecked" );
         }
         else
         {

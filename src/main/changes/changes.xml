@@ -209,5 +209,13 @@
       </action>
     </release>
 
+    <!-- ******************************************************************* -->
+    <release version="1.2" date="2009-11-15">
+      <action dev="schulte2005" type="update" issue="6" system="MantisBT">
+        <![CDATA[Updated to annotate various methods with
+        <code>@SuppressWarnings("unchecked")</code>.]]>
+      </action>
+    </release>
+
   </body>
 </document>
