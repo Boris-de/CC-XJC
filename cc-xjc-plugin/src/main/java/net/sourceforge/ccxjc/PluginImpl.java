@@ -1872,9 +1872,8 @@ public final class PluginImpl extends Plugin
         final JType jType = type.toType( fieldOutline.parent().parent(), Aspect.IMPLEMENTATION );
         block.directStatement( "// CNonElement: " + jType.binaryName() );
 
-        block.directStatement(
-            "// " + WARNING_PREFIX + ": " +
-            "The '" + jType.binaryName() + "' type was not part of the compilation unit." );
+        block.directStatement( "// " + WARNING_PREFIX + ": " + "The '" + jType.binaryName() + "'" );
+        block.directStatement( "// " + WARNING_PREFIX + ": type was not part of the compilation unit." );
 
         block.directStatement(
             "// " + WARNING_PREFIX + ": " +
@@ -1882,17 +1881,15 @@ public final class PluginImpl extends Plugin
 
         block.directStatement(
             "// " + WARNING_PREFIX + ": " +
-            "does not throw a 'CloneNotSupportedException' and to have class" );
-
-        block.directStatement( "// " + WARNING_PREFIX + ": 'java.lang.Object' as its direct super-class." );
+            "does not throw a 'CloneNotSupportedException' and to directly extend class" );
 
         block.directStatement(
             "// " + WARNING_PREFIX + ": " +
-            "If this warning is part of an 'if instanceof' block, the order of any" );
+            "'java.lang.Object'. If this warning is part of an 'if instanceof' block," );
 
         block.directStatement(
             "// " + WARNING_PREFIX + ": " +
-            "other 'if instanceof' statements may be wrong and must be verified." );
+            "the order of 'if instanceof' statements may be wrong and must be verified." );
 
         this.log( Level.WARNING, "nonElementWarning", new Object[]
             {
@@ -1973,12 +1970,14 @@ public final class PluginImpl extends Plugin
                 "// " + WARNING_PREFIX + ": A super-class of this class was not part of the compilation unit." );
 
             ctor.body().directStatement(
-                "// " + WARNING_PREFIX + ": The plugin assumes this super-class to have class " +
-                "'java.lang.Object' as its direct super-class." );
+                "// " + WARNING_PREFIX + ": The plugin assumes this super-class to directly extend class " +
+                "'java.lang.Object'." );
 
             ctor.body().directStatement(
-                "// " + WARNING_PREFIX + ": The constructors in the hierarchy this constructor is part of " +
-                "could be wrong and must be verified." );
+                "// " + WARNING_PREFIX + ": The type of the constructor arguments (type of o) in the hierarchy " +
+                "this constructor is part" );
+            ctor.body().directStatement(
+                "// " + WARNING_PREFIX + ": of may be wrong and must be verified." );
 
         }
 
