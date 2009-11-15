@@ -36,7 +36,7 @@
   <artifactId>cc-xjc</artifactId>
   <packaging>pom</packaging>
   <name>CC-XJC</name>
-  <version>1.2</version>
+  <version>1.3-SNAPSHOT</version>
   <description>JAXB 2.0 Schema to Java compiler plugin for adding a copy constructor to schema derived classes.</description>
   <url>http://ccxjc.sourceforge.net</url>
   <inceptionYear>2009</inceptionYear>
@@ -78,9 +78,9 @@
     </mailingList>
   </mailingLists>
   <scm>
-    <connection>scm:svn:https://ccxjc.svn.sourceforge.net/svnroot/ccxjc/tags/cc-xjc-1.2</connection>
-    <developerConnection>scm:svn:https://ccxjc.svn.sourceforge.net/svnroot/ccxjc/tags/cc-xjc-1.2</developerConnection>
-    <url>http://ccxjc.svn.sourceforge.net/viewvc/ccxjc/tags/cc-xjc-1.2</url>
+    <connection>scm:svn:https://ccxjc.svn.sourceforge.net/svnroot/ccxjc/trunk</connection>
+    <developerConnection>scm:svn:https://ccxjc.svn.sourceforge.net/svnroot/ccxjc/trunk</developerConnection>
+    <url>http://ccxjc.svn.sourceforge.net/viewvc/ccxjc/trunk</url>
   </scm>
   <build>
     <pluginManagement>
