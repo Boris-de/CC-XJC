@@ -211,6 +211,9 @@
 
     <!-- ******************************************************************* -->
     <release version="1.2" date="2009-11-15">
+      <action dev="schulte2005" type="update" issue="5" system="MantisBT">
+        <![CDATA[Added option <code>-cc-hierarchical</code>.]]>
+      </action>
       <action dev="schulte2005" type="update" issue="6" system="MantisBT">
         <![CDATA[Updated to annotate various methods with
         <code>@SuppressWarnings("unchecked")</code>.]]>

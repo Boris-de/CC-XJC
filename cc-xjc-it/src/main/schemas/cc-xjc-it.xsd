@@ -208,13 +208,17 @@
   <!--                                                                       -->
   <!-- ParentComplexType                                                     -->
   <!--                                                                       -->
-  <xsd:complexType name="ParentComplexType"/>
+  <xsd:complexType name="ParentComplexType">
+    <xsd:attribute name="parentString" type="xsd:string" use="required"/>
+  </xsd:complexType>
   <!--                                                                       -->
   <!-- ChildOfParentComplexType                                              -->
   <!--                                                                       -->
   <xsd:complexType name="ChildOfParentComplexType">
     <xsd:complexContent>
-      <xsd:extension base="ccxjcit:ParentComplexType"/>
+      <xsd:extension base="ccxjcit:ParentComplexType">
+        <xsd:attribute name="childOfParentString" type="xsd:string" use="required"/>
+      </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>
   <!--                                                                       -->
@@ -222,7 +226,9 @@
   <!--                                                                       -->
   <xsd:complexType name="ChildOfChildOfParentComplexType">
     <xsd:complexContent>
-      <xsd:extension base="ccxjcit:ChildOfParentComplexType"/>
+      <xsd:extension base="ccxjcit:ChildOfParentComplexType">
+        <xsd:attribute name="childOfChildOfParentString" type="xsd:string" use="required"/>
+      </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>
   <!--                                                                       -->
@@ -230,7 +236,9 @@
   <!--                                                                       -->
   <xsd:complexType name="ChildOfChildOfChildOfParentComplexType">
     <xsd:complexContent>
-      <xsd:extension base="ccxjcit:ChildOfChildOfParentComplexType"/>
+      <xsd:extension base="ccxjcit:ChildOfChildOfParentComplexType">
+        <xsd:attribute name="childOfChildOfChildOfParentString" type="xsd:string" use="required"/>
+      </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>
   <!--                                                                       -->
@@ -238,19 +246,25 @@
   <!--                                                                       -->
   <xsd:complexType name="ChildOfChildOfChildOfChildOfParentComplexType">
     <xsd:complexContent>
-      <xsd:extension base="ccxjcit:ChildOfChildOfChildOfParentComplexType"/>
+      <xsd:extension base="ccxjcit:ChildOfChildOfChildOfParentComplexType">
+        <xsd:attribute name="childOfChildOfChildOfChildOfParentString" type="xsd:string" use="required"/>
+      </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>
   <!--                                                                       -->
   <!-- AbstractParentComplexType                                             -->
   <!--                                                                       -->
-  <xsd:complexType name="AbstractParentComplexType" abstract="true"/>
+  <xsd:complexType name="AbstractParentComplexType" abstract="true">
+    <xsd:attribute name="parentString" type="xsd:string" use="required"/>
+  </xsd:complexType>
   <!--                                                                       -->
   <!-- AbstractChildOfParentComplexType                                      -->
   <!--                                                                       -->
   <xsd:complexType name="AbstractChildOfParentComplexType" abstract="true">
     <xsd:complexContent>
-      <xsd:extension base="ccxjcit:AbstractParentComplexType"/>
+      <xsd:extension base="ccxjcit:AbstractParentComplexType">
+        <xsd:attribute name="childOfParentString" type="xsd:string" use="required"/>
+      </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>
   <!--                                                                       -->
@@ -258,7 +272,9 @@
   <!--                                                                       -->
   <xsd:complexType name="AbstractChildOfChildOfParentComplexType" abstract="true">
     <xsd:complexContent>
-      <xsd:extension base="ccxjcit:AbstractChildOfParentComplexType"/>
+      <xsd:extension base="ccxjcit:AbstractChildOfParentComplexType">
+        <xsd:attribute name="childOfChildOfParentString" type="xsd:string" use="required"/>
+      </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>
   <!--                                                                       -->
@@ -266,7 +282,9 @@
   <!--                                                                       -->
   <xsd:complexType name="AbstractChildOfChildOfChildOfParentComplexType" abstract="true">
     <xsd:complexContent>
-      <xsd:extension base="ccxjcit:AbstractChildOfChildOfParentComplexType"/>
+      <xsd:extension base="ccxjcit:AbstractChildOfChildOfParentComplexType">
+        <xsd:attribute name="childOfChildOfChildOfParentString" type="xsd:string" use="required"/>
+      </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>
   <!--                                                                       -->
@@ -274,7 +292,9 @@
   <!--                                                                       -->
   <xsd:complexType name="AbstractChildOfChildOfChildOfChildOfParentComplexType" abstract="true">
     <xsd:complexContent>
-      <xsd:extension base="ccxjcit:AbstractChildOfChildOfChildOfParentComplexType"/>
+      <xsd:extension base="ccxjcit:AbstractChildOfChildOfChildOfParentComplexType">
+        <xsd:attribute name="childOfChildOfChildOfChildOfParentString" type="xsd:string" use="required"/>
+      </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>
   <!--                                                                       -->

@@ -65,6 +65,56 @@ CC-XJC
     version 1.1, that default has been changed to throw a 'NullPointerException'
     for any 'null' references passed to copy constructors.
 
+    * -cc-hierarchical (since 1.2)
+
+    The '-cc-hierarchical' option got introduced in version 1.2. It can be used
+    to instruct the plugin to generate hierarchical copy constructors - copy
+    constructors supporting copying from super types.
+
+    Example:
+
+---
+        <xsd:complexType name="Root"/>
+
+        <xsd:complexType name="Parent">
+          <xsd:complexContext>
+            <xsd:extension base="Root"/>
+          </xsd:complexContext>
+        </xsd:complexType>
+
+        <xsd:complexType name="Child">
+          <xsd:complexContext>
+            <xsd:extension base="Parent"/>
+          </xsd:complexContext>
+        </xsd:complexType>
+---
+
+    Without the '-cc-hierarchical' option, the plugin will generate the
+    following copy constructors (compatible with versions 1.0.x):
+
+---
+        public Root(final Root o)
+        public Parent(final Parent o)
+        public Child(final Child o)
+---
+
+    Specifying the '-cc-hierarchical' option, the plugin will generate the
+    following copy constructors allowing to create copies of super types.
+
+---
+        public Root(final Root o)
+        public Parent(final Root o)
+        public Child(final Root o)
+---
+
+    Note: Using the '-cc-hierarchical' option has the drawback of losing type
+    safety. There will be no compile errors and no runtime errors when
+    accidentally passing the wrong instance to such a constructor. If you plan
+    to use the '-cc-hierarchical' option, you may want to verify your code by
+    regenerating your classes without that option and by inspecting any compile
+    errors this produces to verify the instance passed to the copy constructor
+    is the instance you intended to copy.
+
   See the examples for further information.
 
 * Support

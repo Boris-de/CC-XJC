@@ -120,6 +120,8 @@ public final class PluginImpl extends Plugin
 
     private static final String NULLABLE_OPTION_NAME = "-cc-nullable";
 
+    private static final String HIERARCHICAL_OPTION_NAME = "-cc-hierarchical";
+
     private static final Class[] IMMUTABLE_TYPES =
     {
         Boolean.class,
@@ -187,6 +189,8 @@ public final class PluginImpl extends Plugin
 
     private boolean nullable = false;
 
+    private boolean hierarchical = false;
+
     private BigInteger methodCount;
 
     private BigInteger constructorCount;
@@ -209,7 +213,9 @@ public final class PluginImpl extends Plugin
             append( "  " ).append( TARGET_OPTION_NAME ).append( "         :  " ).
             append( this.getMessage( "targetUsage", null ) ).append( System.getProperty( "line.separator" ) ).
             append( "  " ).append( NULLABLE_OPTION_NAME ).append( "       :  " ).
-            append( this.getMessage( "nullableUsage", null ) ).toString();
+            append( this.getMessage( "nullableUsage", null ) ).append( System.getProperty( "line.separator" ) ).
+            append( "  " ).append( HIERARCHICAL_OPTION_NAME ).append( "   :  " ).
+            append( this.getMessage( "hierarchicalUsage", null ) ).toString();
 
     }
 
@@ -337,6 +343,12 @@ public final class PluginImpl extends Plugin
         if ( args[i].startsWith( NULLABLE_OPTION_NAME ) )
         {
             this.nullable = true;
+            return 1;
+        }
+
+        if ( args[i].startsWith( HIERARCHICAL_OPTION_NAME ) )
+        {
+            this.hierarchical = true;
             return 1;
         }
 
@@ -1946,8 +1958,9 @@ public final class PluginImpl extends Plugin
     private JMethod generateCopyConstructor( final ClassOutline clazz )
     {
         final JMethod ctor = clazz.implClass.constructor( JMod.PUBLIC );
-        final JClass paramClass = clazz.implClass;
+        final JClass paramClass = this.hierarchical ? this.getSupertype( clazz.implClass ) : clazz.implClass;
         final JVar o = ctor.param( JMod.FINAL, paramClass, "o" );
+        final boolean superTypeParam = !clazz.implClass.equals( paramClass );
 
         ctor.javadoc().add( "Creates a new {@code " + clazz.implClass.name() +
                             "} instance by deeply copying a given {@code " + paramClass.name() +
@@ -2005,7 +2018,7 @@ public final class PluginImpl extends Plugin
         if ( !clazz.implClass.fields().isEmpty() )
         {
             final JBlock copyBlock = new JBlock( false, false );
-            final JExpression source = o;
+            final JExpression source = superTypeParam ? JExpr.cast( clazz.implClass, o ) : o;
 
             for ( FieldOutline field : clazz.getDeclaredFields() )
             {
@@ -2061,7 +2074,11 @@ public final class PluginImpl extends Plugin
 
             if ( hasFields )
             {
-                if ( this.nullable )
+                if ( superTypeParam )
+                {
+                    ctor.body()._if( o._instanceof( clazz.implClass ) )._then().add( copyBlock );
+                }
+                else if ( this.nullable )
                 {
                     ctor.body()._if( o.ne( JExpr._null() ) )._then().add( copyBlock );
                 }
@@ -2110,6 +2127,16 @@ public final class PluginImpl extends Plugin
         }
 
         return false;
+    }
+
+    private JClass getSupertype( final JClass clazz )
+    {
+        if ( clazz._extends() != null && !clazz._extends().binaryName().equals( "java.lang.Object" ) )
+        {
+            return this.getSupertype( clazz._extends() );
+        }
+
+        return clazz;
     }
 
     private JMethod generateCloneMethod( final ClassOutline clazz )

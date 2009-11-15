@@ -54,7 +54,7 @@ Download
 
 ---
 <repository>
-  <id>http://ccxjc.sourceforge.net/maven2/snapshots</id>
+  <id>snapshots.ccxjc.sourceforge.net</id>
   <url>http://ccxjc.sourceforge.net/maven2/snapshots</url>
   <releases>
     <enabled>false</enabled>
