@@ -76,6 +76,13 @@
       <post>ccxjc-svn@lists.sourceforge.net</post>
       <archive>http://sourceforge.net/mailarchive/forum.php?forum=ccxjc-svn</archive>
     </mailingList>
+    <mailingList>
+      <name>ccxjc-notifications</name>
+      <subscribe>http://lists.sourceforge.net/lists/listinfo/ccxjc-notifications</subscribe>
+      <unsubscribe>http://lists.sourceforge.net/lists/listinfo/ccxjc-notifications</unsubscribe>
+      <post>ccxjc-notifications@lists.sourceforge.net</post>
+      <archive>http://sourceforge.net/mailarchive/forum.php?forum=ccxjc-notifications</archive>
+    </mailingList>
   </mailingLists>
   <scm>
     <connection>scm:svn:https://ccxjc.svn.sourceforge.net/svnroot/ccxjc/trunk</connection>
