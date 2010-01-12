@@ -40,6 +40,7 @@ import javax.xml.namespace.QName;
 import junit.framework.Assert;
 import net.sourceforge.ccxjc.it.model.priv.indexed.valueclass.ccxjcit.SimpleTypeAttributes;
 import org.apache.commons.lang.SerializationUtils;
+import org.junit.Test;
 
 /**
  * Tests the {@code SimpleTypeAttributes} complex type.
@@ -275,22 +276,22 @@ public class SimpleTypeAttributesIndexedTest
         Assert.assertEquals( 100, a.getUnsignedShort() );
     }
 
-    public void testSimpleTypeAttributesNull() throws Exception
+    @Test public void testSimpleTypeAttributesNull() throws Exception
     {
         new SimpleTypeAttributes( null );
     }
 
-    public void testSimpleTypeAttributesDefaults() throws Exception
+    @Test public void testSimpleTypeAttributesDefaults() throws Exception
     {
         new SimpleTypeAttributes( new SimpleTypeAttributes() );
     }
 
-    public void testSimpleTypeAttributes() throws Exception
+    @Test public void testSimpleTypeAttributes() throws Exception
     {
         this.assertTestSimpleTypeAttributes( new SimpleTypeAttributes( this.getTestSimpleTypeAttributes() ) );
     }
 
-    public void testSerializable() throws Exception
+    @Test public void testSerializable() throws Exception
     {
         final int runs = 100000;
 

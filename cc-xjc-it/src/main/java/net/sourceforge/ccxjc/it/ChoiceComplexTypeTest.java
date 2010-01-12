@@ -32,6 +32,7 @@ package net.sourceforge.ccxjc.it;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import net.sourceforge.ccxjc.it.model.priv.collections.valueclass.ccxjcit.ChoiceComplexType;
+import org.junit.Test;
 
 /**
  * Tests the {@code ChoiceComplexType} complex type.
@@ -42,7 +43,7 @@ import net.sourceforge.ccxjc.it.model.priv.collections.valueclass.ccxjcit.Choice
 public class ChoiceComplexTypeTest
 {
 
-    public void testChoiceComplexType() throws Exception
+    @Test public void testChoiceComplexType() throws Exception
     {
         final JAXBElement<ChoiceComplexType> e = (JAXBElement<ChoiceComplexType>) JAXBContext.newInstance(
             ChoiceComplexType.class ).createUnmarshaller().unmarshal( this.getClass().getResource(
