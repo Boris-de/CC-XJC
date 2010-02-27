@@ -56,26 +56,27 @@
             <configuration>
               <artifactItems>
                 <artifactItem>
-                  <groupId>${pom.groupId}</groupId>
+                  <groupId>${project.groupId}</groupId>
                   <artifactId>cc-xjc</artifactId>
-                  <version>${pom.version}</version>
+                  <version>${project.version}</version>
+                  <classifier>readme</classifier>
                   <type>xhtml</type>
                   <outputDirectory>${project.build.directory}</outputDirectory>
                   <destFileName>README.xhtml</destFileName>
                 </artifactItem>
                 <artifactItem>
-                  <groupId>${pom.groupId}</groupId>
+                  <groupId>${project.groupId}</groupId>
                   <artifactId>cc-xjc</artifactId>
-                  <version>${pom.version}</version>
+                  <version>${project.version}</version>
                   <classifier>license</classifier>
                   <type>txt</type>
                   <outputDirectory>${project.build.directory}</outputDirectory>
                   <destFileName>LICENSE.txt</destFileName>
                 </artifactItem>
                 <artifactItem>
-                  <groupId>${pom.groupId}</groupId>
+                  <groupId>${project.groupId}</groupId>
                   <artifactId>cc-xjc-plugin</artifactId>
-                  <version>${pom.version}</version>
+                  <version>${project.version}</version>
                   <type>jar</type>
                   <outputDirectory>${project.build.directory}</outputDirectory>
                 </artifactItem>
@@ -98,7 +99,7 @@
               <descriptors>
                 <descriptor>src/main/assembly/bin.xml</descriptor>
               </descriptors>
-              <finalName>cc-xjc-${pom.version}</finalName>
+              <finalName>cc-xjc-${project.version}</finalName>
             </configuration>
           </execution>
         </executions>

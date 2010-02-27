@@ -299,17 +299,13 @@
               <artifacts>
                 <artifact>
                   <file>${project.build.directory}/generated-site/xhtml/cc-xjc/cc-xjc.xhtml</file>
+                  <classifier>readme</classifier>
                   <type>xhtml</type>
                 </artifact>
                 <artifact>
                   <file>${basedir}/LICENSE.txt</file>
                   <classifier>license</classifier>
                   <type>txt</type>
-                </artifact>
-                <artifact>
-                  <file>${basedir}/src/site/site.xml</file>
-                  <classifier>site</classifier>
-                  <type>xml</type>
                 </artifact>
               </artifacts>
             </configuration>

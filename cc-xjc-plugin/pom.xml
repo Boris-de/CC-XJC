@@ -75,17 +75,18 @@
             <configuration>
               <artifactItems>
                 <artifactItem>
-                  <groupId>${pom.groupId}</groupId>
+                  <groupId>${project.groupId}</groupId>
                   <artifactId>cc-xjc</artifactId>
-                  <version>${pom.version}</version>
+                  <version>${project.version}</version>
+                  <classifier>readme</classifier>
                   <type>xhtml</type>
                   <outputDirectory>${project.build.outputDirectory}/META-INF</outputDirectory>
                   <destFileName>README.xhtml</destFileName>
                 </artifactItem>
                 <artifactItem>
-                  <groupId>${pom.groupId}</groupId>
+                  <groupId>${project.groupId}</groupId>
                   <artifactId>cc-xjc</artifactId>
-                  <version>${pom.version}</version>
+                  <version>${project.version}</version>
                   <classifier>license</classifier>
                   <type>txt</type>
                   <outputDirectory>${project.build.outputDirectory}/META-INF</outputDirectory>
