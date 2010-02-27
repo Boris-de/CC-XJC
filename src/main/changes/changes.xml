@@ -38,187 +38,138 @@
     <author email="schulte2005@users.sourceforge.net">Christian Schulte</author>
   </properties>
   <body>
-    <!-- ******************************************************************* -->
+    <!-- *********************************************************************************************************** -->
     <release version="1.0-beta-1" date="2009-05-02"/>
-
-    <!-- ******************************************************************* -->
+    <!-- *********************************************************************************************************** -->
     <release version="1.0-beta-2" date="2009-05-03">
       <action dev="schulte2005" type="fix" issue="0000001" system="MantisBT">
-        Incorrect code generated for collection valued properties referencing
-        non schema derived classes.
+        Incorrect code generated for collection valued properties referencing non schema derived classes.
       </action>
     </release>
-
-    <!-- ******************************************************************* -->
+    <!-- *********************************************************************************************************** -->
     <release version="1.0-beta-3" date="2009-05-04">
       <action dev="schulte2005" type="update">
-        Added support for multi-valued collection properties. Updated to add
-        a clone method and the the Cloneable interface to all schema derived
+        Added support for multi-valued collection properties. Updated to add a clone method and the the Cloneable
+        interface to all schema derived classes.
+      </action>
+    </release>
+    <!-- *********************************************************************************************************** -->
+    <release version="1.0-beta-4" date="2009-05-07">
+      <action dev="schulte2005" type="update">
+        Updated to suppress warnings for known immutable types and to warn about copying references of schema derived
         classes.
       </action>
     </release>
-
-    <!-- ******************************************************************* -->
-    <release version="1.0-beta-4" date="2009-05-07">
-      <action dev="schulte2005" type="update">
-        Updated to suppress warnings for known immutable types and to warn
-        about copying references of schema derived classes.
-      </action>
-    </release>
-
-    <!-- ******************************************************************* -->
+    <!-- *********************************************************************************************************** -->
     <release version="1.0-beta-5" date="2009-06-26">
-      <action dev="schulte2005" type="fix" issue="2" system="MantisBT"><![CDATA[
-        Updated to ignore any fields with a <code>static</code> or
-        <code>final</code> modifier.]]>
+      <action dev="schulte2005" type="fix" issue="2" system="MantisBT">
+        Updated to ignore any fields with a 'static' or 'final' modifier.
       </action>
     </release>
-
-    <!-- ******************************************************************* -->
+    <!-- *********************************************************************************************************** -->
     <release version="1.0-beta-6" date="2009-07-26">
-      <action dev="schulte2005" type="update"><![CDATA[
-      Updated the return type of generated <code>clone()</code> methods from
-      <code>java.lang.Object</code> to the type of the declaring class.]]>
+      <action dev="schulte2005" type="update">
+        Updated the return type of generated 'clone()' methods from 'java.lang.Object' to the type of the declaring
+        class.
       </action>
     </release>
-
-    <!-- ******************************************************************* -->
+    <!-- *********************************************************************************************************** -->
     <release version="1.0-beta-7" date="2009-08-16">
-      <action dev="schulte2005" type="fix"><![CDATA[
-      Added support for various property types not supported prior to this
-      version (collectionType=&amp;indexed&amp;,
-      generateValueClass=&amp;false&amp;, etc.).]]>
+      <action dev="schulte2005" type="fix">
+        Added support for various property types not supported prior to this version (collectionType=&amp;indexed&amp;,
+        generateValueClass=&amp;false&amp;, etc.).
       </action>
-      <action dev="schulte2005" type="update"><![CDATA[
-      Added <code>-cc-visibility</code> option.]]>
-      </action>
+      <action dev="schulte2005" type="update">Added '-cc-visibility' option.</action>
     </release>
-
-    <!-- ******************************************************************* -->
+    <!-- *********************************************************************************************************** -->
     <release version="1.0-beta-8" date="2009-08-17">
-      <action dev="schulte2005" type="fix"><![CDATA[
-      Corrected an <code>IllegalArgumentException</code> thrown by
-      generated <code>copyObject</code> methods.]]>
+      <action dev="schulte2005" type="fix">
+      Corrected an 'IllegalArgumentException' thrown by generated 'copyObject' methods.
       </action>
-      <action dev="schulte2005" type="update"><![CDATA[
-      Removed generated <code>copyOfQName</code> methods and added
-      <code>QName</code> to the list of immutable types.]]>
+      <action dev="schulte2005" type="update">
+        Removed generated 'copyOfQName' methods and added 'QName' to the list of immutable types.
       </action>
-      <action dev="schulte2005" type="update"><![CDATA[
-      Removed generated <code>copyOfDuration</code> methods and added
-      <code>Duration</code> to the list of immutable types.]]>
+      <action dev="schulte2005" type="update">
+        Removed generated 'copyOfDuration' methods and added 'Duration' to the list of immutable types.
       </action>
-      <action dev="schulte2005" type="update"><![CDATA[
-      Added support for <code>@XmlAnyAttribute</code>.]]>
-      </action>
-      <action dev="schulte2005" type="update"><![CDATA[
-      Added <code>-cc-target</code> option.]]>
-      </action>
+      <action dev="schulte2005" type="update">Added support for '@XmlAnyAttribute'.</action>
+      <action dev="schulte2005" type="update">Added '-cc-target' option.</action>
     </release>
-
-    <!-- ******************************************************************* -->
+    <!-- *********************************************************************************************************** -->
     <release version="1.0-beta-9" date="2009-08-18">
-      <action dev="schulte2005" type="fix"><![CDATA[
-      Corrected a <code>ClassCastException</code> thrown when copying
-      <code>CWildcardTypeInfo</code> properties.]]>
+      <action dev="schulte2005" type="fix">
+        Corrected a 'ClassCastException' thrown when copying 'CWildcardTypeInfo' properties.
       </action>
-      <action dev="schulte2005" type="fix"><![CDATA[
-      Corrected handling of non-collection properties referencing multiple
-      types.]]>
+      <action dev="schulte2005" type="fix">
+        Corrected handling of non-collection properties referencing multiple types.
       </action>
-      <action dev="schulte2005" type="update"><![CDATA[
-      Updated to stop logging when verbose option is not set.]]>
-      </action>
-      <action dev="schulte2005" type="update"><![CDATA[
-      Changed default visibility from package to private.]]>
-      </action>
+      <action dev="schulte2005" type="update">Updated to stop logging when verbose option is not set.</action>
+      <action dev="schulte2005" type="update">Changed default visibility from package to private.</action>
     </release>
-
-    <!-- ******************************************************************* -->
+    <!-- *********************************************************************************************************** -->
     <release version="1.0-beta-10" date="2009-08-21">
-      <action dev="schulte2005" type="fix"><![CDATA[
-      Updated generated javadoc.]]>
-      </action>
+      <action dev="schulte2005" type="fix">Updated generated javadoc.</action>
     </release>
-
-    <!-- ******************************************************************* -->
+    <!-- *********************************************************************************************************** -->
     <release version="1.0-beta-11" date="2009-08-23">
-      <action dev="schulte2005" type="update"><![CDATA[
-      Updated generated <code>copyOfObject</code> methods to support copying of
-      <code>XMLGregorianCalendar</code> instances without using reflection.]]>
+      <action dev="schulte2005" type="update">
+        Updated generated 'copyOfObject' methods to support copying of 'XMLGregorianCalendar' instances without using
+        reflection.
       </action>
-      <action dev="schulte2005" type="update"><![CDATA[
-      Updated generated <code>copyOfArray</code> methods to support copying of
-      primitive arrays without using reflection.]]>
+      <action dev="schulte2005" type="update">
+        Updated generated 'copyOfArray' methods to support copying of primitive arrays without using reflection.
       </action>
     </release>
-
-    <!-- ******************************************************************* -->
+    <!-- *********************************************************************************************************** -->
     <release version="1.0-beta-12" date="2009-08-24">
       <action dev="schulte2005" type="fix"><![CDATA[
       Corrected generated <code>copyOfXYZElement</code> methods.]]>
       </action>
     </release>
-
-    <!-- ******************************************************************* -->
+    <!-- *********************************************************************************************************** -->
     <release version="1.0-beta-13" date="2009-08-25">
-      <action dev="schulte2005" type="fix"><![CDATA[
-      Updated default visibility to 'private' as stated in the documentation.]]>
+      <action dev="schulte2005" type="fix">
+        Updated default visibility to 'private' as stated in the documentation.
       </action>
-      <action dev="schulte2005" type="update"><![CDATA[
-      Added class <code>java.util.Currency</code> to the list of immutable
-      types.]]>
+      <action dev="schulte2005" type="update">
+        Added class 'java.util.Currency' to the list of immutable types.
       </action>
-      <action dev="schulte2005" type="update"><![CDATA[
-      Added classes <code>java.util.Date</code>, <code>java.util.Calendar</code>,
-      <code>java.util.TimeZone</code> and <code>java.util.Locale</code> to the
-      list of cloneable types.]]>
+      <action dev="schulte2005" type="update">
+        Added classes 'java.util.Date', 'java.util.Calendar', 'java.util.TimeZone' and 'java.util.Locale' to the list of
+        cloneable types.
       </action>
     </release>
-
-    <!-- ******************************************************************* -->
+    <!-- *********************************************************************************************************** -->
     <release version="1.0-beta-14" date="2009-08-27">
-      <action dev="schulte2005" type="fix"><![CDATA[
-      Moved java.net repositories from parent POM to cc-xjc-it POM.]]>
+      <action dev="schulte2005" type="fix">Moved java.net repositories from parent POM to cc-xjc-it POM.</action>
+    </release>
+    <!-- *********************************************************************************************************** -->
+    <release version="1.0" date="2009-09-18" description="First stable release."/>
+    <!-- *********************************************************************************************************** -->
+    <release version="1.0.1" date="2009-10-12" description="Bugfix release.">
+      <action dev="schulte2005" type="fix" issue="4" system="MantisBT">
+        Corrected 'MissingResourceException's thrown when copying properties is not possible and corresponding messages
+        are logged. Added support for JAXB class customizations using a 'ref' attribute.
       </action>
     </release>
-
-    <!-- ******************************************************************* -->
-    <release version="1.0" date="2009-09-18">
-      <action dev="schulte2005" type="update"><![CDATA[First stable release.]]>
+    <!-- *********************************************************************************************************** -->
+    <release version="1.1" date="2009-11-01" description="Feature enhancements.">
+      <action dev="schulte2005" type="update">
+        Added a '-cc-nullable' option and changed the default behavior of the generated copy constructors to throw a
+        'NullPointerException' when passed a 'null' reference.
       </action>
     </release>
-
-    <!-- ******************************************************************* -->
-    <release version="1.0.1" date="2009-10-12">
-      <action dev="schulte2005" type="fix" issue="4" system="MantisBT"><![CDATA[
-      Corrected <code>MissingResourceException</code>s thrown when copying
-      properties is not possible and corresponding messages are logged.
-      Added support for JAXB class customizations using a <code>ref</code>
-      attribute (<code>CNonElement</code>).]]>
-      </action>
-    </release>
-
-    <!-- ******************************************************************* -->
-    <release version="1.1" date="2009-11-01">
-      <action dev="schulte2005" type="update"><![CDATA[
-      Added a <code>-cc-nullable</code> option and changed the default
-      behavior of the generated copy constructors to throw a
-      <code>NullPointerException</code> when passed a <code>null</code>
-      reference.]]>
-      </action>
-    </release>
-
-    <!-- ******************************************************************* -->
-    <release version="1.2" date="2009-11-15">
-      <action dev="schulte2005" type="update" issue="5" system="MantisBT">
-        <![CDATA[Added option <code>-cc-hierarchical</code>.]]>
-      </action>
+    <!-- *********************************************************************************************************** -->
+    <release version="1.2" date="2009-11-15" description="Feature enhancements.">
+      <action dev="schulte2005" type="update" issue="5" system="MantisBT">Added option '-cc-hierarchical'.</action>
       <action dev="schulte2005" type="update" issue="6" system="MantisBT">
-        <![CDATA[Updated to annotate various methods with
-        <code>@SuppressWarnings("unchecked")</code>.]]>
+        Updated to annotate various methods with '@SuppressWarnings("unchecked")'.
       </action>
     </release>
-
+    <!-- *********************************************************************************************************** -->
+    <release version="1.3" date="2010-02-27" description="Feature enhancements.">
+      <action dev="schulte2005" type="update">Added option '-cc-cloneable-types'.</action>
+      <action dev="schulte2005" type="update">Added option '-cc-immutable-types'.</action>
+    </release>
   </body>
 </document>

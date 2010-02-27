@@ -122,34 +122,40 @@ public final class PluginImpl extends Plugin
 
     private static final String HIERARCHICAL_OPTION_NAME = "-cc-hierarchical";
 
-    private static final Class[] IMMUTABLE_TYPES =
-    {
-        Boolean.class,
-        Byte.class,
-        Character.class,
-        Double.class,
-        Enum.class,
-        Float.class,
-        Integer.class,
-        Long.class,
-        Short.class,
-        String.class,
-        BigDecimal.class,
-        BigInteger.class,
-        UUID.class,
-        QName.class,
-        Duration.class,
-        Currency.class
-    };
+    private static final String IMMUTABLE_TYPES_OPTION_NAME = "-cc-immutable-types";
 
-    private static final Class[] CLONEABLE_TYPES =
-    {
-        XMLGregorianCalendar.class,
-        Date.class,
-        Calendar.class,
-        TimeZone.class,
-        Locale.class
-    };
+    private static final String CLONEABLE_TYPES_OPTION_NAME = "-cc-cloneable-types";
+
+    private static final String ELEMENT_SEPARATOR = ":";
+
+    private static final List<String> DEFAULT_IMMUTABLE_TYPES = Arrays.asList( new String[]
+        {
+            Boolean.class.getName(),
+            Byte.class.getName(),
+            Character.class.getName(),
+            Double.class.getName(),
+            Enum.class.getName(),
+            Float.class.getName(),
+            Integer.class.getName(),
+            Long.class.getName(),
+            Short.class.getName(),
+            String.class.getName(),
+            BigDecimal.class.getName(),
+            BigInteger.class.getName(),
+            UUID.class.getName(),
+            QName.class.getName(),
+            Duration.class.getName(),
+            Currency.class.getName()
+        } );
+
+    private static final List<String> DEFAULT_CLONEABLE_TYPES = Arrays.asList( new String[]
+        {
+            XMLGregorianCalendar.class.getName(),
+            Date.class.getName(),
+            Calendar.class.getName(),
+            TimeZone.class.getName(),
+            Locale.class.getName()
+        } );
 
     private static final Class[] PRIMITIVE_ARRAY_TYPES =
     {
@@ -191,6 +197,10 @@ public final class PluginImpl extends Plugin
 
     private boolean hierarchical = false;
 
+    private final List<String> immutableTypes = new ArrayList<String>();
+
+    private final List<String> cloneableTypes = new ArrayList<String>();
+
     private BigInteger methodCount;
 
     private BigInteger constructorCount;
@@ -206,16 +216,22 @@ public final class PluginImpl extends Plugin
     @Override
     public String getUsage()
     {
+        final String n = System.getProperty( "line.separator" );
+
         return new StringBuffer().append( "  -" ).append( OPTION_NAME ).append( "  :  " ).
-            append( this.getMessage( "usage", null ) ).append( System.getProperty( "line.separator" ) ).
+            append( getMessage( "usage" ) ).append( n ).
             append( "  " ).append( VISIBILITY_OPTION_NAME ).append( "     :  " ).
-            append( this.getMessage( "visibilityUsage", null ) ).append( System.getProperty( "line.separator" ) ).
+            append( getMessage( "visibilityUsage" ) ).append( n ).
             append( "  " ).append( TARGET_OPTION_NAME ).append( "         :  " ).
-            append( this.getMessage( "targetUsage", null ) ).append( System.getProperty( "line.separator" ) ).
+            append( getMessage( "targetUsage" ) ).append( n ).
             append( "  " ).append( NULLABLE_OPTION_NAME ).append( "       :  " ).
-            append( this.getMessage( "nullableUsage", null ) ).append( System.getProperty( "line.separator" ) ).
+            append( getMessage( "nullableUsage" ) ).append( n ).
             append( "  " ).append( HIERARCHICAL_OPTION_NAME ).append( "   :  " ).
-            append( this.getMessage( "hierarchicalUsage", null ) ).toString();
+            append( getMessage( "hierarchicalUsage" ) ).append( n ).
+            append( "  " ).append( CLONEABLE_TYPES_OPTION_NAME ).append( ":  " ).
+            append( getMessage( "cloneableTypesUsage", ELEMENT_SEPARATOR ) ).append( n ).
+            append( "  " ).append( IMMUTABLE_TYPES_OPTION_NAME ).append( ":  " ).
+            append( getMessage( "immutableTypesUsage", ELEMENT_SEPARATOR ) ).toString();
 
     }
 
@@ -247,15 +263,9 @@ public final class PluginImpl extends Plugin
         {
             if ( i + 1 >= args.length )
             {
-                final String missingOptionArgument = this.getMessage( "missingOptionArgument", new Object[]
-                    {
-                        VISIBILITY_OPTION_NAME
-                    } );
-
-                final String expectedOptionArgument = this.getMessage( "expectedOptionArgument", new Object[]
-                    {
-                        supportedVisibilities.append( ']' ).toString()
-                    } );
+                final String missingOptionArgument = getMessage( "missingOptionArgument", VISIBILITY_OPTION_NAME );
+                final String expectedOptionArgument = getMessage( "expectedOptionArgument",
+                                                                  supportedVisibilities.append( ']' ).toString() );
 
                 throw new BadCommandLineException( missingOptionArgument + " " + expectedOptionArgument );
             }
@@ -274,10 +284,8 @@ public final class PluginImpl extends Plugin
 
             if ( !supported )
             {
-                final String expectedOptionArgument = this.getMessage( "expectedOptionArgument", new Object[]
-                    {
-                        supportedVisibilities.append( ']' ).toString()
-                    } );
+                final String expectedOptionArgument = getMessage( "expectedOptionArgument",
+                                                                  supportedVisibilities.append( ']' ).toString() );
 
                 throw new BadCommandLineException( expectedOptionArgument );
             }
@@ -289,15 +297,9 @@ public final class PluginImpl extends Plugin
         {
             if ( i + 1 >= args.length )
             {
-                final String missingOptionArgument = this.getMessage( "missingOptionArgument", new Object[]
-                    {
-                        TARGET_OPTION_NAME
-                    } );
-
-                final String expectedOptionArgument = this.getMessage( "expectedOptionArgument", new Object[]
-                    {
-                        supportedTargets.append( ']' ).toString()
-                    } );
+                final String missingOptionArgument = getMessage( "missingOptionArgument", TARGET_OPTION_NAME );
+                final String expectedOptionArgument = getMessage( "expectedOptionArgument",
+                                                                  supportedTargets.append( ']' ).toString() );
 
                 throw new BadCommandLineException( missingOptionArgument + " " + expectedOptionArgument );
             }
@@ -316,10 +318,8 @@ public final class PluginImpl extends Plugin
 
             if ( !supported )
             {
-                final String expectedOptionArgument = this.getMessage( "expectedOptionArgument", new Object[]
-                    {
-                        supportedTargets.append( ']' ).toString()
-                    } );
+                final String expectedOptionArgument = getMessage( "expectedOptionArgument",
+                                                                  supportedTargets.append( ']' ).toString() );
 
                 throw new BadCommandLineException( expectedOptionArgument );
             }
@@ -352,6 +352,28 @@ public final class PluginImpl extends Plugin
             return 1;
         }
 
+        if ( args[i].startsWith( IMMUTABLE_TYPES_OPTION_NAME ) )
+        {
+            if ( i + 1 >= args.length )
+            {
+                throw new BadCommandLineException( getMessage( "missingOptionArgument", IMMUTABLE_TYPES_OPTION_NAME ) );
+            }
+
+            this.immutableTypes.addAll( Arrays.asList( args[i + 1].split( ELEMENT_SEPARATOR ) ) );
+            return 2;
+        }
+
+        if ( args[i].startsWith( CLONEABLE_TYPES_OPTION_NAME ) )
+        {
+            if ( i + 1 >= args.length )
+            {
+                throw new BadCommandLineException( getMessage( "missingOptionArgument", CLONEABLE_TYPES_OPTION_NAME ) );
+            }
+
+            this.cloneableTypes.addAll( Arrays.asList( args[i + 1].split( ELEMENT_SEPARATOR ) ) );
+            return 2;
+        }
+
         return 0;
     }
 
@@ -364,11 +386,29 @@ public final class PluginImpl extends Plugin
         this.constructorCount = BigInteger.ZERO;
         this.expressionCount = BigInteger.ZERO;
 
-        this.log( Level.INFO, "title", null );
-        this.log( Level.INFO, "visibilityReport", new Object[]
-            {
-                this.visibility
-            } );
+        this.cloneableTypes.removeAll( DEFAULT_CLONEABLE_TYPES );
+        this.cloneableTypes.addAll( DEFAULT_CLONEABLE_TYPES );
+        this.immutableTypes.removeAll( DEFAULT_IMMUTABLE_TYPES );
+        this.immutableTypes.addAll( DEFAULT_IMMUTABLE_TYPES );
+
+        this.log( Level.INFO, "title" );
+        this.log( Level.INFO, "visibilityReport", this.visibility );
+
+        final StringBuffer cloneableInfo = new StringBuffer();
+        final StringBuffer immutableInfo = new StringBuffer();
+
+        for ( String name : this.cloneableTypes )
+        {
+            cloneableInfo.append( "," ).append( name );
+        }
+
+        for ( String name : this.immutableTypes )
+        {
+            immutableInfo.append( "," ).append( name );
+        }
+
+        this.log( Level.INFO, "cloneableTypesInfo", cloneableInfo.toString().substring( 1 ) );
+        this.log( Level.INFO, "immutableTypesInfo", immutableInfo.toString().substring( 1 ) );
 
         for ( ClassOutline clazz : model.getClasses() )
         {
@@ -376,37 +416,21 @@ public final class PluginImpl extends Plugin
 
             if ( this.getStandardConstructor( clazz ) == null )
             {
-                this.log( Level.WARNING, "couldNotAddStdCtor", new Object[]
-                    {
-                        clazz.implClass.binaryName()
-                    } );
-
+                this.log( Level.WARNING, "couldNotAddStdCtor", clazz.implClass.binaryName() );
             }
 
             if ( this.getCopyConstructor( clazz ) == null )
             {
-                this.log( Level.WARNING, "couldNotAddCopyCtor", new Object[]
-                    {
-                        clazz.implClass.binaryName()
-                    } );
-
+                this.log( Level.WARNING, "couldNotAddCopyCtor", clazz.implClass.binaryName() );
             }
 
             if ( this.getCloneMethod( clazz ) == null )
             {
-                this.log( Level.WARNING, "couldNotAddMethod", new Object[]
-                    {
-                        "clone",
-                        clazz.implClass.binaryName()
-                    } );
-
+                this.log( Level.WARNING, "couldNotAddMethod", "clone", clazz.implClass.binaryName() );
             }
         }
 
-        this.log( Level.INFO, "report", new Object[]
-            {
-                this.methodCount, this.constructorCount, this.expressionCount
-            } );
+        this.log( Level.INFO, "report", this.methodCount, this.constructorCount, this.expressionCount );
 
         this.options = null;
         return this.success;
@@ -444,11 +468,7 @@ public final class PluginImpl extends Plugin
         }
         else
         {
-            this.log( Level.WARNING, "standardCtorExists", new Object[]
-                {
-                    clazz.implClass.binaryName()
-                } );
-
+            this.log( Level.WARNING, "standardCtorExists", clazz.implClass.binaryName() );
         }
 
         return ctor;
@@ -467,11 +487,7 @@ public final class PluginImpl extends Plugin
         }
         else
         {
-            this.log( Level.WARNING, "copyCtorExists", new Object[]
-                {
-                    clazz.implClass.binaryName()
-                } );
-
+            this.log( Level.WARNING, "copyCtorExists", clazz.implClass.binaryName() );
         }
 
         return ctor;
@@ -486,11 +502,7 @@ public final class PluginImpl extends Plugin
         }
         else
         {
-            this.log( Level.WARNING, "methodExists", new Object[]
-                {
-                    "clone", clazz.implClass.binaryName()
-                } );
-
+            this.log( Level.WARNING, "methodExists", "clone", clazz.implClass.binaryName() );
         }
 
         return clone;
@@ -567,7 +579,7 @@ public final class PluginImpl extends Plugin
         m.javadoc().addReturn().append(
             "A deep copy of {@code element} or {@code null} if {@code element} is {@code null}." );
 
-        m.body().directStatement( "// " + this.getMessage( "title", null ) );
+        m.body().directStatement( "// " + getMessage( "title" ) );
 
         final JConditional isNotNull = m.body()._if( element.ne( JExpr._null() ) );
         final JExpression newElement = JExpr._new( jaxbElement ).
@@ -645,7 +657,7 @@ public final class PluginImpl extends Plugin
         m.javadoc().addReturn().append(
             "A deep copy of {@code array} or {@code null} if {@code array} is {@code null}." );
 
-        m.body().directStatement( "// " + this.getMessage( "title", null ) );
+        m.body().directStatement( "// " + getMessage( "title" ) );
 
         final JConditional arrayNotNull = m.body()._if( arrayParam.ne( JExpr._null() ) );
         final JVar copy = arrayNotNull._then().decl(
@@ -711,7 +723,7 @@ public final class PluginImpl extends Plugin
         m.javadoc().addReturn().append(
             "A deep copy of {@code array} or {@code null} if {@code array} is {@code null}." );
 
-        m.body().directStatement( "// " + this.getMessage( "title", null ) );
+        m.body().directStatement( "// " + getMessage( "title" ) );
 
         final JConditional arrayNotNull = m.body()._if( arrayArg.ne( JExpr._null() ) );
 
@@ -803,7 +815,7 @@ public final class PluginImpl extends Plugin
         m.javadoc().addReturn().append(
             "A deep copy of {@code serializable} or {@code null} if {@code serializable} is {@code null}." );
 
-        m.body().directStatement( "// " + this.getMessage( "title", null ) );
+        m.body().directStatement( "// " + getMessage( "title" ) );
 
         final JConditional sNotNull = m.body()._if( s.ne( JExpr._null() ) );
         final JTryBlock tryClone = sNotNull._then()._try();
@@ -917,7 +929,7 @@ public final class PluginImpl extends Plugin
         m.javadoc().addParam( o ).append( "The instance to copy or {@code null}." );
         m.javadoc().addReturn().append( "A deep copy of {@code o} or {@code null} if {@code o} is {@code null}." );
 
-        m.body().directStatement( "// " + this.getMessage( "title", null ) );
+        m.body().directStatement( "// " + getMessage( "title" ) );
 
         final JConditional objectNotNull = m.body()._if( o.ne( JExpr._null() ) );
 
@@ -931,14 +943,13 @@ public final class PluginImpl extends Plugin
 
         isArray._then()._return( this.getCopyOfArrayInvocation( clazz ).arg( o ) );
 
-        for ( Class immutableType : IMMUTABLE_TYPES )
+        for ( String immutableType : this.immutableTypes )
         {
-            objectNotNull._then()._if( o._instanceof( clazz.parent().getCodeModel().ref( immutableType ) ) ).
-                _then()._return( o );
-
+            final JClass immutable = clazz.parent().getCodeModel().ref( immutableType );
+            objectNotNull._then()._if( o._instanceof( immutable ) )._then()._return( o );
         }
 
-        for ( Class cloneableType : CLONEABLE_TYPES )
+        for ( String cloneableType : this.cloneableTypes )
         {
             final JClass cloneable = clazz.parent().getCodeModel().ref( cloneableType );
             objectNotNull._then()._if( o._instanceof( cloneable ) )._then()._return(
@@ -967,43 +978,38 @@ public final class PluginImpl extends Plugin
         instanceOfSerializable._then()._return( this.getCopyOfSerializableInvocation( clazz ).
             arg( JExpr.cast( serializable, o ) ) );
 
-        catchNoSuchMethod.body().directStatement( "// Please report this at " +
-                                                  this.getMessage( "bugtrackerUrl", null ) );
+        catchNoSuchMethod.body().directStatement( "// Please report this at " + getMessage( "bugtrackerUrl" ) );
 
         catchNoSuchMethod.body()._throw( JExpr.cast( assertionError, JExpr._new( assertionError ).
-            arg( assertionErrorMsg ).invoke( "initCause" ).arg( catchNoSuchMethod.param( "e" ) ) ) );
+            arg( assertionErrorMsg ).invoke( "initCause" ).
+            arg( catchNoSuchMethod.param( "e" ) ) ) );
 
         final JCatchBlock catchIllegalAccess = tryCloneMethod._catch( illegalAccess );
-        catchIllegalAccess.body().directStatement( "// Please report this at " +
-                                                   this.getMessage( "bugtrackerUrl", null ) );
+        catchIllegalAccess.body().directStatement( "// Please report this at " + getMessage( "bugtrackerUrl" ) );
 
         catchIllegalAccess.body()._throw( JExpr.cast( assertionError, JExpr._new( assertionError ).
             arg( assertionErrorMsg ).invoke( "initCause" ).arg( catchIllegalAccess.param( "e" ) ) ) );
 
         final JCatchBlock catchInvocationTarget = tryCloneMethod._catch( invocationTarget );
-        catchInvocationTarget.body().directStatement( "// Please report this at " +
-                                                      this.getMessage( "bugtrackerUrl", null ) );
+        catchInvocationTarget.body().directStatement( "// Please report this at " + getMessage( "bugtrackerUrl" ) );
 
         catchInvocationTarget.body()._throw( JExpr.cast( assertionError, JExpr._new( assertionError ).
             arg( assertionErrorMsg ).invoke( "initCause" ).arg( catchInvocationTarget.param( "e" ) ) ) );
 
         final JCatchBlock catchSecurityException = tryCloneMethod._catch( securityException );
-        catchSecurityException.body().directStatement( "// Please report this at " +
-                                                       this.getMessage( "bugtrackerUrl", null ) );
+        catchSecurityException.body().directStatement( "// Please report this at " + getMessage( "bugtrackerUrl" ) );
 
         catchSecurityException.body()._throw( JExpr.cast( assertionError, JExpr._new( assertionError ).
             arg( assertionErrorMsg ).invoke( "initCause" ).arg( catchSecurityException.param( "e" ) ) ) );
 
         final JCatchBlock catchIllegalArgument = tryCloneMethod._catch( illegalArgument );
-        catchIllegalArgument.body().directStatement( "// Please report this at " +
-                                                     this.getMessage( "bugtrackerUrl", null ) );
+        catchIllegalArgument.body().directStatement( "// Please report this at " + getMessage( "bugtrackerUrl" ) );
 
         catchIllegalArgument.body()._throw( JExpr.cast( assertionError, JExpr._new( assertionError ).
             arg( assertionErrorMsg ).invoke( "initCause" ).arg( catchIllegalArgument.param( "e" ) ) ) );
 
         final JCatchBlock catchInitializerError = tryCloneMethod._catch( initializerError );
-        catchInitializerError.body().directStatement( "// Please report this at " +
-                                                      this.getMessage( "bugtrackerUrl", null ) );
+        catchInitializerError.body().directStatement( "// Please report this at " + getMessage( "bugtrackerUrl" ) );
 
         catchInitializerError.body()._throw( JExpr.cast( assertionError, JExpr._new( assertionError ).
             arg( assertionErrorMsg ).invoke( "initCause" ).arg( catchInitializerError.param( "e" ) ) ) );
@@ -1069,7 +1075,7 @@ public final class PluginImpl extends Plugin
         m.javadoc().addParam( e ).append( "The instance to copy or {@code null}." );
         m.javadoc().addReturn().append( "A deep copy of {@code e} or {@code null} if {@code e} is {@code null}." );
 
-        m.body().directStatement( "// " + this.getMessage( "title", null ) );
+        m.body().directStatement( "// " + getMessage( "title" ) );
 
         final JConditional elementNotNull = m.body()._if( e.ne( JExpr._null() ) );
 
@@ -1164,7 +1170,7 @@ public final class PluginImpl extends Plugin
         m.javadoc().addReturn().append(
             "A deep copy of {@code array} or {@code null} if {@code array} is {@code null}." );
 
-        m.body().directStatement( "// " + this.getMessage( "title", null ) );
+        m.body().directStatement( "// " + getMessage( "title" ) );
 
         final JConditional arrayNotNull = m.body()._if( a.ne( JExpr._null() ) );
         final JVar copy = arrayNotNull._then().decl( arrayType, "copy", JExpr.newArray( itemType, a.ref( "length" ) ) );
@@ -1212,7 +1218,7 @@ public final class PluginImpl extends Plugin
         m.javadoc().addReturn().append(
             "A deep copy of {@code source} or {@code null} if {@code source} is {@code null}." );
 
-        m.body().directStatement( "// " + this.getMessage( "title", null ) );
+        m.body().directStatement( "// " + getMessage( "title" ) );
 
         final JConditional sourceNotNull = m.body()._if( source.ne( JExpr._null() ) );
 
@@ -1307,11 +1313,8 @@ public final class PluginImpl extends Plugin
 
                     if ( copyExpr == null )
                     {
-                        this.log( Level.SEVERE, "cannotCopyProperty", new Object[]
-                            {
-                                field.getPropertyInfo().getName( true ),
-                                field.parent().implClass.binaryName()
-                            } );
+                        this.log( Level.SEVERE, "cannotCopyProperty", field.getPropertyInfo().getName( true ),
+                                  field.parent().implClass.binaryName() );
 
                     }
                     else
@@ -1339,11 +1342,8 @@ public final class PluginImpl extends Plugin
 
                     if ( copyExpr == null )
                     {
-                        this.log( Level.SEVERE, "cannotCopyProperty", new Object[]
-                            {
-                                field.getPropertyInfo().getName( true ),
-                                field.parent().implClass.binaryName()
-                            } );
+                        this.log( Level.SEVERE, "cannotCopyProperty", field.getPropertyInfo().getName( true ),
+                                  field.parent().implClass.binaryName() );
 
                     }
                     else
@@ -1368,11 +1368,8 @@ public final class PluginImpl extends Plugin
 
             if ( copyExpr == null )
             {
-                this.log( Level.SEVERE, "cannotCopyProperty", new Object[]
-                    {
-                        field.getPropertyInfo().getName( true ),
-                        field.parent().implClass.binaryName()
-                    } );
+                this.log( Level.SEVERE, "cannotCopyProperty", field.getPropertyInfo().getName( true ),
+                          field.parent().implClass.binaryName() );
 
             }
             else
@@ -1390,11 +1387,8 @@ public final class PluginImpl extends Plugin
 
             if ( copyExpr == null )
             {
-                this.log( Level.SEVERE, "cannotCopyProperty", new Object[]
-                    {
-                        field.getPropertyInfo().getName( true ),
-                        field.parent().implClass.binaryName()
-                    } );
+                this.log( Level.SEVERE, "cannotCopyProperty", field.getPropertyInfo().getName( true ),
+                          field.parent().implClass.binaryName() );
 
             }
             else
@@ -1403,7 +1397,7 @@ public final class PluginImpl extends Plugin
             }
         }
 
-        sourceNotNull._then().directStatement( "// Please report this at " + this.getMessage( "bugtrackerUrl", null ) );
+        sourceNotNull._then().directStatement( "// Please report this at " + getMessage( "bugtrackerUrl" ) );
         sourceNotNull._then()._throw( JExpr._new( assertionError ).arg( JExpr.lit( "Unexpected instance '" ).
             plus( source ).plus( JExpr.lit( "' for property '" + field.getPropertyInfo().getName( true ) +
                                             "' of class '" + field.parent().implClass.binaryName() + "'." ) ) ) );
@@ -1454,7 +1448,7 @@ public final class PluginImpl extends Plugin
             m.javadoc().addThrows( nullPointerException ).append( "if {@code source} is {@code null}." );
         }
 
-        m.body().directStatement( "// " + this.getMessage( "title", null ) );
+        m.body().directStatement( "// " + getMessage( "title" ) );
 
 //        m.body()._if( source.eq( JExpr._null() ) )._then()._throw( JExpr._new( nullPointerException ).arg( "source" ) );
 //        m.body()._if( target.eq( JExpr._null() ) )._then()._throw( JExpr._new( nullPointerException ).arg( "target" ) );
@@ -1582,11 +1576,8 @@ public final class PluginImpl extends Plugin
 
                     if ( copyExpr == null )
                     {
-                        this.log( Level.SEVERE, "cannotCopyProperty", new Object[]
-                            {
-                                field.getPropertyInfo().getName( true ),
-                                field.parent().implClass.binaryName()
-                            } );
+                        this.log( Level.SEVERE, "cannotCopyProperty", field.getPropertyInfo().getName( true ),
+                                  field.parent().implClass.binaryName() );
 
                     }
                     else
@@ -1624,11 +1615,8 @@ public final class PluginImpl extends Plugin
 
                     if ( copyExpr == null )
                     {
-                        this.log( Level.SEVERE, "cannotCopyProperty", new Object[]
-                            {
-                                field.getPropertyInfo().getName( true ),
-                                field.parent().implClass.binaryName()
-                            } );
+                        this.log( Level.SEVERE, "cannotCopyProperty", field.getPropertyInfo().getName( true ),
+                                  field.parent().implClass.binaryName() );
 
                     }
                     else
@@ -1662,11 +1650,8 @@ public final class PluginImpl extends Plugin
 
             if ( copyExpr == null )
             {
-                this.log( Level.SEVERE, "cannotCopyProperty", new Object[]
-                    {
-                        field.getPropertyInfo().getName( true ),
-                        field.parent().implClass.binaryName()
-                    } );
+                this.log( Level.SEVERE, "cannotCopyProperty", field.getPropertyInfo().getName( true ),
+                          field.parent().implClass.binaryName() );
 
             }
             else
@@ -1693,11 +1678,8 @@ public final class PluginImpl extends Plugin
 
             if ( copyExpr == null )
             {
-                this.log( Level.SEVERE, "cannotCopyProperty", new Object[]
-                    {
-                        field.getPropertyInfo().getName( true ),
-                        field.parent().implClass.binaryName()
-                    } );
+                this.log( Level.SEVERE, "cannotCopyProperty", field.getPropertyInfo().getName( true ),
+                          field.parent().implClass.binaryName() );
 
             }
             else
@@ -1715,7 +1697,7 @@ public final class PluginImpl extends Plugin
             ifInstanceOf._then()._continue();
         }
 
-        copyLoop.body().directStatement( "// Please report this at " + this.getMessage( "bugtrackerUrl", null ) );
+        copyLoop.body().directStatement( "// Please report this at " + getMessage( "bugtrackerUrl" ) );
         copyLoop.body()._throw( JExpr._new( assertionError ).arg( JExpr.lit( "Unexpected instance '" ).plus(
             next ).plus( JExpr.lit( "' for property '" + field.getPropertyInfo().getName( true ) + "' of class '" +
                                     field.parent().implClass.binaryName() + "'." ) ) ) );
@@ -1826,11 +1808,9 @@ public final class PluginImpl extends Plugin
         else if ( type == CBuiltinLeafInfo.DATA_HANDLER || type == CBuiltinLeafInfo.IMAGE ||
                   type == CBuiltinLeafInfo.XML_SOURCE )
         {
-            this.log( Level.WARNING, "cannotCopyType", new Object[]
-                {
-                    type.toType( fieldOutline.parent().parent(), Aspect.IMPLEMENTATION ).fullName(),
-                    fieldOutline.getPropertyInfo().getName( true ), fieldOutline.parent().implClass.fullName()
-                } );
+            this.log( Level.WARNING, "cannotCopyType",
+                      type.toType( fieldOutline.parent().parent(), Aspect.IMPLEMENTATION ).fullName(),
+                      fieldOutline.getPropertyInfo().getName( true ), fieldOutline.parent().implClass.fullName() );
 
             expr = source;
         }
@@ -1904,11 +1884,9 @@ public final class PluginImpl extends Plugin
             "// " + WARNING_PREFIX + ": " +
             "the order of 'if instanceof' statements may be wrong and must be verified." );
 
-        this.log( Level.WARNING, "nonElementWarning", new Object[]
-            {
-                fieldOutline.parent().implClass.fullName(), fieldOutline.getPropertyInfo().getName( true ),
-                jType.binaryName(), WARNING_PREFIX
-            } );
+        this.log( Level.WARNING, "nonElementWarning",
+                  fieldOutline.parent().implClass.fullName(), fieldOutline.getPropertyInfo().getName( true ),
+                  jType.binaryName(), WARNING_PREFIX );
 
         if ( sourceMaybeNull )
         {
@@ -1948,7 +1926,7 @@ public final class PluginImpl extends Plugin
     private JMethod generateStandardConstructor( final ClassOutline clazz )
     {
         final JMethod ctor = clazz.implClass.constructor( JMod.PUBLIC );
-        ctor.body().directStatement( "// " + this.getMessage( "title", null ) );
+        ctor.body().directStatement( "// " + getMessage( "title" ) );
         ctor.body().invoke( "super" );
         ctor.javadoc().add( "Creates a new {@code " + clazz.implClass.name() + "} instance." );
         this.constructorCount = this.constructorCount.add( BigInteger.ONE );
@@ -1976,7 +1954,7 @@ public final class PluginImpl extends Plugin
             ctor.javadoc().addParam( o ).add( "The instance to copy or {@code null}." );
         }
 
-        ctor.body().directStatement( "// " + this.getMessage( "title", null ) );
+        ctor.body().directStatement( "// " + getMessage( "title" ) );
 
         if ( this.needsWarningOnReferencedSupertypes( clazz ) )
         {
@@ -2041,11 +2019,7 @@ public final class PluginImpl extends Plugin
                     {
                         copyBlock.directStatement( "// Unknown primitive field '" + field.name() + "'." );
                         copyBlock.assign( JExpr.refthis( field.name() ), source.ref( field ) );
-                        this.log( Level.WARNING, "fieldWithoutProperties", new Object[]
-                            {
-                                field.name(), clazz.implClass.name()
-                            } );
-
+                        this.log( Level.WARNING, "fieldWithoutProperties", field.name(), clazz.implClass.name() );
                     }
                     else
                     {
@@ -2062,11 +2036,7 @@ public final class PluginImpl extends Plugin
                             copyBlock.assign( JExpr.refthis( field.name() ), JExpr.cast(
                                 field.type(), this.getCopyOfObjectInvocation( clazz ).arg( source.ref( field ) ) ) );
 
-                            this.log( Level.WARNING, "fieldWithoutProperties", new Object[]
-                                {
-                                    field.name(), clazz.implClass.name()
-                                } );
-
+                            this.log( Level.WARNING, "fieldWithoutProperties", field.name(), clazz.implClass.name() );
                         }
                     }
                 }
@@ -2099,10 +2069,8 @@ public final class PluginImpl extends Plugin
              ( clazz.implClass._extends() != null &&
                !clazz.implClass._extends().binaryName().equals( "java.lang.Object" ) ) )
         {
-            this.log( Level.WARNING, "referencedSupertypeWarning", new Object[]
-                {
-                    clazz.implClass.fullName(), clazz.implClass._extends().binaryName(), WARNING_PREFIX
-                } );
+            this.log( Level.WARNING, "referencedSupertypeWarning", clazz.implClass.fullName(),
+                      clazz.implClass._extends().binaryName(), WARNING_PREFIX );
 
         }
 
@@ -2150,7 +2118,7 @@ public final class PluginImpl extends Plugin
         else
         {
             cloneMethod = clazz.implClass.method( JMod.PUBLIC, clazz.implClass, "clone" );
-            cloneMethod.body().directStatement( "// " + this.getMessage( "title", null ) );
+            cloneMethod.body().directStatement( "// " + getMessage( "title" ) );
             cloneMethod.body()._return( JExpr._new( clazz.implClass ).arg( JExpr._this() ) );
         }
 
@@ -2211,11 +2179,8 @@ public final class PluginImpl extends Plugin
 
                 if ( copyExpr == null )
                 {
-                    this.log( Level.SEVERE, "cannotCopyProperty", new Object[]
-                        {
-                            field.getPropertyInfo().getName( true ),
-                            field.parent().implClass.binaryName()
-                        } );
+                    this.log( Level.SEVERE, "cannotCopyProperty", field.getPropertyInfo().getName( true ),
+                              field.parent().implClass.binaryName() );
 
                 }
                 else
@@ -2226,11 +2191,8 @@ public final class PluginImpl extends Plugin
         }
         else
         {
-            throw new AssertionError( this.getMessage( "getterNotFound", new Object[]
-                {
-                    field.getPropertyInfo().getName( true ),
-                    field.parent().implClass.binaryName(),
-                } ) );
+            throw new AssertionError( getMessage( "getterNotFound", field.getPropertyInfo().getName( true ),
+                                                  field.parent().implClass.binaryName() ) );
 
         }
     }
@@ -2250,16 +2212,17 @@ public final class PluginImpl extends Plugin
         return methodName;
     }
 
-    private String getMessage( final String key, final Object args )
+    private static String getMessage( final String key, final Object... args )
     {
-        final ResourceBundle bundle = ResourceBundle.getBundle( "net/sourceforge/ccxjc/PluginImpl" );
-        return new MessageFormat( bundle.getString( key ) ).format( args );
+        return MessageFormat.format(
+            ResourceBundle.getBundle( "net/sourceforge/ccxjc/PluginImpl" ).getString( key ), args );
+
     }
 
-    private void log( final Level level, final String key, final Object args )
+    private void log( final Level level, final String key, final Object... args )
     {
         final StringBuffer b = new StringBuffer().append( "[" ).append( MESSAGE_PREFIX ).append( "] [" ).
-            append( level.getLocalizedName() ).append( "] " ).append( this.getMessage( key, args ) );
+            append( level.getLocalizedName() ).append( "] " ).append( getMessage( key, args ) );
 
         int logLevel = Level.WARNING.intValue();
         if ( this.options != null && !this.options.quiet )
