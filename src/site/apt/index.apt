@@ -120,12 +120,11 @@ CC-XJC
 * Support
 
   Development of CC-XJC is community driven. Please file any issues with the
-  {{{https://apps.sourceforge.net/mantisbt/ccxjc/}MantisBT}} bugtracker or
+  {{{http://apps.sourceforge.net/mantisbt/ccxjc/}MantisBT}} bugtracker or
   subscribe to the {{{http://ccxjc.sourceforge.net/mail-lists.html}ccxjc-users}}
-  mailing list for discussing issues or asking questions. The
-  {{{http://apps.sourceforge.net/ideatorrent/ccxjc/}IdeaTorrent}} is used to
-  collect ideas. You may also want to use
-  {{{https://apps.sourceforge.net/mediawiki/ccxjc/index.php?title=Main_Page}the wiki}}
+  mailing list for discussing issues or asking questions. You may also want to use
+  {{{http://apps.sourceforge.net/mediawiki/ccxjc/index.php?title=Main_Page}the wiki}}
   for providing content related to CC-XJC yourself. Please note that applications
-  provided by Sourceforge require you to login to Sourceforge. If you do not
-  have a Sourceforge account, simply create one at {{{http://sourceforge.net}Sourceforge}}.
+  provided by Sourceforge may require you to login to Sourceforge. If you do not
+  have a Sourceforge account, simply create one at
+  {{{http://sourceforge.net}Sourceforge}}.

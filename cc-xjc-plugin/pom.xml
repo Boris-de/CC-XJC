@@ -86,7 +86,8 @@
                   <groupId>${pom.groupId}</groupId>
                   <artifactId>cc-xjc</artifactId>
                   <version>${pom.version}</version>
-                  <type>lic</type>
+                  <classifier>license</classifier>
+                  <type>txt</type>
                   <outputDirectory>${project.build.outputDirectory}/META-INF</outputDirectory>
                   <destFileName>LICENSE.txt</destFileName>
                 </artifactItem>

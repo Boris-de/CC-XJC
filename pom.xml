@@ -59,7 +59,7 @@
   </developers>
   <issueManagement>
     <system>MantisBT</system>
-    <url>https://apps.sourceforge.net/mantisbt/ccxjc/</url>
+    <url>http://apps.sourceforge.net/mantisbt/ccxjc/</url>
   </issueManagement>
   <mailingLists>
     <mailingList>
@@ -123,11 +123,6 @@
             </delimiters>
             <useDefaultDelimiters>false</useDefaultDelimiters>
           </configuration>
-        </plugin>
-        <plugin>
-          <groupId>org.codehaus.mojo</groupId>
-          <artifactId>buildnumber-maven-plugin</artifactId>
-          <version>1.0-beta-4</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
@@ -236,11 +231,6 @@
           </configuration>
         </plugin>
         <plugin>
-          <groupId>org.codehaus.mojo</groupId>
-          <artifactId>build-helper-maven-plugin</artifactId>
-          <version>1.5</version>
-        </plugin>
-        <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-dependency-plugin</artifactId>
           <version>2.1</version>
@@ -254,6 +244,16 @@
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-gpg-plugin</artifactId>
           <version>1.0</version>
+        </plugin>
+        <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>buildnumber-maven-plugin</artifactId>
+          <version>1.0-beta-4</version>
+        </plugin>
+        <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>build-helper-maven-plugin</artifactId>
+          <version>1.5</version>
         </plugin>
       </plugins>
     </pluginManagement>
@@ -290,7 +290,7 @@
             </goals>
           </execution>
           <execution>
-            <id>attach-resources</id>
+            <id>attach</id>
             <phase>process-resources</phase>
             <goals>
               <goal>attach-artifact</goal>
@@ -303,7 +303,13 @@
                 </artifact>
                 <artifact>
                   <file>${basedir}/LICENSE.txt</file>
-                  <type>lic</type>
+                  <classifier>license</classifier>
+                  <type>txt</type>
+                </artifact>
+                <artifact>
+                  <file>${basedir}/src/site/site.xml</file>
+                  <classifier>site</classifier>
+                  <type>xml</type>
                 </artifact>
               </artifacts>
             </configuration>

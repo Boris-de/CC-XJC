@@ -43,24 +43,3 @@ Download
   {{{http://sourceforge.net/projects/ccxjc/files/}Sourceforge file release system}}.
   The {{{http://ccxjc.sourceforge.net/changes-report.html}changes report}} contains
   information regarding changes between releases.
-
-* Snapshots
-
-  Development snapshots are deployed to the CC-XJC snapshot repository and
-  are available for download from there. Please see group
-  {{{http://ccxjc.sourceforge.net/maven2/snapshots/net/sourceforge/ccxjc/}net.sourceforge.ccxjc}}.
-  Maven users may want to add the CC-XJC snapshot repository to a POM or the
-  Maven settings.
-
----
-<repository>
-  <id>snapshots.ccxjc.sourceforge.net</id>
-  <url>http://ccxjc.sourceforge.net/maven2/snapshots</url>
-  <releases>
-    <enabled>false</enabled>
-  </releases>
-  <snapshots>
-    <enabled>true</enabled>
-  </snapshots>
-</repository>
----
