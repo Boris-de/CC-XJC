@@ -36,7 +36,7 @@
   <artifactId>cc-xjc</artifactId>
   <packaging>pom</packaging>
   <name>CC-XJC</name>
-  <version>1.4-SNAPSHOT</version>
+  <version>1.4</version>
   <description>JAXB 2.0 Schema to Java compiler plugin for adding a copy constructor to schema derived classes.</description>
   <url>http://ccxjc.sourceforge.net</url>
   <inceptionYear>2009</inceptionYear>
@@ -85,9 +85,9 @@
     </mailingList>
   </mailingLists>
   <scm>
-    <connection>scm:svn:https://ccxjc.svn.sourceforge.net/svnroot/ccxjc/trunk</connection>
-    <developerConnection>scm:svn:https://ccxjc.svn.sourceforge.net/svnroot/ccxjc/trunk</developerConnection>
-    <url>http://ccxjc.svn.sourceforge.net/viewvc/ccxjc/trunk</url>
+    <connection>scm:svn:https://ccxjc.svn.sourceforge.net/svnroot/ccxjc/tags/cc-xjc-1.4</connection>
+    <developerConnection>scm:svn:https://ccxjc.svn.sourceforge.net/svnroot/ccxjc/tags/cc-xjc-1.4</developerConnection>
+    <url>http://ccxjc.svn.sourceforge.net/viewvc/ccxjc/tags/cc-xjc-1.4</url>
   </scm>
   <build>
     <pluginManagement>
@@ -201,7 +201,7 @@
           <artifactId>maven-javadoc-plugin</artifactId>
           <version>2.7</version>
           <configuration>
-            <bottom><![CDATA[<table border="0" width="100%"><tr><td align="left">Copyright &#169; {inceptionYear}-{currentYear} {organizationName}. All Rights Reserved.</td><td align="right"><a href="http://sourceforge.net/projects/ccxjc"><img src="http://sflogo.sourceforge.net/sflogo.php?group_id=260900&amp;type=10" width="80" height="15" alt="Get CC-XJC at SourceForge.net. Fast, secure and Free Open Source software downloads"/></a></td></tr></table>]]></bottom>
+            <bottom><![CDATA[<table border="0" width="100%"><tr><td align="left">Copyright &#169; {inceptionYear}-{currentYear} {organizationName}. All Rights Reserved.</td><td align="right"><a href="http://sourceforge.net/projects/ccxjc"><img src="http://sflogo.sourceforge.net/sflogo.php?group_id=260900&amp;type=10" width="80" height="15" alt="Get CC-XJC at SourceForge.net. Fast, secure and Free Open Source software downloads" /></a></td></tr></table>]]></bottom>
             <breakiterator>true</breakiterator>
             <keywords>true</keywords>
             <linksource>true</linksource>
