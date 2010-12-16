@@ -70,17 +70,18 @@
       </object>
       <!-- End Piwik Tag -->
     </head>
+    <menu ref="parent" inherit="top" inheritAsRef="false"/>
     <menu name="CC-XJC">
       <item name="About" href="index.html"/>
       <item name="Examples" href="examples.html"/>
       <item name="Download" href="download.html"/>
     </menu>
-    <menu name="Sourceforge">
+    <menu name="Sourceforge" inherit="bottom">
       <item name="Project Summary" href="http://sourceforge.net/projects/ccxjc/"/>
       <item name="MantisBT" href="http://apps.sourceforge.net/mantisbt/ccxjc/"/>
       <item name="MediaWiki" href="https://apps.sourceforge.net/mediawiki/ccxjc/index.php?title=Main_Page"/>
       <item name="Stats" href="http://sourceforge.net/project/stats/?group_id=260900&amp;ugn=ccxjc"/>
     </menu>
-    <menu ref="reports" />
+    <menu ref="reports" inherit="bottom" inheritAsRef="false"/>
   </body>
 </project>

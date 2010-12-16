@@ -95,7 +95,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-compiler-plugin</artifactId>
-          <version>2.1</version>
+          <version>2.3.2</version>
           <configuration>
             <source>1.5</source>
             <target>1.5</target>
@@ -108,26 +108,27 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-site-plugin</artifactId>
-          <version>2.1</version>
+          <version>2.2</version>
           <configuration>
-            <locales>en</locales>
+            <validate>true</validate>
           </configuration>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-resources-plugin</artifactId>
-          <version>2.4.2</version>
+          <version>2.4.3</version>
           <configuration>
             <delimiters>
               <delimiter>${*}</delimiter>
             </delimiters>
             <useDefaultDelimiters>false</useDefaultDelimiters>
+            <escapeWindowsPaths>true</escapeWindowsPaths>
           </configuration>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-release-plugin</artifactId>
-          <version>2.0</version>
+          <version>2.1</version>
           <configuration>
             <tagBase>https://ccxjc.svn.sourceforge.net/svnroot/ccxjc/tags</tagBase>
             <preparationGoals>clean install</preparationGoals>
@@ -138,7 +139,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-jar-plugin</artifactId>
-          <version>2.3</version>
+          <version>2.3.1</version>
           <configuration>
             <archive>
               <index>true</index>
@@ -162,7 +163,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-clean-plugin</artifactId>
-          <version>2.4</version>
+          <version>2.4.1</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
@@ -172,17 +173,17 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-install-plugin</artifactId>
-          <version>2.3</version>
+          <version>2.3.1</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-assembly-plugin</artifactId>
-          <version>2.2-beta-5</version>
+          <version>2.2</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-source-plugin</artifactId>
-          <version>2.1.1</version>
+          <version>2.1.2</version>
           <configuration>
             <archive>
               <index>true</index>
@@ -198,8 +199,36 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-javadoc-plugin</artifactId>
-          <version>2.6.1</version>
+          <version>2.7</version>
           <configuration>
+            <bottom><![CDATA[<table border="0" width="100%"><tr><td align="left">Copyright &#169; {inceptionYear}-{currentYear} {organizationName}. All Rights Reserved.</td><td align="right"><a href="http://sourceforge.net/projects/ccxjc"><img src="http://sflogo.sourceforge.net/sflogo.php?group_id=260900&amp;type=10" width="80" height="15" alt="Get CC-XJC at SourceForge.net. Fast, secure and Free Open Source software downloads"/></a></td></tr></table>]]></bottom>
+            <breakiterator>true</breakiterator>
+            <keywords>true</keywords>
+            <linksource>true</linksource>
+            <serialwarn>true</serialwarn>
+            <source>1.5</source>
+            <doctitle>${project.name} ${project.version}</doctitle>
+            <windowtitle>${project.name} ${project.version}</windowtitle>
+            <detectJavaApiLink>true</detectJavaApiLink>
+            <javaApiLinks>
+              <property>
+                <name>api_1.3</name>
+                <value>http://download.oracle.com/javase/1.3/docs/api/</value>
+              </property>
+              <property>
+                <name>api_1.4</name>
+                <value>http://download.oracle.com/javase/1.4.2/docs/api/</value>
+              </property>
+              <property>
+                <name>api_1.5</name>
+                <value>http://download.oracle.com/javase/1.5.0/docs/api/</value>
+              </property>
+              <property>
+                <name>api_1.6</name>
+                <value>http://download.oracle.com/javase/6/docs/api/</value>
+              </property>
+            </javaApiLinks>
+            <detectOfflineLinks>false</detectOfflineLinks>
             <archive>
               <index>true</index>
               <addMavenDescriptor>false</addMavenDescriptor>
@@ -209,13 +238,13 @@
                 <Maven-Version>${maven.version}</Maven-Version>
               </manifestEntries>
             </archive>
-            <additionalJOption>-J-Xmx1024m</additionalJOption>
+            <additionalJOption>-J-Xmx512m</additionalJOption>
           </configuration>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.doxia</groupId>
           <artifactId>doxia-maven-plugin</artifactId>
-          <version>1.1.2</version>
+          <version>1.1.4</version>
           <configuration>
             <books>
               <book>
@@ -238,12 +267,12 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-antrun-plugin</artifactId>
-          <version>1.3</version>
+          <version>1.6</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-gpg-plugin</artifactId>
-          <version>1.0</version>
+          <version>1.1</version>
         </plugin>
         <plugin>
           <groupId>org.codehaus.mojo</groupId>
@@ -333,7 +362,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-project-info-reports-plugin</artifactId>
-        <version>2.1.2</version>
+        <version>2.2</version>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -403,7 +432,7 @@
               <execution>
                 <id>attach-sources</id>
                 <goals>
-                  <goal>jar</goal>
+                  <goal>jar-no-fork</goal>
                 </goals>
               </execution>
             </executions>
@@ -446,6 +475,6 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-    <surefire.version>2.5</surefire.version>
+    <surefire.version>2.6</surefire.version>
   </properties>
 </project>
