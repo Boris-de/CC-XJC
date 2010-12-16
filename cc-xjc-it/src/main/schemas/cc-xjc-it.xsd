@@ -132,6 +132,64 @@
     <xsd:anyAttribute namespace="##other" processContents="lax"/>
   </xsd:complexType>
   <!--                                                                       -->
+  <!-- OptionalWithDefaultSimpleTypeAttributes                               -->
+  <!--                                                                       -->
+  <xsd:element name="optional-with-default-simple-type-attibutes-test"
+               type="ccxjcit:OptionalWithDefaultSimpleTypeAttributes"/>
+  <xsd:complexType name="OptionalWithDefaultSimpleTypeAttributes">
+    <xsd:annotation>
+      <xsd:documentation><![CDATA[
+        XML Schema Part 2: Datatypes Second Edition
+        3 Built-in datatypes]]>
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:attribute name="anySimpleType" type="xsd:anySimpleType" use="optional" default="TEST"/>
+    <xsd:attribute name="duration" type="xsd:duration" use="optional" default="P1Y1M1DT1H1M1S"/>
+    <xsd:attribute name="dateTime" type="xsd:dateTime" use="optional" default="2010-12-12T04:53:29+01:00"/>
+    <xsd:attribute name="time" type="xsd:dateTime" use="optional" default="2010-12-12T04:53:29+01:00"/>
+    <xsd:attribute name="date" type="xsd:dateTime" use="optional" default="2010-12-12T04:53:29+01:00"/>
+    <xsd:attribute name="gYearMonth" type="xsd:gYearMonth" use="optional" default="2010-12"/>
+    <xsd:attribute name="gYear" type="xsd:gYear" use="optional" default="2010"/>
+    <xsd:attribute name="gMonthDay" type="xsd:gMonthDay" use="optional" default="--12-16"/>
+    <xsd:attribute name="gDay" type="xsd:gDay" use="optional" default="---01"/>
+    <xsd:attribute name="gMonth" type="xsd:gMonth" use="optional" default="--12"/>
+    <xsd:attribute name="boolean" type="xsd:boolean" use="optional" default="true"/>
+    <xsd:attribute name="base64Binary" type="xsd:base64Binary" use="optional" default="TEST"/>
+    <xsd:attribute name="hexBinary" type="xsd:hexBinary" use="optional"/>
+    <xsd:attribute name="float" type="xsd:float" use="optional" default="1"/>
+    <xsd:attribute name="decimal" type="xsd:decimal" use="optional" default="1"/>
+    <xsd:attribute name="integer" type="xsd:integer" use="optional" default="1"/>
+    <xsd:attribute name="nonPositiveInteger" type="xsd:nonPositiveInteger" use="optional" default="-1"/>
+    <xsd:attribute name="negativeInteger" type="xsd:negativeInteger" use="optional" default="-1"/>
+    <xsd:attribute name="nonNegativeInteger" type="xsd:nonNegativeInteger" use="optional" default="1"/>
+    <xsd:attribute name="positiveInteger" type="xsd:positiveInteger" use="optional" default="1"/>
+    <xsd:attribute name="unsignedLong" type="xsd:unsignedLong" use="optional" default="1"/>
+    <xsd:attribute name="unsignedInt" type="xsd:unsignedInt" use="optional" default="1"/>
+    <xsd:attribute name="unsignedShort" type="xsd:unsignedShort" use="optional" default="1"/>
+    <xsd:attribute name="unsignedByte" type="xsd:unsignedByte" use="optional" default="1"/>
+    <xsd:attribute name="long" type="xsd:long" use="optional" default="1"/>
+    <xsd:attribute name="int" type="xsd:int" use="optional" default="1"/>
+    <xsd:attribute name="short" type="xsd:short" use="optional" default="1"/>
+    <xsd:attribute name="byte" type="xsd:byte" use="optional" default="1"/>
+    <xsd:attribute name="double" type="xsd:double" use="optional" default="1"/>
+    <xsd:attribute name="anyURI" type="xsd:anyURI" use="optional" default="TEST"/>
+    <xsd:attribute name="QName" type="xsd:QName" use="optional" default="TEST"/>
+    <xsd:attribute name="NOTATION" type="ccxjcit:testNotation" use="optional"/>
+    <xsd:attribute name="string" type="xsd:string" use="optional" default="TEST"/>
+    <xsd:attribute name="normalizedString" type="xsd:normalizedString" use="optional" default="TEST"/>
+    <xsd:attribute name="token" type="xsd:token" use="optional" default="TEST"/>
+    <xsd:attribute name="language" type="xsd:language" use="optional" default="en"/>
+    <xsd:attribute name="Name" type="xsd:Name" use="optional" default="TEST"/>
+    <xsd:attribute name="NCName" type="xsd:NCName" use="optional" default="TEST"/>
+    <xsd:attribute name="IDREF" type="xsd:IDREF" use="optional" default="TEST"/>
+    <xsd:attribute name="IDREFS" type="xsd:IDREFS" use="optional" default="TEST"/>
+    <xsd:attribute name="ENTITY" type="xsd:ENTITY" use="optional" default="TEST"/>
+    <xsd:attribute name="ENTITIES" type="xsd:ENTITIES" use="optional" default="TEST"/>
+    <xsd:attribute name="NMTOKEN" type="xsd:NMTOKEN" use="optional" default="TEST"/>
+    <xsd:attribute name="NMTOKENS" type="xsd:NMTOKENS" use="optional" default="TEST"/>
+    <xsd:anyAttribute namespace="##other" processContents="lax"/>
+  </xsd:complexType>
+  <!--                                                                       -->
   <!-- ChoiceComplexType                                                     -->
   <!--                                                                       -->
   <xsd:element name="choice-complex-type-test"
