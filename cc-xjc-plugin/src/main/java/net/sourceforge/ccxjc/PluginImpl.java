@@ -157,7 +157,7 @@ public final class PluginImpl extends Plugin
             Locale.class.getName()
         } );
 
-    private static final Class[] PRIMITIVE_ARRAY_TYPES =
+    private static final Class<?>[] PRIMITIVE_ARRAY_TYPES =
     {
         boolean[].class,
         byte[].class,
@@ -216,9 +216,9 @@ public final class PluginImpl extends Plugin
     @Override
     public String getUsage()
     {
-        final String n = System.getProperty( "line.separator" );
+        final String n = System.getProperty( "line.separator", "\n" );
 
-        return new StringBuffer().append( "  -" ).append( OPTION_NAME ).append( "  :  " ).
+        return new StringBuilder( 1024 ).append( "  -" ).append( OPTION_NAME ).append( "  :  " ).
             append( getMessage( "usage" ) ).append( n ).
             append( "  " ).append( VISIBILITY_OPTION_NAME ).append( "     :  " ).
             append( getMessage( "visibilityUsage" ) ).append( n ).
@@ -239,7 +239,7 @@ public final class PluginImpl extends Plugin
     public int parseArgument( final Options opt, final String[] args, final int i )
         throws BadCommandLineException, IOException
     {
-        final StringBuffer supportedVisibilities = new StringBuffer().append( '[' );
+        final StringBuilder supportedVisibilities = new StringBuilder( 1024 ).append( '[' );
         for ( Iterator<String> it = Arrays.asList( VISIBILITY_ARGUMENTS ).iterator(); it.hasNext(); )
         {
             supportedVisibilities.append( it.next() );
@@ -249,7 +249,7 @@ public final class PluginImpl extends Plugin
             }
         }
 
-        final StringBuffer supportedTargets = new StringBuffer().append( '[' );
+        final StringBuilder supportedTargets = new StringBuilder( 512 ).append( '[' );
         for ( Iterator<String> it = Arrays.asList( TARGET_ARGUMENTS ).iterator(); it.hasNext(); )
         {
             supportedTargets.append( it.next() );
@@ -394,8 +394,8 @@ public final class PluginImpl extends Plugin
         this.log( Level.INFO, "title" );
         this.log( Level.INFO, "visibilityReport", this.visibility );
 
-        final StringBuffer cloneableInfo = new StringBuffer();
-        final StringBuffer immutableInfo = new StringBuffer();
+        final StringBuilder cloneableInfo = new StringBuilder( 1024 );
+        final StringBuilder immutableInfo = new StringBuilder( 1024 );
 
         for ( String name : this.cloneableTypes )
         {
@@ -727,7 +727,7 @@ public final class PluginImpl extends Plugin
 
         final JConditional arrayNotNull = m.body()._if( arrayArg.ne( JExpr._null() ) );
 
-        for ( Class a : PRIMITIVE_ARRAY_TYPES )
+        for ( Class<?> a : PRIMITIVE_ARRAY_TYPES )
         {
             final JClass primitiveArray = clazz.parent().getCodeModel().ref( a );
             final JConditional isArrayOfPrimitive =
@@ -1069,8 +1069,8 @@ public final class PluginImpl extends Plugin
 
         final JVar e = m.param( JMod.FINAL, elementType, "e" );
 
-        m.javadoc().append( "Creates and returns a deep copy of a given {@code " + elementType.binaryName() +
-                            "} instance." );
+        m.javadoc().append( "Creates and returns a deep copy of a given {@code " + elementType.binaryName()
+                            + "} instance." );
 
         m.javadoc().addParam( e ).append( "The instance to copy or {@code null}." );
         m.javadoc().addReturn().append( "A deep copy of {@code e} or {@code null} if {@code e} is {@code null}." );
@@ -1123,7 +1123,7 @@ public final class PluginImpl extends Plugin
         final JType arrayType =
             ( array.getAdapterUse() != null
               ? fieldOutline.parent().parent().getModel().getTypeInfo( array.getAdapterUse().customType ).
-            toType( fieldOutline.parent().parent(), Aspect.IMPLEMENTATION )
+             toType( fieldOutline.parent().parent(), Aspect.IMPLEMENTATION )
               : array.toType( fieldOutline.parent().parent(), Aspect.IMPLEMENTATION ) );
 
         final JType itemType = array.getItemType().toType( fieldOutline.parent().parent(), Aspect.IMPLEMENTATION );
@@ -1211,8 +1211,8 @@ public final class PluginImpl extends Plugin
 
         final JVar source = m.param( JMod.FINAL, field.getRawType(), "source" );
 
-        m.javadoc().append( "Creates and returns a deep copy of property {@code " +
-                            field.getPropertyInfo().getName( true ) + "}." );
+        m.javadoc().append( "Creates and returns a deep copy of property {@code "
+                            + field.getPropertyInfo().getName( true ) + "}." );
 
         m.javadoc().addParam( source ).append( "The source to copy from or {@code null}." );
         m.javadoc().addReturn().append(
@@ -1330,8 +1330,9 @@ public final class PluginImpl extends Plugin
                 for ( CElementInfo elementInfo : referencedElementInfos )
                 {
                     final JType contentType =
-                        ( elementInfo.getAdapterUse() != null ? field.parent().parent().getModel().getTypeInfo(
-                        elementInfo.getAdapterUse().customType ).toType( field.parent().parent(), Aspect.IMPLEMENTATION )
+                        ( elementInfo.getAdapterUse() != null
+                          ? field.parent().parent().getModel().getTypeInfo(
+                         elementInfo.getAdapterUse().customType ).toType( field.parent().parent(), Aspect.IMPLEMENTATION )
                           : elementInfo.getContentType().toType( field.parent().parent(), Aspect.IMPLEMENTATION ) );
 
                     final JConditional ifInstanceOf = elementBlock._if( JExpr.invoke( JExpr.cast(
@@ -1358,7 +1359,7 @@ public final class PluginImpl extends Plugin
         {
             final JType javaType =
                 ( classInfo.getAdapterUse() != null ? field.parent().parent().getModel().getTypeInfo(
-                classInfo.getAdapterUse().customType ).toType( field.parent().parent(), Aspect.IMPLEMENTATION )
+                 classInfo.getAdapterUse().customType ).toType( field.parent().parent(), Aspect.IMPLEMENTATION )
                   : classInfo.toType( field.parent().parent(), Aspect.IMPLEMENTATION ) );
 
             final JConditional ifInstanceOf = sourceNotNull._then()._if( source._instanceof( javaType ) );
@@ -1399,8 +1400,8 @@ public final class PluginImpl extends Plugin
 
         sourceNotNull._then().directStatement( "// Please report this at " + getMessage( "bugtrackerUrl" ) );
         sourceNotNull._then()._throw( JExpr._new( assertionError ).arg( JExpr.lit( "Unexpected instance '" ).
-            plus( source ).plus( JExpr.lit( "' for property '" + field.getPropertyInfo().getName( true ) +
-                                            "' of class '" + field.parent().implClass.binaryName() + "'." ) ) ) );
+            plus( source ).plus( JExpr.lit( "' for property '" + field.getPropertyInfo().getName( true )
+                                            + "' of class '" + field.parent().implClass.binaryName() + "'." ) ) ) );
 
         m.body()._return( JExpr._null() );
         this.methodCount = this.methodCount.add( BigInteger.ONE );
@@ -1430,8 +1431,8 @@ public final class PluginImpl extends Plugin
         final JVar source = m.param( JMod.FINAL, field.getRawType(), "source" );
         final JVar target = field.getRawType().isArray() ? null : m.param( JMod.FINAL, field.getRawType(), "target" );
 
-        m.javadoc().append( "Copies all values of property {@code " + field.getPropertyInfo().getName( true ) +
-                            "} deeply." );
+        m.javadoc().append( "Copies all values of property {@code " + field.getPropertyInfo().getName( true )
+                            + "} deeply." );
 
         m.javadoc().addParam( source ).append( "The source to copy from." );
 
@@ -1602,8 +1603,9 @@ public final class PluginImpl extends Plugin
                 for ( CElementInfo elementInfo : referencedElementInfos )
                 {
                     final JType contentType =
-                        ( elementInfo.getAdapterUse() != null ? field.parent().parent().getModel().getTypeInfo(
-                        elementInfo.getAdapterUse().customType ).toType( field.parent().parent(), Aspect.IMPLEMENTATION )
+                        ( elementInfo.getAdapterUse() != null
+                          ? field.parent().parent().getModel().getTypeInfo(
+                         elementInfo.getAdapterUse().customType ).toType( field.parent().parent(), Aspect.IMPLEMENTATION )
                           : elementInfo.getContentType().toType( field.parent().parent(), Aspect.IMPLEMENTATION ) );
 
                     final JConditional ifInstanceOf = copyBlock._if( JExpr.invoke( JExpr.cast(
@@ -1639,8 +1641,8 @@ public final class PluginImpl extends Plugin
         for ( CClassInfo classInfo : referencedClassInfos )
         {
             final JType javaType =
-                ( classInfo.getAdapterUse() != null ? field.parent().parent().getModel().getTypeInfo( classInfo.
-                getAdapterUse().customType ).toType( field.parent().parent(), Aspect.IMPLEMENTATION )
+                ( classInfo.getAdapterUse() != null ? field.parent().parent().getModel().getTypeInfo(
+                 classInfo.getAdapterUse().customType ).toType( field.parent().parent(), Aspect.IMPLEMENTATION )
                   : classInfo.toType( field.parent().parent(), Aspect.IMPLEMENTATION ) );
 
             final JConditional ifInstanceOf = copyLoop.body()._if( next._instanceof( javaType ) );
@@ -1699,8 +1701,8 @@ public final class PluginImpl extends Plugin
 
         copyLoop.body().directStatement( "// Please report this at " + getMessage( "bugtrackerUrl" ) );
         copyLoop.body()._throw( JExpr._new( assertionError ).arg( JExpr.lit( "Unexpected instance '" ).plus(
-            next ).plus( JExpr.lit( "' for property '" + field.getPropertyInfo().getName( true ) + "' of class '" +
-                                    field.parent().implClass.binaryName() + "'." ) ) ) );
+            next ).plus( JExpr.lit( "' for property '" + field.getPropertyInfo().getName( true ) + "' of class '"
+                                    + field.parent().implClass.binaryName() + "'." ) ) ) );
 
         if ( field.getRawType().isArray() )
         {
@@ -1764,8 +1766,8 @@ public final class PluginImpl extends Plugin
     {
         JExpression expr = null;
 
-        block.directStatement( "// CBuiltinLeafInfo: " +
-                               type.toType( fieldOutline.parent().parent(), Aspect.IMPLEMENTATION ).binaryName() );
+        block.directStatement( "// CBuiltinLeafInfo: " + type.toType( fieldOutline.parent().parent(),
+                                                                      Aspect.IMPLEMENTATION ).binaryName() );
 
         if ( type == CBuiltinLeafInfo.ANYTYPE )
         {
@@ -1776,10 +1778,10 @@ public final class PluginImpl extends Plugin
             final JClass byteArray = fieldOutline.parent().parent().getCodeModel().ref( byte[].class );
             expr = this.getCopyOfPrimitiveArrayExpression( fieldOutline.parent(), byteArray, source );
         }
-        else if ( type == CBuiltinLeafInfo.BIG_DECIMAL || type == CBuiltinLeafInfo.BIG_INTEGER ||
-                  type == CBuiltinLeafInfo.STRING || type == CBuiltinLeafInfo.BOOLEAN || type == CBuiltinLeafInfo.INT ||
-                  type == CBuiltinLeafInfo.LONG || type == CBuiltinLeafInfo.BYTE || type == CBuiltinLeafInfo.SHORT ||
-                  type == CBuiltinLeafInfo.FLOAT || type == CBuiltinLeafInfo.DOUBLE )
+        else if ( type == CBuiltinLeafInfo.BIG_DECIMAL || type == CBuiltinLeafInfo.BIG_INTEGER
+                  || type == CBuiltinLeafInfo.STRING || type == CBuiltinLeafInfo.BOOLEAN || type == CBuiltinLeafInfo.INT
+                  || type == CBuiltinLeafInfo.LONG || type == CBuiltinLeafInfo.BYTE || type == CBuiltinLeafInfo.SHORT
+                  || type == CBuiltinLeafInfo.FLOAT || type == CBuiltinLeafInfo.DOUBLE )
         {
             expr = source;
         }
@@ -1805,8 +1807,8 @@ public final class PluginImpl extends Plugin
         {
             expr = source;
         }
-        else if ( type == CBuiltinLeafInfo.DATA_HANDLER || type == CBuiltinLeafInfo.IMAGE ||
-                  type == CBuiltinLeafInfo.XML_SOURCE )
+        else if ( type == CBuiltinLeafInfo.DATA_HANDLER || type == CBuiltinLeafInfo.IMAGE
+                  || type == CBuiltinLeafInfo.XML_SOURCE )
         {
             this.log( Level.WARNING, "cannotCopyType",
                       type.toType( fieldOutline.parent().parent(), Aspect.IMPLEMENTATION ).fullName(),
@@ -1822,8 +1824,8 @@ public final class PluginImpl extends Plugin
                                                    final JBlock block, final JExpression source,
                                                    final boolean sourceMaybeNull )
     {
-        block.directStatement( "// CWildcardTypeInfo: " +
-                               type.toType( fieldOutline.parent().parent(), Aspect.IMPLEMENTATION ).binaryName() );
+        block.directStatement( "// CWildcardTypeInfo: " + type.toType( fieldOutline.parent().parent(),
+                                                                       Aspect.IMPLEMENTATION ).binaryName() );
 
         if ( sourceMaybeNull )
         {
@@ -1868,21 +1870,17 @@ public final class PluginImpl extends Plugin
         block.directStatement( "// " + WARNING_PREFIX + ": " + "The '" + jType.binaryName() + "'" );
         block.directStatement( "// " + WARNING_PREFIX + ": type was not part of the compilation unit." );
 
-        block.directStatement(
-            "// " + WARNING_PREFIX + ": " +
-            "The plugin assumes that type to declare a 'public Object clone()' method which " );
+        block.directStatement( "// " + WARNING_PREFIX + ": "
+                               + "The plugin assumes that type to declare a 'public Object clone()' method which " );
 
-        block.directStatement(
-            "// " + WARNING_PREFIX + ": " +
-            "does not throw a 'CloneNotSupportedException' and to directly extend class" );
+        block.directStatement( "// " + WARNING_PREFIX + ": "
+                               + "does not throw a 'CloneNotSupportedException' and to directly extend class" );
 
-        block.directStatement(
-            "// " + WARNING_PREFIX + ": " +
-            "'java.lang.Object'. If this warning is part of an 'if instanceof' block," );
+        block.directStatement( "// " + WARNING_PREFIX + ": "
+                               + "'java.lang.Object'. If this warning is part of an 'if instanceof' block," );
 
-        block.directStatement(
-            "// " + WARNING_PREFIX + ": " +
-            "the order of 'if instanceof' statements may be wrong and must be verified." );
+        block.directStatement( "// " + WARNING_PREFIX + ": "
+                               + "the order of 'if instanceof' statements may be wrong and must be verified." );
 
         this.log( Level.WARNING, "nonElementWarning",
                   fieldOutline.parent().implClass.fullName(), fieldOutline.getPropertyInfo().getName( true ),
@@ -1940,9 +1938,8 @@ public final class PluginImpl extends Plugin
         final JVar o = ctor.param( JMod.FINAL, paramClass, "o" );
         final boolean superTypeParam = !clazz.implClass.equals( paramClass );
 
-        ctor.javadoc().add( "Creates a new {@code " + clazz.implClass.name() +
-                            "} instance by deeply copying a given {@code " + paramClass.name() +
-                            "} instance.\n" );
+        ctor.javadoc().add( "Creates a new {@code " + clazz.implClass.name()
+                            + "} instance by deeply copying a given {@code " + paramClass.name() + "} instance.\n" );
 
         if ( !this.nullable )
         {
@@ -1961,21 +1958,19 @@ public final class PluginImpl extends Plugin
             ctor.body().directStatement(
                 "// " + WARNING_PREFIX + ": A super-class of this class was not part of the compilation unit." );
 
-            ctor.body().directStatement(
-                "// " + WARNING_PREFIX + ": The plugin assumes this super-class to directly extend class " +
-                "'java.lang.Object'." );
+            ctor.body().directStatement( "// " + WARNING_PREFIX
+                                         + ": The plugin assumes this super-class to directly extend class "
+                                         + "'java.lang.Object'." );
 
-            ctor.body().directStatement(
-                "// " + WARNING_PREFIX + ": The type of the constructor arguments (type of o) in the hierarchy " +
-                "this constructor is part" );
-            ctor.body().directStatement(
-                "// " + WARNING_PREFIX + ": of may be wrong and must be verified." );
+            ctor.body().directStatement( "// " + WARNING_PREFIX
+                                         + ": The type of the constructor arguments (type of o) in the hierarchy "
+                                         + "this constructor is part" );
 
+            ctor.body().directStatement( "// " + WARNING_PREFIX + ": of may be wrong and must be verified." );
         }
 
-        if ( clazz.getSuperClass() != null ||
-             ( clazz.implClass._extends() != null &&
-               !clazz.implClass._extends().binaryName().equals( "java.lang.Object" ) ) )
+        if ( clazz.getSuperClass() != null || ( clazz.implClass._extends() != null && !clazz.implClass._extends().
+                                               binaryName().equals( "java.lang.Object" ) ) )
         {
             ctor.body().invoke( "super" ).arg( o );
         }
@@ -2065,9 +2060,8 @@ public final class PluginImpl extends Plugin
 
     private void warnOnReferencedSupertypes( final ClassOutline clazz )
     {
-        if ( clazz.getSuperClass() == null &&
-             ( clazz.implClass._extends() != null &&
-               !clazz.implClass._extends().binaryName().equals( "java.lang.Object" ) ) )
+        if ( clazz.getSuperClass() == null && ( clazz.implClass._extends() != null && !clazz.implClass._extends().
+                                               binaryName().equals( "java.lang.Object" ) ) )
         {
             this.log( Level.WARNING, "referencedSupertypeWarning", clazz.implClass.fullName(),
                       clazz.implClass._extends().binaryName(), WARNING_PREFIX );
@@ -2082,9 +2076,8 @@ public final class PluginImpl extends Plugin
 
     private boolean needsWarningOnReferencedSupertypes( final ClassOutline clazz )
     {
-        if ( clazz.getSuperClass() == null &&
-             ( clazz.implClass._extends() != null &&
-               !clazz.implClass._extends().binaryName().equals( "java.lang.Object" ) ) )
+        if ( clazz.getSuperClass() == null && ( clazz.implClass._extends() != null && !clazz.implClass._extends().
+                                               binaryName().equals( "java.lang.Object" ) ) )
         {
             return true;
         }
@@ -2165,8 +2158,8 @@ public final class PluginImpl extends Plugin
                 {
                     final CTypeInfo typeInfo =
                         ( field.getPropertyInfo().getAdapter() != null ? field.parent().parent().getModel().getTypeInfo(
-                        field.getPropertyInfo().getAdapter().customType ) : field.getPropertyInfo().ref().iterator().
-                        next() );
+                         field.getPropertyInfo().getAdapter().customType ) : field.getPropertyInfo().ref().iterator().
+                         next() );
 
                     final JType javaType = typeInfo.toType( field.parent().parent(), Aspect.IMPLEMENTATION );
                     final JExpression source =
@@ -2221,7 +2214,7 @@ public final class PluginImpl extends Plugin
 
     private void log( final Level level, final String key, final Object... args )
     {
-        final StringBuffer b = new StringBuffer().append( "[" ).append( MESSAGE_PREFIX ).append( "] [" ).
+        final StringBuilder b = new StringBuilder( 512 ).append( "[" ).append( MESSAGE_PREFIX ).append( "] [" ).
             append( level.getLocalizedName() ).append( "] " ).append( getMessage( key, args ) );
 
         int logLevel = Level.WARNING.intValue();
@@ -2351,8 +2344,8 @@ class CTypeInfoComparator implements Comparator<CTypeInfo>
 
         int ret = 0;
 
-        if ( !javaType1.binaryName().equals( javaType2.binaryName() ) &&
-             javaType1 instanceof JClass && javaType2 instanceof JClass )
+        if ( !javaType1.binaryName().equals( javaType2.binaryName() ) && javaType1 instanceof JClass
+             && javaType2 instanceof JClass )
         {
             if ( ( (JClass) javaType1 ).isAssignableFrom( (JClass) javaType2 ) )
             {
