@@ -2134,15 +2134,21 @@ public final class PluginImpl extends Plugin
                 if ( field.getRawType().isArray() )
                 {
                     block.directStatement( "// '" + field.getPropertyInfo().getName( true ) + "' array." );
-                    block.add( JExpr.invoke( this.getCopyOfCollectionMethod( field ) ).
-                        arg( JExpr.invoke( o, getter ) ) );
+                    final JConditional fieldNotNull =
+                        block._if( JExpr.ref( o, field.getPropertyInfo().getName( false ) ).ne( JExpr._null() ) );
+
+                    fieldNotNull._then().invoke( this.getCopyOfCollectionMethod( field ) ).
+                        arg( JExpr.invoke( o, getter ) );
 
                 }
                 else
                 {
                     block.directStatement( "// '" + field.getPropertyInfo().getName( true ) + "' collection." );
-                    block.add( JExpr.invoke( this.getCopyOfCollectionMethod( field ) ).
-                        arg( JExpr.invoke( o, getter ) ).arg( JExpr.invoke( getter ) ) );
+                    final JConditional fieldNotNull =
+                        block._if( JExpr.ref( o, field.getPropertyInfo().getName( false ) ).ne( JExpr._null() ) );
+
+                    fieldNotNull._then().invoke( this.getCopyOfCollectionMethod( field ) ).
+                        arg( JExpr.invoke( o, getter ) ).arg( JExpr.invoke( getter ) );
 
                 }
             }
@@ -2178,7 +2184,17 @@ public final class PluginImpl extends Plugin
                 }
                 else
                 {
-                    block.assign( JExpr.refthis( field.getPropertyInfo().getName( false ) ), copyExpr );
+                    if ( field.getRawType().isPrimitive() )
+                    {
+                        block.assign( JExpr.refthis( field.getPropertyInfo().getName( false ) ), copyExpr );
+                    }
+                    else
+                    {
+                        block.assign( JExpr.refthis( field.getPropertyInfo().getName( false ) ),
+                                      JOp.cond( JExpr.ref( o, field.getPropertyInfo().getName( false ) ).
+                            eq( JExpr._null() ), JExpr._null(), copyExpr ) );
+
+                    }
                 }
             }
         }

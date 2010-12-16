@@ -171,5 +171,9 @@
       <action dev="schulte2005" type="update">Added option '-cc-cloneable-types'.</action>
       <action dev="schulte2005" type="update">Added option '-cc-immutable-types'.</action>
     </release>
+    <!-- *********************************************************************************************************** -->
+    <release version="1.4" date="2010-12-16" description="Feature enhancements.">
+      <action dev="schulte2005" type="update">Updated to stop initializing unset optional attributes to default values during copying.</action>
+    </release>
   </body>
 </document>
