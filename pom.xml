@@ -399,7 +399,7 @@
     <site>
       <id>ccxjc.sourceforge.net</id>
       <name>CC-XJC Site</name>
-      <url>scp://shell.sourceforge.net/home/groups/c/cc/ccxjc/htdocs</url>
+      <url>scp://shell.sourceforge.net/home/project-web/ccxjc/htdocs</url>
     </site>
   </distributionManagement>
   <profiles>
