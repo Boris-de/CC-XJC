@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
 
-  Copyright (c) 2009 The CC-XJC Project. All rights reserved.
+  Copyright (C) 2009 The CC-XJC Project. All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
   modification, are permitted provided that the following conditions
@@ -41,7 +41,7 @@
   <xsd:annotation>
     <xsd:documentation xml:lang="en"><![CDATA[
 
-  Copyright (c) 2009 The CC-XJC Project. All rights reserved.
+  Copyright (C) 2009 The CC-XJC Project. All rights reserved.
 
   Redistribution and use in source and binary forms, with or without
   modification, are permitted provided that the following conditions
@@ -442,6 +442,14 @@
       <xsd:element ref="ccxjcit:ref-class-customization" minOccurs="1"
                    maxOccurs="unbounded"/>
     </xsd:sequence>
+  </xsd:complexType>
+  <!--                                                                       -->
+  <!-- AdapterTestType                                                       -->
+  <!--                                                                       -->
+  <xsd:element name="adapter-test" type="ccxjcit:AdapterTestType"/>
+  <xsd:complexType name="AdapterTestType">
+    <xsd:attribute name="standardMimeType" type="xsd:string" use="required"/>
+    <xsd:attribute name="xjcMimeType" type="xsd:string" use="required"/>
   </xsd:complexType>
   <!--                                                                       -->
   <!-- Test simple types.                                                    -->

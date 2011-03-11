@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009 The CC-XJC Project. All rights reserved.
+ * Copyright (C) 2009 The CC-XJC Project. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -49,20 +49,31 @@ import com.sun.tools.xjc.BadCommandLineException;
 import com.sun.tools.xjc.Options;
 import com.sun.tools.xjc.Plugin;
 import com.sun.tools.xjc.generator.bean.ImplStructureStrategy;
+import com.sun.tools.xjc.model.CAdapter;
 import com.sun.tools.xjc.model.CArrayInfo;
 import com.sun.tools.xjc.model.CBuiltinLeafInfo;
 import com.sun.tools.xjc.model.CClassInfo;
+import com.sun.tools.xjc.model.CCustomizations;
 import com.sun.tools.xjc.model.CElementInfo;
 import com.sun.tools.xjc.model.CEnumLeafInfo;
 import com.sun.tools.xjc.model.CNonElement;
 import com.sun.tools.xjc.model.CTypeInfo;
 import com.sun.tools.xjc.model.CWildcardTypeInfo;
+import com.sun.tools.xjc.model.nav.NType;
 import com.sun.tools.xjc.outline.Aspect;
 import com.sun.tools.xjc.outline.ClassOutline;
 import com.sun.tools.xjc.outline.FieldOutline;
 import com.sun.tools.xjc.outline.Outline;
+import com.sun.xml.bind.v2.model.annotation.Locatable;
+import com.sun.xml.bind.v2.model.core.ID;
+import com.sun.xml.bind.v2.runtime.Location;
+import com.sun.xml.xsom.XSComponent;
+import com.sun.xml.xsom.XmlString;
+import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InvalidClassException;
 import java.io.NotSerializableException;
@@ -75,27 +86,35 @@ import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.net.URI;
+import java.net.URL;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Currency;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
+import java.util.Set;
 import java.util.TimeZone;
 import java.util.UUID;
 import java.util.logging.Level;
+import javax.activation.MimeType;
 import javax.xml.bind.JAXBElement;
 import javax.xml.datatype.Duration;
 import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.namespace.QName;
 import org.w3c.dom.Element;
 import org.xml.sax.ErrorHandler;
+import org.xml.sax.Locator;
 
 /**
  * CC-XJC plugin implementation.
@@ -126,6 +145,8 @@ public final class PluginImpl extends Plugin
 
     private static final String CLONEABLE_TYPES_OPTION_NAME = "-cc-cloneable-types";
 
+    private static final String STRING_TYPES_OPTION_NAME = "-cc-string-types";
+
     private static final String ELEMENT_SEPARATOR = ":";
 
     private static final List<String> DEFAULT_IMMUTABLE_TYPES = Arrays.asList( new String[]
@@ -155,6 +176,14 @@ public final class PluginImpl extends Plugin
             Calendar.class.getName(),
             TimeZone.class.getName(),
             Locale.class.getName()
+        } );
+
+    private static final List<String> DEFAULT_STRING_TYPES = Arrays.asList( new String[]
+        {
+            File.class.getName(),
+            URI.class.getName(),
+            URL.class.getName(),
+            MimeType.class.getName()
         } );
 
     private static final Class<?>[] PRIMITIVE_ARRAY_TYPES =
@@ -197,15 +226,19 @@ public final class PluginImpl extends Plugin
 
     private boolean hierarchical = false;
 
-    private final List<String> immutableTypes = new ArrayList<String>();
+    private final List<String> immutableTypes = new ArrayList<String>( 64 );
 
-    private final List<String> cloneableTypes = new ArrayList<String>();
+    private final List<String> cloneableTypes = new ArrayList<String>( 64 );
+
+    private final List<String> stringTypes = new ArrayList<String>( 64 );
 
     private BigInteger methodCount;
 
     private BigInteger constructorCount;
 
     private BigInteger expressionCount;
+
+    private final Set<Class<?>> contextExceptions = new HashSet<Class<?>>();
 
     @Override
     public String getOptionName()
@@ -231,7 +264,9 @@ public final class PluginImpl extends Plugin
             append( "  " ).append( CLONEABLE_TYPES_OPTION_NAME ).append( ":  " ).
             append( getMessage( "cloneableTypesUsage", ELEMENT_SEPARATOR ) ).append( n ).
             append( "  " ).append( IMMUTABLE_TYPES_OPTION_NAME ).append( ":  " ).
-            append( getMessage( "immutableTypesUsage", ELEMENT_SEPARATOR ) ).toString();
+            append( getMessage( "immutableTypesUsage", ELEMENT_SEPARATOR ) ).append( n ).
+            append( "  " ).append( STRING_TYPES_OPTION_NAME ).append( "   :  " ).
+            append( getMessage( "stringTypesUsage", ELEMENT_SEPARATOR ) ).toString();
 
     }
 
@@ -359,7 +394,19 @@ public final class PluginImpl extends Plugin
                 throw new BadCommandLineException( getMessage( "missingOptionArgument", IMMUTABLE_TYPES_OPTION_NAME ) );
             }
 
-            this.immutableTypes.addAll( Arrays.asList( args[i + 1].split( ELEMENT_SEPARATOR ) ) );
+            final Collection<String> types = Arrays.asList( args[i + 1].split( ELEMENT_SEPARATOR ) );
+            for ( String type : types )
+            {
+                if ( type.startsWith( "@" ) )
+                {
+                    this.immutableTypes.addAll( this.readTypes( type.substring( 1 ) ) );
+                }
+                else if ( type.trim().length() > 0 )
+                {
+                    this.immutableTypes.add( type );
+                }
+            }
+
             return 2;
         }
 
@@ -370,7 +417,44 @@ public final class PluginImpl extends Plugin
                 throw new BadCommandLineException( getMessage( "missingOptionArgument", CLONEABLE_TYPES_OPTION_NAME ) );
             }
 
-            this.cloneableTypes.addAll( Arrays.asList( args[i + 1].split( ELEMENT_SEPARATOR ) ) );
+            final Collection<String> types = Arrays.asList( args[i + 1].split( ELEMENT_SEPARATOR ) );
+
+            for ( String type : types )
+            {
+                if ( type.startsWith( "@" ) )
+                {
+                    this.cloneableTypes.addAll( this.readTypes( type.substring( 1 ) ) );
+                }
+                else if ( type.trim().length() > 0 )
+                {
+                    this.cloneableTypes.add( type );
+                }
+            }
+
+            return 2;
+        }
+
+        if ( args[i].startsWith( STRING_TYPES_OPTION_NAME ) )
+        {
+            if ( i + 1 >= args.length )
+            {
+                throw new BadCommandLineException( getMessage( "missingOptionArgument", STRING_TYPES_OPTION_NAME ) );
+            }
+
+            final Collection<String> types = Arrays.asList( args[i + 1].split( ELEMENT_SEPARATOR ) );
+
+            for ( String type : types )
+            {
+                if ( type.startsWith( "@" ) )
+                {
+                    this.stringTypes.addAll( this.readTypes( type.substring( 1 ) ) );
+                }
+                else if ( type.trim().length() > 0 )
+                {
+                    this.stringTypes.add( type );
+                }
+            }
+
             return 2;
         }
 
@@ -390,25 +474,34 @@ public final class PluginImpl extends Plugin
         this.cloneableTypes.addAll( DEFAULT_CLONEABLE_TYPES );
         this.immutableTypes.removeAll( DEFAULT_IMMUTABLE_TYPES );
         this.immutableTypes.addAll( DEFAULT_IMMUTABLE_TYPES );
+        this.stringTypes.removeAll( DEFAULT_STRING_TYPES );
+        this.stringTypes.addAll( DEFAULT_STRING_TYPES );
 
         this.log( Level.INFO, "title" );
         this.log( Level.INFO, "visibilityReport", this.visibility );
 
         final StringBuilder cloneableInfo = new StringBuilder( 1024 );
         final StringBuilder immutableInfo = new StringBuilder( 1024 );
+        final StringBuilder stringInfo = new StringBuilder( 1024 );
 
         for ( String name : this.cloneableTypes )
         {
-            cloneableInfo.append( "," ).append( name );
+            cloneableInfo.append( System.getProperty( "line.separator", "\n" ) ).append( "\t" ).append( name );
         }
 
         for ( String name : this.immutableTypes )
         {
-            immutableInfo.append( "," ).append( name );
+            immutableInfo.append( System.getProperty( "line.separator", "\n" ) ).append( "\t" ).append( name );
         }
 
-        this.log( Level.INFO, "cloneableTypesInfo", cloneableInfo.toString().substring( 1 ) );
-        this.log( Level.INFO, "immutableTypesInfo", immutableInfo.toString().substring( 1 ) );
+        for ( String name : this.stringTypes )
+        {
+            stringInfo.append( System.getProperty( "line.separator", "\n" ) ).append( "\t" ).append( name );
+        }
+
+        this.log( Level.INFO, "cloneableTypesInfo", cloneableInfo.toString() );
+        this.log( Level.INFO, "immutableTypesInfo", immutableInfo.toString() );
+        this.log( Level.INFO, "stringTypesInfo", stringInfo.toString() );
 
         for ( ClassOutline clazz : model.getClasses() )
         {
@@ -924,6 +1017,7 @@ public final class PluginImpl extends Plugin
               : clazz.implClass.method( JMod.STATIC | mod, object, methodName ) );
 
         final JVar o = m.param( JMod.FINAL, object, "o" );
+        final Set<Class<?>> exceptions = new HashSet<Class<?>>();
 
         m.javadoc().append( "Creates and returns a deep copy of a given object." );
         m.javadoc().addParam( o ).append( "The instance to copy or {@code null}." );
@@ -931,7 +1025,8 @@ public final class PluginImpl extends Plugin
 
         m.body().directStatement( "// " + getMessage( "title" ) );
 
-        final JConditional objectNotNull = m.body()._if( o.ne( JExpr._null() ) );
+        final JBlock copyBlock = new JBlock( false, false );
+        final JConditional objectNotNull = copyBlock._if( o.ne( JExpr._null() ) );
 
         final JConditional isPrimitive =
             objectNotNull._then()._if( JExpr.invoke( JExpr.invoke( o, "getClass" ), "isPrimitive" ) );
@@ -943,15 +1038,57 @@ public final class PluginImpl extends Plugin
 
         isArray._then()._return( this.getCopyOfArrayInvocation( clazz ).arg( o ) );
 
+        objectNotNull._then().directStatement( "// Immutable types." );
+
         for ( String immutableType : this.immutableTypes )
         {
             final JClass immutable = clazz.parent().getCodeModel().ref( immutableType );
             objectNotNull._then()._if( o._instanceof( immutable ) )._then()._return( o );
         }
 
+        objectNotNull._then().directStatement( "// String based types." );
+
+        for ( String stringType : this.stringTypes )
+        {
+            final JClass string = clazz.parent().getCodeModel().ref( stringType );
+            final Class<?> c = this.getClass( stringType );
+
+            if ( c != null )
+            {
+                try
+                {
+                    exceptions.addAll( Arrays.asList( c.getConstructor( String.class ).getExceptionTypes() ) );
+                }
+                catch ( final NoSuchMethodException e )
+                {
+                    // Generated code won't compile.
+                }
+            }
+
+            objectNotNull._then()._if( o._instanceof( string ) )._then()._return(
+                JExpr._new( string ).arg( o.invoke( "toString" ) ) );
+
+        }
+
+        objectNotNull._then().directStatement( "// Cloneable types." );
+
         for ( String cloneableType : this.cloneableTypes )
         {
             final JClass cloneable = clazz.parent().getCodeModel().ref( cloneableType );
+            final Class<?> c = this.getClass( cloneableType );
+
+            if ( c != null )
+            {
+                try
+                {
+                    exceptions.addAll( Arrays.asList( c.getMethod( "clone" ).getExceptionTypes() ) );
+                }
+                catch ( final NoSuchMethodException e )
+                {
+                    // Generated code won't compile.
+                }
+            }
+
             objectNotNull._then()._if( o._instanceof( cloneable ) )._then()._return(
                 JExpr.invoke( JExpr.cast( cloneable, o ), ( "clone" ) ) );
 
@@ -1014,7 +1151,26 @@ public final class PluginImpl extends Plugin
         catchInitializerError.body()._throw( JExpr.cast( assertionError, JExpr._new( assertionError ).
             arg( assertionErrorMsg ).invoke( "initCause" ).arg( catchInitializerError.param( "e" ) ) ) );
 
-        m.body()._return( JExpr._null() );
+        copyBlock._return( JExpr._null() );
+
+        if ( !exceptions.isEmpty() )
+        {
+            final JTryBlock tryCopy = m.body()._try();
+            tryCopy.body().add( copyBlock );
+
+            for ( Class<?> e : exceptions )
+            {
+                final JCatchBlock catchBlock = tryCopy._catch( clazz.parent().getCodeModel().ref( e ) );
+                catchBlock.body()._throw( JExpr.cast( assertionError, JExpr._new( assertionError ).
+                    arg( assertionErrorMsg ).invoke( "initCause" ).arg( catchBlock.param( "e" ) ) ) );
+
+            }
+        }
+        else
+        {
+            m.body().add( copyBlock );
+        }
+
         this.methodCount = this.methodCount.add( BigInteger.ONE );
         return ( mod != JMod.PRIVATE ? clazz._package().objectFactory().staticInvoke( m ) : JExpr.invoke( m ) );
     }
@@ -1121,9 +1277,8 @@ public final class PluginImpl extends Plugin
     private JInvocation getCopyOfArrayInfoInvocation( final FieldOutline fieldOutline, final CArrayInfo array )
     {
         final JType arrayType =
-            ( array.getAdapterUse() != null
-              ? fieldOutline.parent().parent().getModel().getTypeInfo( array.getAdapterUse().customType ).
-             toType( fieldOutline.parent().parent(), Aspect.IMPLEMENTATION )
+            ( array.getAdapterUse() != null && array.getAdapterUse().customType != null
+              ? array.getAdapterUse().customType.toType( fieldOutline.parent().parent(), Aspect.IMPLEMENTATION )
               : array.toType( fieldOutline.parent().parent(), Aspect.IMPLEMENTATION ) );
 
         final JType itemType = array.getItemType().toType( fieldOutline.parent().parent(), Aspect.IMPLEMENTATION );
@@ -1330,9 +1485,9 @@ public final class PluginImpl extends Plugin
                 for ( CElementInfo elementInfo : referencedElementInfos )
                 {
                     final JType contentType =
-                        ( elementInfo.getAdapterUse() != null
-                          ? field.parent().parent().getModel().getTypeInfo(
-                         elementInfo.getAdapterUse().customType ).toType( field.parent().parent(), Aspect.IMPLEMENTATION )
+                        ( elementInfo.getAdapterUse() != null && elementInfo.getAdapterUse().customType != null
+                          ? elementInfo.getAdapterUse().customType.toType( field.parent().parent(),
+                                                                           Aspect.IMPLEMENTATION )
                           : elementInfo.getContentType().toType( field.parent().parent(), Aspect.IMPLEMENTATION ) );
 
                     final JConditional ifInstanceOf = elementBlock._if( JExpr.invoke( JExpr.cast(
@@ -1358,8 +1513,8 @@ public final class PluginImpl extends Plugin
         for ( CClassInfo classInfo : referencedClassInfos )
         {
             final JType javaType =
-                ( classInfo.getAdapterUse() != null ? field.parent().parent().getModel().getTypeInfo(
-                 classInfo.getAdapterUse().customType ).toType( field.parent().parent(), Aspect.IMPLEMENTATION )
+                ( classInfo.getAdapterUse() != null && classInfo.getAdapterUse().customType != null
+                  ? classInfo.getAdapterUse().customType.toType( field.parent().parent(), Aspect.IMPLEMENTATION )
                   : classInfo.toType( field.parent().parent(), Aspect.IMPLEMENTATION ) );
 
             final JConditional ifInstanceOf = sourceNotNull._then()._if( source._instanceof( javaType ) );
@@ -1603,9 +1758,9 @@ public final class PluginImpl extends Plugin
                 for ( CElementInfo elementInfo : referencedElementInfos )
                 {
                     final JType contentType =
-                        ( elementInfo.getAdapterUse() != null
-                          ? field.parent().parent().getModel().getTypeInfo(
-                         elementInfo.getAdapterUse().customType ).toType( field.parent().parent(), Aspect.IMPLEMENTATION )
+                        ( elementInfo.getAdapterUse() != null && elementInfo.getAdapterUse().customType != null
+                          ? elementInfo.getAdapterUse().customType.toType( field.parent().parent(),
+                                                                           Aspect.IMPLEMENTATION )
                           : elementInfo.getContentType().toType( field.parent().parent(), Aspect.IMPLEMENTATION ) );
 
                     final JConditional ifInstanceOf = copyBlock._if( JExpr.invoke( JExpr.cast(
@@ -1641,8 +1796,8 @@ public final class PluginImpl extends Plugin
         for ( CClassInfo classInfo : referencedClassInfos )
         {
             final JType javaType =
-                ( classInfo.getAdapterUse() != null ? field.parent().parent().getModel().getTypeInfo(
-                 classInfo.getAdapterUse().customType ).toType( field.parent().parent(), Aspect.IMPLEMENTATION )
+                ( classInfo.getAdapterUse() != null && classInfo.getAdapterUse().customType != null
+                  ? classInfo.getAdapterUse().customType.toType( field.parent().parent(), Aspect.IMPLEMENTATION )
                   : classInfo.toType( field.parent().parent(), Aspect.IMPLEMENTATION ) );
 
             final JConditional ifInstanceOf = copyLoop.body()._if( next._instanceof( javaType ) );
@@ -1750,6 +1905,10 @@ public final class PluginImpl extends Plugin
         else if ( type instanceof CNonElement )
         {
             expr = this.getNonElementCopyExpression( fieldOutline, (CNonElement) type, block, source, sourceMaybeNull );
+        }
+        else if ( type instanceof CAdapterInfo )
+        {
+            expr = this.getAdapterInfoCopyExpression( fieldOutline, (CAdapterInfo) type, block, source );
         }
 
         if ( expr != null )
@@ -1921,6 +2080,16 @@ public final class PluginImpl extends Plugin
         return source;
     }
 
+    private JExpression getAdapterInfoCopyExpression( final FieldOutline fieldOutline, final CAdapterInfo type,
+                                                      final JBlock block, final JExpression source )
+    {
+        block.directStatement( "// CAdapterInfo: "
+                               + type.toType( fieldOutline.parent().parent(), Aspect.IMPLEMENTATION ).binaryName() );
+
+        final JType jType = type.toType( fieldOutline.parent().parent(), Aspect.IMPLEMENTATION );
+        return JExpr.cast( jType, this.getCopyOfObjectInvocation( fieldOutline.parent() ).arg( source ) );
+    }
+
     private JMethod generateStandardConstructor( final ClassOutline clazz )
     {
         final JMethod ctor = clazz.implClass.constructor( JMod.PUBLIC );
@@ -1987,6 +2156,8 @@ public final class PluginImpl extends Plugin
 
         }
 
+        this.contextExceptions.clear();
+
         boolean hasFields = false;
         if ( !clazz.implClass.fields().isEmpty() )
         {
@@ -2039,17 +2210,36 @@ public final class PluginImpl extends Plugin
 
             if ( hasFields )
             {
+                JBlock effective = ctor.body();
+
+                if ( !this.contextExceptions.isEmpty() )
+                {
+                    final JTryBlock tryCopy = ctor.body()._try();
+                    effective = tryCopy.body();
+
+                    for ( Class<?> e : this.contextExceptions )
+                    {
+                        final JCatchBlock catchBlock = tryCopy._catch( clazz.parent().getCodeModel().ref( e ) );
+                        catchBlock.body().directStatement(
+                            "// Please report this at " + getMessage( "bugtrackerUrl" ) );
+
+                        catchBlock.body()._throw( JExpr._new( clazz.parent().getCodeModel().
+                            ref( AssertionError.class ) ).arg( catchBlock.param( "e" ) ) );
+
+                    }
+                }
+
                 if ( superTypeParam )
                 {
-                    ctor.body()._if( o._instanceof( clazz.implClass ) )._then().add( copyBlock );
+                    effective._if( o._instanceof( clazz.implClass ) )._then().add( copyBlock );
                 }
                 else if ( this.nullable )
                 {
-                    ctor.body()._if( o.ne( JExpr._null() ) )._then().add( copyBlock );
+                    effective._if( o.ne( JExpr._null() ) )._then().add( copyBlock );
                 }
                 else
                 {
-                    ctor.body().add( copyBlock );
+                    effective.add( copyBlock );
                 }
             }
         }
@@ -2162,12 +2352,26 @@ public final class PluginImpl extends Plugin
                 }
                 else
                 {
-                    final CTypeInfo typeInfo =
-                        ( field.getPropertyInfo().getAdapter() != null ? field.parent().parent().getModel().getTypeInfo(
-                         field.getPropertyInfo().getAdapter().customType ) : field.getPropertyInfo().ref().iterator().
-                         next() );
+                    CTypeInfo typeInfo = null;
+
+                    if ( field.getPropertyInfo().getAdapter() != null
+                         && field.getPropertyInfo().getAdapter().customType != null )
+                    {
+                        typeInfo = field.parent().parent().getModel().getTypeInfo(
+                            field.getPropertyInfo().getAdapter().customType );
+
+                        if ( typeInfo == null )
+                        {
+                            typeInfo = new CAdapterInfo( field.getPropertyInfo().getAdapter() );
+                        }
+                    }
+                    else
+                    {
+                        typeInfo = field.getPropertyInfo().ref().iterator().next();
+                    }
 
                     final JType javaType = typeInfo.toType( field.parent().parent(), Aspect.IMPLEMENTATION );
+
                     final JExpression source =
                         field.parent().parent().getModel().strategy == ImplStructureStrategy.BEAN_ONLY
                         ? JExpr.invoke( o, getter )
@@ -2226,6 +2430,40 @@ public final class PluginImpl extends Plugin
         return MessageFormat.format(
             ResourceBundle.getBundle( "net/sourceforge/ccxjc/PluginImpl" ).getString( key ), args );
 
+    }
+
+    private Class<?> getClass( final String binaryName )
+    {
+        try
+        {
+            return Class.forName( binaryName );
+        }
+        catch ( final ClassNotFoundException e )
+        {
+            return null;
+        }
+    }
+
+    private Collection<String> readTypes( final String fileName ) throws IOException
+    {
+        final Collection<String> types = new LinkedList<String>();
+        final BufferedReader reader = new BufferedReader( new FileReader( fileName ) );
+        String line;
+
+        while ( ( line = reader.readLine() ) != null )
+        {
+            if ( line.indexOf( '#' ) > -1 )
+            {
+                continue;
+            }
+
+            if ( line.trim().length() > 0 )
+            {
+                types.add( line.trim() );
+            }
+        }
+
+        return Collections.unmodifiableCollection( types );
     }
 
     private void log( final Level level, final String key, final Object... args )
@@ -2374,6 +2612,98 @@ class CTypeInfoComparator implements Comparator<CTypeInfo>
         }
 
         return ret;
+    }
+
+}
+
+class CAdapterInfo implements CTypeInfo
+{
+
+    private final CAdapter adapter;
+
+    CAdapterInfo( final CAdapter adapter )
+    {
+        this.adapter = adapter;
+    }
+
+    public JType toType( final Outline o, final Aspect aspect )
+    {
+        return this.adapter.customType.toType( o, aspect );
+    }
+
+    public NType getType()
+    {
+        return this.adapter.customType;
+    }
+
+    public boolean canBeReferencedByIDREF()
+    {
+        return false;
+    }
+
+    public Locatable getUpstream()
+    {
+        return null;
+    }
+
+    public Location getLocation()
+    {
+        return null;
+    }
+
+    public CCustomizations getCustomizations()
+    {
+        return null;
+    }
+
+    public Locator getLocator()
+    {
+        return null;
+    }
+
+    public XSComponent getSchemaComponent()
+    {
+        return null;
+    }
+
+    public QName getTypeName()
+    {
+        throw new UnsupportedOperationException( "Not supported yet." );
+    }
+
+    public boolean isSimpleType()
+    {
+        throw new UnsupportedOperationException( "Not supported yet." );
+    }
+
+    public boolean isCollection()
+    {
+        return false;
+    }
+
+    public CAdapter getAdapterUse()
+    {
+        return this.adapter;
+    }
+
+    public CTypeInfo getInfo()
+    {
+        return this;
+    }
+
+    public ID idUse()
+    {
+        return null;
+    }
+
+    public MimeType getExpectedMimeType()
+    {
+        return null;
+    }
+
+    public JExpression createConstant( Outline outline, XmlString lexical )
+    {
+        return null;
     }
 
 }
