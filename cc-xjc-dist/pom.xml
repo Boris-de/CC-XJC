@@ -42,70 +42,80 @@
   <name>CC-XJC Distribution</name>
   <description>JAXB 2.0 Schema to Java compiler plugin binary distribution.</description>
   <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-dependency-plugin</artifactId>
+          <executions>
+            <execution>
+              <id>default-copy</id>
+              <phase>prepare-package</phase>
+              <goals>
+                <goal>copy</goal>
+              </goals>
+              <configuration>
+                <artifactItems>
+                  <artifactItem>
+                    <groupId>${project.groupId}</groupId>
+                    <artifactId>cc-xjc</artifactId>
+                    <version>${project.version}</version>
+                    <classifier>readme</classifier>
+                    <type>xhtml</type>
+                    <outputDirectory>${project.build.directory}</outputDirectory>
+                    <destFileName>README.xhtml</destFileName>
+                  </artifactItem>
+                  <artifactItem>
+                    <groupId>${project.groupId}</groupId>
+                    <artifactId>cc-xjc</artifactId>
+                    <version>${project.version}</version>
+                    <classifier>license</classifier>
+                    <type>txt</type>
+                    <outputDirectory>${project.build.directory}</outputDirectory>
+                    <destFileName>LICENSE.txt</destFileName>
+                  </artifactItem>
+                  <artifactItem>
+                    <groupId>${project.groupId}</groupId>
+                    <artifactId>cc-xjc-plugin</artifactId>
+                    <version>${project.version}</version>
+                    <type>jar</type>
+                    <outputDirectory>${project.build.directory}</outputDirectory>
+                  </artifactItem>
+                </artifactItems>
+              </configuration>
+            </execution>
+          </executions>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-assembly-plugin</artifactId>
+          <executions>
+            <execution>
+              <id>default-single</id>
+              <phase>package</phase>
+              <goals>
+                <goal>single</goal>
+              </goals>
+              <configuration>
+                <descriptors>
+                  <descriptor>src/main/assembly/bin.xml</descriptor>
+                </descriptors>
+                <finalName>cc-xjc-${project.version}</finalName>
+              </configuration>
+            </execution>
+          </executions>
+        </plugin>
+      </plugins>
+    </pluginManagement>
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-dependency-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>copy-dependencies</id>
-            <phase>validate</phase>
-            <goals>
-              <goal>copy</goal>
-            </goals>
-            <configuration>
-              <artifactItems>
-                <artifactItem>
-                  <groupId>${project.groupId}</groupId>
-                  <artifactId>cc-xjc</artifactId>
-                  <version>${project.version}</version>
-                  <classifier>readme</classifier>
-                  <type>xhtml</type>
-                  <outputDirectory>${project.build.directory}</outputDirectory>
-                  <destFileName>README.xhtml</destFileName>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>${project.groupId}</groupId>
-                  <artifactId>cc-xjc</artifactId>
-                  <version>${project.version}</version>
-                  <classifier>license</classifier>
-                  <type>txt</type>
-                  <outputDirectory>${project.build.directory}</outputDirectory>
-                  <destFileName>LICENSE.txt</destFileName>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>${project.groupId}</groupId>
-                  <artifactId>cc-xjc-plugin</artifactId>
-                  <version>${project.version}</version>
-                  <type>jar</type>
-                  <outputDirectory>${project.build.directory}</outputDirectory>
-                </artifactItem>
-              </artifactItems>
-            </configuration>
-          </execution>
-        </executions>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-assembly-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>bin</id>
-            <phase>package</phase>
-            <goals>
-              <goal>single</goal>
-            </goals>
-            <configuration>
-              <descriptors>
-                <descriptor>src/main/assembly/bin.xml</descriptor>
-              </descriptors>
-              <finalName>cc-xjc-${project.version}</finalName>
-            </configuration>
-          </execution>
-        </executions>
       </plugin>
     </plugins>
   </build>
 </project>
-
-

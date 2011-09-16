@@ -48,54 +48,49 @@
         <filtering>true</filtering>
       </resource>
     </resources>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-dependency-plugin</artifactId>
+          <executions>
+            <execution>
+              <id>default-copy</id>
+              <phase>prepare-package</phase>
+              <goals>
+                <goal>copy</goal>
+              </goals>
+              <configuration>
+                <artifactItems>
+                  <artifactItem>
+                    <groupId>${project.groupId}</groupId>
+                    <artifactId>cc-xjc</artifactId>
+                    <version>${project.version}</version>
+                    <classifier>readme</classifier>
+                    <type>xhtml</type>
+                    <outputDirectory>${project.build.outputDirectory}/META-INF</outputDirectory>
+                    <destFileName>README.xhtml</destFileName>
+                  </artifactItem>
+                  <artifactItem>
+                    <groupId>${project.groupId}</groupId>
+                    <artifactId>cc-xjc</artifactId>
+                    <version>${project.version}</version>
+                    <classifier>license</classifier>
+                    <type>txt</type>
+                    <outputDirectory>${project.build.outputDirectory}/META-INF</outputDirectory>
+                    <destFileName>LICENSE.txt</destFileName>
+                  </artifactItem>
+                </artifactItems>
+              </configuration>
+            </execution>
+          </executions>
+        </plugin>
+      </plugins>
+    </pluginManagement>
     <plugins>
-      <plugin>
-        <artifactId>build-helper-maven-plugin</artifactId>
-        <groupId>org.codehaus.mojo</groupId>
-        <executions>
-          <execution>
-            <id>maven-version</id>
-            <phase>validate</phase>
-            <goals>
-              <goal>maven-version</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-dependency-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>copy-dependencies</id>
-            <phase>validate</phase>
-            <goals>
-              <goal>copy</goal>
-            </goals>
-            <configuration>
-              <artifactItems>
-                <artifactItem>
-                  <groupId>${project.groupId}</groupId>
-                  <artifactId>cc-xjc</artifactId>
-                  <version>${project.version}</version>
-                  <classifier>readme</classifier>
-                  <type>xhtml</type>
-                  <outputDirectory>${project.build.outputDirectory}/META-INF</outputDirectory>
-                  <destFileName>README.xhtml</destFileName>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>${project.groupId}</groupId>
-                  <artifactId>cc-xjc</artifactId>
-                  <version>${project.version}</version>
-                  <classifier>license</classifier>
-                  <type>txt</type>
-                  <outputDirectory>${project.build.outputDirectory}/META-INF</outputDirectory>
-                  <destFileName>LICENSE.txt</destFileName>
-                </artifactItem>
-              </artifactItems>
-            </configuration>
-          </execution>
-        </executions>
       </plugin>
     </plugins>
   </build>
