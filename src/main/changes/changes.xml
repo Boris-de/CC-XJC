@@ -176,10 +176,16 @@
       <action dev="schulte2005" type="update">Updated to stop initializing unset optional attributes to default values during copying.</action>
     </release>
     <!-- *********************************************************************************************************** -->
-    <release version="1.5" date="2011-03-11" description="Bugfix release.">
+    <release version="1.5" date="2011-03-11" description="Feature enhancements.">
       <action dev="schulte2005" type="add">Added option '-cc-string-types'.</action>
       <action dev="schulte2005" type="fix" issue="7" system="MantisBT">
       Corrected a 'NullPointerException' thrown with 'javaType' customizations.
+      </action>
+    </release>
+    <!-- *********************************************************************************************************** -->
+    <release version="2.0" date="2011-09-16" description="Feature enhancements.">
+      <action dev="schulte2005" type="fix" issue="8" system="MantisBT">
+      Generated 'clone' methods should call 'super.clone()'.
       </action>
     </release>
   </body>

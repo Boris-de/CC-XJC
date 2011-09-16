@@ -54,16 +54,9 @@ public class ReferencedClass implements Cloneable
     }
 
     @Override
-    public Object clone()
+    public ReferencedClass clone() throws CloneNotSupportedException
     {
-        try
-        {
-            return super.clone();
-        }
-        catch ( CloneNotSupportedException e )
-        {
-            throw new AssertionError( e );
-        }
+        return (ReferencedClass) super.clone();
     }
 
     public void toString( final ToStringBuilder toStringBuilder )
