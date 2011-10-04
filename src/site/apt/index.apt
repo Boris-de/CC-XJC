@@ -197,6 +197,19 @@ CC-XJC
 
             * javax.activation.MimeType
 
+** -cc-deprecated (since 2.1)
+
+    The '-cc-deprecated' option got introduced in version 2.1. It can be
+    used to instruct the plugin to mark generated copy constructors deprecated.
+    It takes one message argument added to generated <<<@deprecated>>>
+    Javadoc tags.
+
+** -cc-skipped (since 2.1)
+
+    The '-cc-skipped' option got introduced in version 2.1. It can be
+    used to instruct the plugin to not generate any copy constructors and only
+    generate 'clone' methods.
+
 * Support
 
   Development of CC-XJC is community driven. Please file any issues with the

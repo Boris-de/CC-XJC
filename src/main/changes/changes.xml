@@ -188,5 +188,9 @@
       Generated 'clone' methods should call 'super.clone()'.
       </action>
     </release>
+    <!-- *********************************************************************************************************** -->
+    <release version="2.1" date="2011-10-04" description="Feature enhancements.">
+      <action dev="schulte2005" type="add">Added options '-cc-deprecated' and '-cc-skipped'.</action>
+    </release>
   </body>
 </document>
