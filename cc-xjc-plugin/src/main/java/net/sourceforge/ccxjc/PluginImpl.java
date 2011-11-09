@@ -147,10 +147,6 @@ public final class PluginImpl extends Plugin
 
     private static final String STRING_TYPES_OPTION_NAME = "-cc-string-types";
 
-    private static final String DEPRECATED_CTOR_OPTION_NAME = "-cc-deprecated";
-
-    private static final String SKIPPED_CTOR_OPTION_NAME = "-cc-skipped";
-
     private static final String ELEMENT_SEPARATOR = ":";
 
     private static final List<String> DEFAULT_IMMUTABLE_TYPES = Arrays.asList( new String[]
@@ -230,10 +226,6 @@ public final class PluginImpl extends Plugin
 
     private boolean hierarchical = false;
 
-    private String deprecateCopyConstructor;
-
-    private boolean skipCopyConstructor;
-
     private final List<String> immutableTypes = new ArrayList<String>( 64 );
 
     private final List<String> cloneableTypes = new ArrayList<String>( 64 );
@@ -271,10 +263,6 @@ public final class PluginImpl extends Plugin
             append( getMessage( "nullableUsage" ) ).append( n ).
             append( "  " ).append( HIERARCHICAL_OPTION_NAME ).append( "   :  " ).
             append( getMessage( "hierarchicalUsage" ) ).append( n ).
-            append( "  " ).append( DEPRECATED_CTOR_OPTION_NAME ).append( "     :  " ).
-            append( getMessage( "deprecatedUsage" ) ).append( n ).
-            append( "  " ).append( SKIPPED_CTOR_OPTION_NAME ).append( "        :  " ).
-            append( getMessage( "skippedUsage", ELEMENT_SEPARATOR ) ).append( n ).
             append( "  " ).append( CLONEABLE_TYPES_OPTION_NAME ).append( ":  " ).
             append( getMessage( "cloneableTypesUsage", ELEMENT_SEPARATOR ) ).append( n ).
             append( "  " ).append( IMMUTABLE_TYPES_OPTION_NAME ).append( ":  " ).
@@ -472,23 +460,6 @@ public final class PluginImpl extends Plugin
             return 2;
         }
 
-        if ( args[i].startsWith( DEPRECATED_CTOR_OPTION_NAME ) )
-        {
-            if ( i + 1 >= args.length )
-            {
-                throw new BadCommandLineException( getMessage( "missingOptionArgument", DEPRECATED_CTOR_OPTION_NAME ) );
-            }
-
-            this.deprecateCopyConstructor = args[i + 1].trim();
-            return 2;
-        }
-
-        if ( args[i].startsWith( SKIPPED_CTOR_OPTION_NAME ) )
-        {
-            this.skipCopyConstructor = true;
-            return 1;
-        }
-
         return 0;
     }
 
@@ -543,7 +514,7 @@ public final class PluginImpl extends Plugin
                 this.log( Level.WARNING, "couldNotAddStdCtor", clazz.implClass.binaryName() );
             }
 
-            if ( !this.skipCopyConstructor && this.getCopyConstructor( clazz ) == null )
+            if ( this.getCopyConstructor( clazz ) == null )
             {
                 this.log( Level.WARNING, "couldNotAddCopyCtor", clazz.implClass.binaryName() );
             }
@@ -2300,12 +2271,6 @@ public final class PluginImpl extends Plugin
         else
         {
             ctor.javadoc().addParam( o ).add( "The instance to copy or {@code null}." );
-        }
-
-        if ( this.deprecateCopyConstructor != null )
-        {
-            ctor.annotate( Deprecated.class );
-            ctor.javadoc().addDeprecated().append( this.deprecateCopyConstructor );
         }
 
         ctor.body().directStatement( "// " + getMessage( "title" ) );
