@@ -2291,8 +2291,9 @@ public final class PluginImpl extends Plugin
             ctor.body().directStatement( "// " + WARNING_PREFIX + ": of may be wrong and must be verified." );
         }
 
-        if ( clazz.getSuperClass() != null || ( clazz.implClass._extends() != null && !clazz.implClass._extends().
-                                               binaryName().equals( "java.lang.Object" ) ) )
+        if ( clazz.getSuperClass() != null
+             || ( clazz.implClass._extends() != null
+                  && !clazz.implClass._extends().binaryName().equals( "java.lang.Object" ) ) )
         {
             ctor.body().invoke( "super" ).arg( o );
         }
@@ -2412,8 +2413,8 @@ public final class PluginImpl extends Plugin
 
     private void warnOnReferencedSupertypes( final ClassOutline clazz )
     {
-        if ( clazz.getSuperClass() == null && ( clazz.implClass._extends() != null && !clazz.implClass._extends().
-                                               binaryName().equals( "java.lang.Object" ) ) )
+        if ( clazz.getSuperClass() == null && clazz.implClass._extends() != null
+             && !clazz.implClass._extends().binaryName().equals( "java.lang.Object" ) )
         {
             this.log( Level.WARNING, "referencedSupertypeWarning", clazz.implClass.fullName(),
                       clazz.implClass._extends().binaryName(), WARNING_PREFIX );
@@ -2429,7 +2430,7 @@ public final class PluginImpl extends Plugin
     private boolean needsWarningOnReferencedSupertypes( final ClassOutline clazz )
     {
         if ( clazz.getSuperClass() == null && ( clazz.implClass._extends() != null && !clazz.implClass._extends().
-                                               binaryName().equals( "java.lang.Object" ) ) )
+            binaryName().equals( "java.lang.Object" ) ) )
         {
             return true;
         }
@@ -2461,9 +2462,10 @@ public final class PluginImpl extends Plugin
         cloneMethod.javadoc().addReturn().append( "A deep copy of this object." );
         this.contextExceptions.clear();
 
-        if ( clazz.getSuperClass() == null || clazz.getSuperClass().implClass.binaryName().equals( "java.lang.Object" )
-             || ( clazz.implClass._extends() != null
-                  && clazz.implClass._extends().binaryName().equals( "java.lang.Object" ) ) )
+        if ( ( clazz.implClass._extends() != null
+               && clazz.implClass._extends().binaryName().equals( "java.lang.Object" ) )
+             || ( clazz.getSuperClass() != null
+                  && clazz.getSuperClass().implClass.binaryName().equals( "java.lang.Object" ) ) )
         {
             // Cannot check the super classes 'clone' method throwing a 'CloneNotSupportedException'.
             this.contextExceptions.add( CloneNotSupportedException.class );

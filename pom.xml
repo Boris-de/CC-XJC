@@ -125,7 +125,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-release-plugin</artifactId>
-          <version>2.2.1</version>
+          <version>2.2.2</version>
           <configuration>
             <remoteTagging>false</remoteTagging>
             <suppressCommitBeforeTag>true</suppressCommitBeforeTag>
@@ -137,7 +137,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-jar-plugin</artifactId>
-          <version>2.3.2</version>
+          <version>2.4</version>
           <configuration>
             <archive>
               <index>true</index>
@@ -176,7 +176,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-assembly-plugin</artifactId>
-          <version>2.2.1</version>
+          <version>2.3</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
@@ -197,10 +197,9 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-javadoc-plugin</artifactId>
-          <version>2.8</version>
+          <version>2.8.1</version>
           <configuration>
-            <bottom><![CDATA[<table border="0" width="100%"><tr><td align="left">Copyright &#169; {inceptionYear}-{currentYear} {organizationName}. All Rights Reserved.</td><td align="right"><a href="http://sourceforge.net/projects/ccxjc"><img src="http://sflogo.sourceforge.net/sflogo.php?group_id=260900&amp;type=10" width="80" height="15" alt="Get CC-XJC at SourceForge.net. Fast, secure and Free Open Source software downloads" /></a></td></tr></table>]]>
-            </bottom>
+            <bottom><![CDATA[<table border="0" width="100%"><tr><td align="left">Copyright &#169; {inceptionYear}-{currentYear} {organizationName}. All Rights Reserved.</td><td align="right"><a href="http://sourceforge.net/projects/ccxjc"><img src="http://sflogo.sourceforge.net/sflogo.php?group_id=260900&amp;type=10" width="80" height="15" alt="Get CC-XJC at SourceForge.net. Fast, secure and Free Open Source software downloads" /></a></td></tr></table>]]></bottom>
             <breakiterator>true</breakiterator>
             <keywords>true</keywords>
             <linksource>true</linksource>
@@ -254,12 +253,12 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-dependency-plugin</artifactId>
-          <version>2.3</version>
+          <version>2.4</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-antrun-plugin</artifactId>
-          <version>1.6</version>
+          <version>1.7</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
@@ -289,8 +288,8 @@
             <fail>false</fail>
             <rules>
               <requireMavenVersion>
-                <message>This project should be built using Apache Maven 3.0.3 (r1075438; 2011-02-28 18:31:09+0100).</message>
-                <version>[3.0.3]</version>
+                <message>This project should be built using Apache Maven 3.0.4 (r1232337; 2012-01-17 09:44:56+0100)</message>
+                <version>[3.0.4]</version>
               </requireMavenVersion>
             </rules>
           </configuration>
@@ -346,7 +345,7 @@
         <plugin>
           <groupId>org.jvnet.jaxb2.maven2</groupId>
           <artifactId>maven-jaxb21-plugin</artifactId>
-          <version>0.8.0</version>
+          <version>0.8.1</version>
         </plugin>
       </plugins>
     </pluginManagement>
@@ -610,7 +609,7 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-    <surefire.version>2.9</surefire.version>
-    <wagon.version>1.0</wagon.version>
+    <surefire.version>2.12</surefire.version>
+    <wagon.version>2.2</wagon.version>
   </properties>
 </project>
