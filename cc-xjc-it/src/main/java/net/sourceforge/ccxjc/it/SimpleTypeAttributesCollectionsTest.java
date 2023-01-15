@@ -40,6 +40,8 @@ import net.sourceforge.ccxjc.it.model.copyable_jaxbbasics.valueclass.ccxjcit.Sim
 import org.apache.commons.lang.SerializationUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.EnabledForJreRange;
+import org.junit.jupiter.api.condition.JRE;
 
 /**
  * Tests the {@code SimpleTypeAttributes} complex type.
@@ -265,6 +267,7 @@ public class SimpleTypeAttributesCollectionsTest
         this.assertTestSimpleTypeAttributes( new SimpleTypeAttributes( this.getTestSimpleTypeAttributes() ) );
     }
 
+    @EnabledForJreRange(max = JRE.JAVA_11) // https://github.com/highsource/jaxb2-basics/issues/130
     @Test public void testSerializable() throws Exception
     {
         final int runs = 100000;
