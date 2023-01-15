@@ -149,6 +149,8 @@ public final class PluginImpl extends Plugin
 
     private static final String STRING_TYPES_OPTION_NAME = "-cc-string-types";
 
+    private static final String COPY_NULL_COLLECTION_ELEMENTS_OPTION_NAME = "-cc-null-collection-elements";
+
     private static final String ELEMENT_SEPARATOR = ":";
 
     private static final List<String> DEFAULT_IMMUTABLE_TYPES = Arrays.asList( new String[]
@@ -228,6 +230,8 @@ public final class PluginImpl extends Plugin
 
     private boolean hierarchical = false;
 
+    private boolean copyNullCollectionElements = false;
+
     private final List<String> immutableTypes = new ArrayList<String>( 64 );
 
     private final List<String> cloneableTypes = new ArrayList<String>( 64 );
@@ -270,7 +274,9 @@ public final class PluginImpl extends Plugin
             append( "  " ).append( IMMUTABLE_TYPES_OPTION_NAME ).append( ":  " ).
             append( getMessage( "immutableTypesUsage", ELEMENT_SEPARATOR ) ).append( n ).
             append( "  " ).append( STRING_TYPES_OPTION_NAME ).append( "   :  " ).
-            append( getMessage( "stringTypesUsage", ELEMENT_SEPARATOR ) ).toString();
+            append( getMessage( "stringTypesUsage", ELEMENT_SEPARATOR ) ).
+            append( "  " ).append( COPY_NULL_COLLECTION_ELEMENTS_OPTION_NAME ).append( "   :  " ).
+            append( getMessage( "copyNullCollectionElementsUsage", ELEMENT_SEPARATOR ) ).toString();
 
     }
 
@@ -460,6 +466,13 @@ public final class PluginImpl extends Plugin
             }
 
             return 2;
+        }
+
+        if ( args[i].startsWith( COPY_NULL_COLLECTION_ELEMENTS_OPTION_NAME ) )
+        {
+           this.copyNullCollectionElements = true;
+
+           return 1;
         }
 
         return 0;
@@ -1926,10 +1939,10 @@ public final class PluginImpl extends Plugin
                   ? classInfo.getAdapterUse().customType.toType( field.parent().parent(), Aspect.IMPLEMENTATION )
                   : classInfo.toType( field.parent().parent(), Aspect.IMPLEMENTATION ) );
 
-            final JConditional ifInstanceOf = copyLoop.body()._if( next._instanceof( javaType ) );
+            final JConditional ifInstanceOf = copyLoop.body()._if( getTypeCheckExpression(next, javaType) );
 
-            final JExpression copyExpr = this.getCopyExpression(
-                field, classInfo, ifInstanceOf._then(), JExpr.cast( javaType, next ), false );
+            final JExpression copyExpr = getCopyExpressionForCollection(
+                field, next, classInfo, javaType, ifInstanceOf);
 
             needsToCatchException = needsToCatchException || this.tryCatchCopyExpression;
 
@@ -1957,9 +1970,9 @@ public final class PluginImpl extends Plugin
         for ( CTypeInfo typeInfo : referencedTypeInfos )
         {
             final JType javaType = typeInfo.toType( field.parent().parent(), Aspect.IMPLEMENTATION );
-            final JConditional ifInstanceOf = copyLoop.body()._if( next._instanceof( javaType ) );
-            final JExpression copyExpr = this.getCopyExpression(
-                field, typeInfo, ifInstanceOf._then(), JExpr.cast( javaType, next ), false );
+            final JConditional ifInstanceOf = copyLoop.body()._if( getTypeCheckExpression(next, javaType) );
+            final JExpression copyExpr = getCopyExpressionForCollection(
+                field, next, typeInfo, javaType, ifInstanceOf);
 
             needsToCatchException = needsToCatchException || this.tryCatchCopyExpression;
 
@@ -2015,6 +2028,27 @@ public final class PluginImpl extends Plugin
 
         this.methodCount = this.methodCount.add( BigInteger.ONE );
         return m;
+    }
+
+    private JExpression getTypeCheckExpression(final JVar next, final JType javaType) {
+      JExpression typeCheckExpr = next._instanceof( javaType );
+      if ( this.copyNullCollectionElements )
+      {
+        typeCheckExpr = next.eq( JExpr._null() ).cor( typeCheckExpr );
+      }
+      return typeCheckExpr;
+    }
+
+    private JExpression getCopyExpressionForCollection(final FieldOutline field, final JVar next,
+        CTypeInfo classInfo, final JType javaType, final JConditional ifInstanceOf) {
+      JExpression copyExpr = this.getCopyExpression(
+          field, classInfo, ifInstanceOf._then(), JExpr.cast( javaType, next ), false );
+      
+      if (this.copyNullCollectionElements )
+      {
+        copyExpr = JOp.cond(next.ne(JExpr._null()), copyExpr, JExpr._null());
+      }
+      return copyExpr;
     }
 
     private JExpression getCopyExpression( final FieldOutline fieldOutline, final CTypeInfo type,
