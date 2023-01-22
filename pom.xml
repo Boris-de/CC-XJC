@@ -256,7 +256,7 @@
         <plugin>
           <groupId>org.apache.maven.doxia</groupId>
           <artifactId>doxia-maven-plugin</artifactId>
-          <version>1.1.4</version>
+          <version>1.2</version>
           <executions>
             <execution>
               <id>default-render-books</id>
