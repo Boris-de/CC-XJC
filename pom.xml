@@ -415,9 +415,9 @@
             </reports>
           </reportSet>
           <reportSet>
-            <id>default-cim</id>
+            <id>default-ci-management</id>
             <reports>
-              <report>cim</report>
+              <report>ci-management</report>
             </reports>
           </reportSet>
           <reportSet>
@@ -439,15 +439,15 @@
             </reports>
           </reportSet>
           <reportSet>
-            <id>default-issue-tracking</id>
+            <id>default-issue-management</id>
             <reports>
-              <report>issue-tracking</report>
+              <report>issue-management</report>
             </reports>
           </reportSet>
           <reportSet>
-            <id>default-mailing-list</id>
+            <id>default-mailing-lists</id>
             <reports>
-              <report>mailing-list</report>
+              <report>mailing-lists</report>
             </reports>
           </reportSet>
           <reportSet>
@@ -457,9 +457,9 @@
             </reports>
           </reportSet>
           <reportSet>
-            <id>default-license</id>
+            <id>default-licenses</id>
             <reports>
-              <report>license</report>
+              <report>licenses</report>
             </reports>
           </reportSet>
           <!-- reportSet> http://jira.codehaus.org/browse/MPIR-229
@@ -487,9 +487,9 @@
             </reports>
           </reportSet>
           <reportSet>
-            <id>default-project-team</id>
+            <id>default-team</id>
             <reports>
-              <report>project-team</report>
+              <report>team</report>
             </reports>
           </reportSet>
           <reportSet>
