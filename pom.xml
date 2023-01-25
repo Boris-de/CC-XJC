@@ -45,6 +45,8 @@
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <java.version>11</java.version>
     <version.jaxb2_commons-basics>3.0.0</version.jaxb2_commons-basics>
+    <buildNumber /><!-- set by build-helper-maven-plugin -->
+    <maven.version /><!-- set by build-helper-maven-plugin -->
   </properties>
   <organization>
     <name>The CC-XJC Community</name>
