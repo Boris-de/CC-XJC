@@ -32,13 +32,13 @@
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>net.sourceforge.ccxjc</groupId>
+  <groupId>de.wcht.cc-xjc</groupId>
   <artifactId>cc-xjc</artifactId>
   <packaging>pom</packaging>
   <name>CC-XJC</name>
   <version>2.0.2-SNAPSHOT</version>
   <description>JAXB 2.0 Schema to Java compiler plugin for adding a copy constructor to schema derived classes.</description>
-  <url>http://ccxjc.sourceforge.net</url>
+  <url>https://cc-xjc.wcht.de</url>
   <inceptionYear>2009</inceptionYear>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -48,10 +48,6 @@
     <buildNumber /><!-- set by build-helper-maven-plugin -->
     <maven.version /><!-- set by build-helper-maven-plugin -->
   </properties>
-  <organization>
-    <name>The CC-XJC Community</name>
-    <url>http://ccxjc.sourceforge.net</url>
-  </organization>
   <licenses>
     <license>
       <name>The CC-XJC Project Copyright</name>
@@ -66,36 +62,13 @@
     </developer>
   </developers>
   <issueManagement>
-    <system>MantisBT</system>
-    <url>http://apps.sourceforge.net/mantisbt/ccxjc/</url>
+    <system>Github</system>
+    <url>https://github.com/Boris-de/CC-XJC/issues</url>
   </issueManagement>
-  <mailingLists>
-    <mailingList>
-      <name>ccxjc-users</name>
-      <subscribe>http://lists.sourceforge.net/lists/listinfo/ccxjc-users</subscribe>
-      <unsubscribe>http://lists.sourceforge.net/lists/listinfo/ccxjc-users</unsubscribe>
-      <post>ccxjc-users@lists.sourceforge.net</post>
-      <archive>http://sourceforge.net/mailarchive/forum.php?forum=ccxjc-users</archive>
-    </mailingList>
-    <mailingList>
-      <name>ccxjc-svn</name>
-      <subscribe>http://lists.sourceforge.net/lists/listinfo/ccxjc-svn</subscribe>
-      <unsubscribe>http://lists.sourceforge.net/lists/listinfo/ccxjc-svn</unsubscribe>
-      <post>ccxjc-svn@lists.sourceforge.net</post>
-      <archive>http://sourceforge.net/mailarchive/forum.php?forum=ccxjc-svn</archive>
-    </mailingList>
-    <mailingList>
-      <name>ccxjc-notifications</name>
-      <subscribe>http://lists.sourceforge.net/lists/listinfo/ccxjc-notifications</subscribe>
-      <unsubscribe>http://lists.sourceforge.net/lists/listinfo/ccxjc-notifications</unsubscribe>
-      <post>ccxjc-notifications@lists.sourceforge.net</post>
-      <archive>http://sourceforge.net/mailarchive/forum.php?forum=ccxjc-notifications</archive>
-    </mailingList>
-  </mailingLists>
   <scm>
-    <connection>scm:svn:https://ccxjc.svn.sourceforge.net/svnroot/ccxjc/trunk</connection>
-    <developerConnection>scm:svn:https://ccxjc.svn.sourceforge.net/svnroot/ccxjc/trunk</developerConnection>
-    <url>http://ccxjc.svn.sourceforge.net/viewvc/ccxjc/trunk</url>
+    <connection>scm:git:https://github.com/Boris-de/CC-XJC.git</connection>
+    <developerConnection>scm:git:git@github.com:Boris-de/CC-XJC.git</developerConnection>
+    <url>https://github.com/Boris-de/CC-XJC</url>
   </scm>
   <dependencyManagement>
     <dependencies>
@@ -231,7 +204,7 @@
           <artifactId>maven-javadoc-plugin</artifactId>
           <version>3.4.1</version>
           <configuration>
-            <bottom><![CDATA[<table border="0" width="100%"><tr><td align="left">Copyright &#169; {inceptionYear}-{currentYear} {organizationName}. All Rights Reserved.</td><td align="right"><a href="http://sourceforge.net/projects/ccxjc"><img src="http://sflogo.sourceforge.net/sflogo.php?group_id=260900&amp;type=10" width="80" height="15" alt="Get CC-XJC at SourceForge.net. Fast, secure and Free Open Source software downloads" /></a></td></tr></table>]]></bottom>
+            <bottom><![CDATA[<div>Copyright &#169; {inceptionYear}-{currentYear} {organizationName}. All Rights Reserved. <a href="https://ccxjc.wcht.de">Get CC-XJC</a></div>]]></bottom>
             <breakiterator>true</breakiterator>
             <keywords>true</keywords>
             <linksource>true</linksource>
@@ -381,7 +354,7 @@
         </reportSets>
         <configuration>
           <issueLinkTemplatePerSystem>
-            <MantisBT>https://apps.sourceforge.net/mantisbt/ccxjc/view.php?id=%ISSUE%</MantisBT>
+            <MantisBT>https://github.com/Boris-de/CC-XJC/issuesview.php?id=%ISSUE%</MantisBT>
           </issueLinkTemplatePerSystem>
         </configuration>
       </plugin>
@@ -488,17 +461,17 @@
     <repository>
       <id>sonatype-nexus-staging</id>
       <name>Sonatype Nexus Release Repository</name>
-      <url>http://oss.sonatype.org/service/local/staging/deploy/maven2</url>
+      <url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
     </repository>
     <snapshotRepository>
       <id>sonatype-nexus-snapshots</id>
       <name>Sonatype Nexus Snapshots</name>
-      <url>http://oss.sonatype.org/content/repositories/snapshots</url>
+      <url>https://oss.sonatype.org/content/repositories/snapshots</url>
     </snapshotRepository>
     <site>
-      <id>ccxjc.sourceforge.net</id>
+      <id>localhost</id>
       <name>CC-XJC Site</name>
-      <url>scp://shell.sourceforge.net/home/project-web/ccxjc/htdocs</url>
+      <url>scp://localhost</url>
     </site>
   </distributionManagement>
   <profiles>
