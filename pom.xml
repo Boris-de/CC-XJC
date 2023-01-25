@@ -234,7 +234,7 @@
             <keywords>true</keywords>
             <linksource>true</linksource>
             <serialwarn>true</serialwarn>
-            <source>1.5</source>
+            <source>${java.version}</source>
             <doctitle>${project.name} ${project.version}</doctitle>
             <windowtitle>${project.name} ${project.version}</windowtitle>
             <detectJavaApiLink>true</detectJavaApiLink>
