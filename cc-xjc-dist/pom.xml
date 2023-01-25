@@ -60,15 +60,6 @@
                     <groupId>${project.groupId}</groupId>
                     <artifactId>cc-xjc</artifactId>
                     <version>${project.version}</version>
-                    <classifier>readme</classifier>
-                    <type>xhtml</type>
-                    <outputDirectory>${project.build.directory}</outputDirectory>
-                    <destFileName>README.xhtml</destFileName>
-                  </artifactItem>
-                  <artifactItem>
-                    <groupId>${project.groupId}</groupId>
-                    <artifactId>cc-xjc</artifactId>
-                    <version>${project.version}</version>
                     <classifier>license</classifier>
                     <type>txt</type>
                     <outputDirectory>${project.build.directory}</outputDirectory>
