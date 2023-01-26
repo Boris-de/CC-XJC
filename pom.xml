@@ -226,6 +226,7 @@
               </manifestEntries>
             </archive>
             <additionalJOption>-J-Xmx512m</additionalJOption>
+            <doclint>none</doclint>
           </configuration>
         </plugin>
         <plugin>
