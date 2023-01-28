@@ -40,7 +40,7 @@
   <artifactId>cc-xjc-plugin</artifactId>
   <packaging>jar</packaging>
   <name>CC-XJC Plugin</name>
-  <description>JAXB 2.0 Schema to Java compiler plugin for adding a copy constructor to schema derived classes.</description>
+  <description>JAXB 3.0 Schema to Java compiler plugin for adding a copy constructor to schema derived classes.</description>
   <build>
     <resources>
       <resource>
