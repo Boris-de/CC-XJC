@@ -36,7 +36,7 @@
   <artifactId>cc-xjc</artifactId>
   <packaging>pom</packaging>
   <name>CC-XJC</name>
-  <version>2.0.2-SNAPSHOT</version>
+  <version>3.0.0-SNAPSHOT</version>
   <description>JAXB 2.0 Schema to Java compiler plugin for adding a copy constructor to schema derived classes.</description>
   <url>https://cc-xjc.wcht.de</url>
   <inceptionYear>2009</inceptionYear>
