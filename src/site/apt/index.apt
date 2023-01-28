@@ -42,8 +42,16 @@ CC-XJC
   CC-XJC is a JAXB 2.0 XJC plugin for adding a copy constructor to schema
   derived classes. The plugin provides a '-copy-constructor' option which is
   enabled by adding its jar file to the XJC classpath. When enabled, the
-  following options can be used to control the behavior of the plugin. See
-  the examples for further information.
+  following options can be used to control the behavior of the plugin.
+
+  See the {{{./examples.html}examples}}. for further information.
+
+* Support
+
+  Development of CC-XJC is community driven. Please file any issues with the
+  {{{https://github.com/Boris-de/CC-XJC/issues}bugtracker}}.
+
+* Features
 
 ** -cc-visibility
 
@@ -203,8 +211,3 @@ CC-XJC
     be used to allow the copy of 'null'-elements contained in collections that
     are copied in the constructor. Before version ? 'null'-elements would be
     dropped silently when copying/cloning collections.
-
-* Support
-
-  Development of CC-XJC is community driven. Please file any issues with the
-  {{{https://github.com/Boris-de/CC-XJC/issues}bugtracker}}.
