@@ -133,7 +133,7 @@
           <version>3.0.0-M7</version>
           <configuration>
             <remoteTagging>false</remoteTagging>
-            <goals>deploy</goals>
+            <goals>install</goals>
             <useReleaseProfile>false</useReleaseProfile>
             <releaseProfiles>ccxjc-release</releaseProfiles>
           </configuration>
