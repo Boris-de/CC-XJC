@@ -194,5 +194,13 @@
         Exception 'java.lang.CloneNotSupportedException' is never thrown in body of corresponding try statement.
       </action>
     </release>
+    <release version="3.0.0" date="2023-01-28" description="New version to support Jakarta Jaxb namespace">
+      <action dev="Boris-de" type="update">Published at new maven coordinates de.wcht.cc-xjc</action>
+      <action dev="Boris-de" type="update" issue="1" system="Github">
+        migrate plugin to use the Jakarta Jaxb namespace used in jaxb 3.x and later
+      </action>
+      <action dev="Boris-de" type="add" issue="9" system="Github">Added option -cc-null-collection-elements</action>
+      <action dev="Boris-de" type="update">Update build dependencies</action>
+    </release>
   </body>
 </document>

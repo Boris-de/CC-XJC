@@ -61,6 +61,12 @@
       <id>schulte2005</id>
       <name>Christian Schulte</name>
     </developer>
+    <developer>
+      <id>Boris-de</id>
+      <name>Boris Wachtmeister</name>
+      <url>https://github.com/Boris-de</url>
+      <timezone>Europe/Brussels</timezone>
+    </developer>
   </developers>
   <issueManagement>
     <system>Github</system>
@@ -355,8 +361,10 @@
           </reportSet>
         </reportSets>
         <configuration>
+          <teamlist>team.html</teamlist>
           <issueLinkTemplatePerSystem>
-            <MantisBT>https://github.com/Boris-de/CC-XJC/issuesview.php?id=%ISSUE%</MantisBT>
+            <Github>https://github.com/Boris-de/CC-XJC/issues/%ISSUE%</Github>
+            <MantisBT>https://apps.sourceforge.net/mantisbt/ccxjc/view.php?id=%ISSUE%</MantisBT>
           </issueLinkTemplatePerSystem>
         </configuration>
       </plugin>
