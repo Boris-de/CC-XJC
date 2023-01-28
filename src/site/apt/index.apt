@@ -205,9 +205,9 @@ CC-XJC
 
             * jakarta.activation.MimeType
 
-** -cc-null-collection-elements (since ?)
+** -cc-null-collection-elements (since 3.0.0)
 
-    The '-cc-null-collection-elements' option got introduced in version ?. It can
+    The '-cc-null-collection-elements' option got introduced in version 3.0.0. It can
     be used to allow the copy of 'null'-elements contained in collections that
-    are copied in the constructor. Before version ? 'null'-elements would be
+    are copied in the constructor. Before version 3.0.0 'null'-elements would be
     dropped silently when copying/cloning collections.
