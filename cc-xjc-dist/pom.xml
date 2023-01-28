@@ -40,7 +40,7 @@
   <artifactId>cc-xjc-dist</artifactId>
   <packaging>pom</packaging>
   <name>CC-XJC Distribution</name>
-  <description>JAXB 2.0 Schema to Java compiler plugin binary distribution.</description>
+  <description>JAXB 3.0 Schema to Java compiler plugin binary distribution.</description>
   <build>
     <pluginManagement>
       <plugins>

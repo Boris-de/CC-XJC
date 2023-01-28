@@ -40,7 +40,7 @@
   <artifactId>cc-xjc-it</artifactId>
   <packaging>jar</packaging>
   <name>CC-XJC Test Suite</name>
-  <description>JAXB 2.0 Schema to Java compiler plugin test suite.</description>
+  <description>JAXB 3.0 Schema to Java compiler plugin test suite.</description>
   <build>
     <pluginManagement>
       <plugins>
