@@ -47,6 +47,7 @@
     <version.jaxb2_commons-basics>3.0.0</version.jaxb2_commons-basics>
     <buildNumber /><!-- set by build-helper-maven-plugin -->
     <maven.version /><!-- set by build-helper-maven-plugin -->
+    <ccxjc.gpg.keyname /><!-- should be set in settings.xml -->
   </properties>
   <licenses>
     <license>
@@ -560,6 +561,10 @@
                 </goals>
               </execution>
             </executions>
+            <configuration>
+              <keyname>${ccxjc.gpg.keyname}</keyname>
+              <passphraseServerId>gpg-${ccxjc.gpg.keyname}</passphraseServerId>
+            </configuration>
           </plugin>
         </plugins>
       </build>
