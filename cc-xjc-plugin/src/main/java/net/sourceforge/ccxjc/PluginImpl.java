@@ -2629,7 +2629,7 @@ public final class PluginImpl extends Plugin
                 }
                 else
                 {
-                    CTypeInfo typeInfo = null;
+                    CTypeInfo typeInfo;
 
                     if ( field.getPropertyInfo().getAdapter() != null
                          && field.getPropertyInfo().getAdapter().customType != null )
@@ -2781,11 +2781,11 @@ public final class PluginImpl extends Plugin
         {
             if ( level.intValue() <= Level.INFO.intValue() )
             {
-                System.out.println( b.toString() );
+                System.out.println( b );
             }
             else
             {
-                System.err.println( b.toString() );
+                System.err.println( b );
             }
         }
     }
