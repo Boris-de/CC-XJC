@@ -41,17 +41,23 @@ CC-XJC
 
   CC-XJC is a JAXB 3.0 XJC plugin for adding a copy constructor to schema
   derived classes. The plugin provides a '-copy-constructor' option which is
-  enabled by adding its jar file to the XJC classpath. When enabled, the
-  following options can be used to control the behavior of the plugin.
+  enabled by adding its jar file to the XJC classpath.
 
-  See the {{{./examples.html}examples}}. for further information.
+  See the {{{./examples.html}examples}} for further information on how to
+  enable it.
+
+  When enabled, the options listed below can be used to control the behavior
+  of the plugin.
+
+  CC-XJC 3.x can only be used with JAXB/XJC 3.0 and higher and Java 11 and higher.
+  For use with older version please refer to old versions of the plugin.
 
 * Support
 
   Development of CC-XJC is community driven. Please file any issues with the
   {{{https://github.com/Boris-de/CC-XJC/issues}bugtracker}}.
 
-* Features
+* Options
 
 ** -cc-visibility
 
