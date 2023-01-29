@@ -215,11 +215,13 @@ public final class PluginImpl extends Plugin
 
     private static final int TARGET_1_7 = 7;
 
+    private static final int DEFAULT_TARGET_JDK = TARGET_1_5;
+
     private Options options;
 
     private String visibility = "private";
 
-    private int targetJdk = TARGET_1_5;
+    private int targetJdk = DEFAULT_TARGET_JDK;
 
     private boolean nullable = false;
 
@@ -364,18 +366,7 @@ public final class PluginImpl extends Plugin
                 throw new BadCommandLineException( expectedOptionArgument );
             }
 
-            if ( targetArg.equals( "1.5" ) )
-            {
-                this.targetJdk = TARGET_1_5;
-            }
-            else if ( targetArg.equals( "1.6" ) )
-            {
-                this.targetJdk = TARGET_1_6;
-            }
-            else if ( targetArg.equals( "1.7" ) )
-            {
-                this.targetJdk = TARGET_1_7;
-            }
+            this.targetJdk = parseTargetJdk( targetArg );
 
             return 2;
         }
@@ -473,6 +464,19 @@ public final class PluginImpl extends Plugin
         return 0;
     }
 
+    private int parseTargetJdk(String targetArg ) {
+        switch ( targetArg ) {
+            case "1.5":
+                return TARGET_1_5;
+            case "1.6":
+                return TARGET_1_6;
+            case "1.7":
+                return TARGET_1_7;
+            default:
+                return DEFAULT_TARGET_JDK;
+        }
+    }
+
     @Override
     public boolean run( final Outline model, final Options options, final ErrorHandler errorHandler )
     {
@@ -542,20 +546,16 @@ public final class PluginImpl extends Plugin
 
     private int getVisibilityModifier()
     {
-        if ( "private".equals( this.visibility ) )
-        {
-            return JMod.PRIVATE;
+        switch ( this.visibility ) {
+            case "private":
+                return JMod.PRIVATE;
+            case "protected":
+                return JMod.PROTECTED;
+            case "public":
+                return JMod.PUBLIC;
+            default:
+                return JMod.NONE;
         }
-        else if ( "protected".equals( this.visibility ) )
-        {
-            return JMod.PROTECTED;
-        }
-        else if ( "public".equals( this.visibility ) )
-        {
-            return JMod.PUBLIC;
-        }
-
-        return JMod.NONE;
     }
 
     private boolean isTargetSupported( final int target )
