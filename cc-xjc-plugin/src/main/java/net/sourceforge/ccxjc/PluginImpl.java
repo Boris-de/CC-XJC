@@ -229,11 +229,11 @@ public final class PluginImpl extends Plugin
 
     private boolean copyNullCollectionElements = false;
 
-    private final List<String> immutableTypes = new ArrayList<String>( 64 );
+    private final List<String> immutableTypes = new ArrayList<>( 64 );
 
-    private final List<String> cloneableTypes = new ArrayList<String>( 64 );
+    private final List<String> cloneableTypes = new ArrayList<>( 64 );
 
-    private final List<String> stringTypes = new ArrayList<String>( 64 );
+    private final List<String> stringTypes = new ArrayList<>( 64 );
 
     private BigInteger methodCount;
 
@@ -241,7 +241,7 @@ public final class PluginImpl extends Plugin
 
     private BigInteger expressionCount;
 
-    private final Set<Class<?>> contextExceptions = new HashSet<Class<?>>();
+    private final Set<Class<?>> contextExceptions = new HashSet<>();
 
     private boolean tryCatchCopyExpression = false;
 
@@ -1031,7 +1031,7 @@ public final class PluginImpl extends Plugin
               : clazz.implClass.method( JMod.STATIC | mod, object, methodName ) );
 
         final JVar o = m.param( JMod.FINAL, object, "o" );
-        final Set<Class<?>> exceptions = new HashSet<Class<?>>();
+        final Set<Class<?>> exceptions = new HashSet<>();
 
         m.javadoc().append( "Creates and returns a deep copy of a given object." );
         m.javadoc().addParam( o ).append( "The instance to copy or {@code null}." );
@@ -1450,25 +1450,25 @@ public final class PluginImpl extends Plugin
 //        m.body()._if( target.eq( JExpr._null() ) )._then()._throw( JExpr._new( nullPointerException ).arg( "target" ) );
 
         final List<CClassInfo> referencedClassInfos =
-            new ArrayList<CClassInfo>( field.getPropertyInfo().ref().size() );
+          new ArrayList<>( field.getPropertyInfo().ref().size() );
 
         final List<CElementInfo> referencedElementInfos =
-            new ArrayList<CElementInfo>( field.getPropertyInfo().ref().size() );
+          new ArrayList<>( field.getPropertyInfo().ref().size() );
 
         final List<CElementInfo> referencedElementInfosWithClass =
-            new ArrayList<CElementInfo>( field.getPropertyInfo().ref().size() );
+          new ArrayList<>( field.getPropertyInfo().ref().size() );
 
         final List<CTypeInfo> referencedTypeInfos =
-            new ArrayList<CTypeInfo>( field.getPropertyInfo().ref().size() );
+          new ArrayList<>( field.getPropertyInfo().ref().size() );
 
         final List<JType> referencedClassTypes =
-            new ArrayList<JType>( field.getPropertyInfo().ref().size() );
+          new ArrayList<>( field.getPropertyInfo().ref().size() );
 
         final List<JType> referencedContentTypes =
-            new ArrayList<JType>( field.getPropertyInfo().ref().size() );
+          new ArrayList<>( field.getPropertyInfo().ref().size() );
 
         final List<JType> referencedTypes =
-            new ArrayList<JType>( field.getPropertyInfo().ref().size() );
+          new ArrayList<>( field.getPropertyInfo().ref().size() );
 
         for ( CTypeInfo type : field.getPropertyInfo().ref() )
         {
@@ -1743,25 +1743,25 @@ public final class PluginImpl extends Plugin
 //        m.body()._if( target.eq( JExpr._null() ) )._then()._throw( JExpr._new( nullPointerException ).arg( "target" ) );
 
         final List<CClassInfo> referencedClassInfos =
-            new ArrayList<CClassInfo>( field.getPropertyInfo().ref().size() );
+          new ArrayList<>( field.getPropertyInfo().ref().size() );
 
         final List<CElementInfo> referencedElementInfos =
-            new ArrayList<CElementInfo>( field.getPropertyInfo().ref().size() );
+          new ArrayList<>( field.getPropertyInfo().ref().size() );
 
         final List<CElementInfo> referencedElementInfosWithClass =
-            new ArrayList<CElementInfo>( field.getPropertyInfo().ref().size() );
+          new ArrayList<>( field.getPropertyInfo().ref().size() );
 
         final List<CTypeInfo> referencedTypeInfos =
-            new ArrayList<CTypeInfo>( field.getPropertyInfo().ref().size() );
+          new ArrayList<>( field.getPropertyInfo().ref().size() );
 
         final List<JType> referencedClassTypes =
-            new ArrayList<JType>( field.getPropertyInfo().ref().size() );
+          new ArrayList<>( field.getPropertyInfo().ref().size() );
 
         final List<JType> referencedContentTypes =
-            new ArrayList<JType>( field.getPropertyInfo().ref().size() );
+          new ArrayList<>( field.getPropertyInfo().ref().size() );
 
         final List<JType> referencedTypes =
-            new ArrayList<JType>( field.getPropertyInfo().ref().size() );
+          new ArrayList<>( field.getPropertyInfo().ref().size() );
 
         for ( CTypeInfo type : field.getPropertyInfo().ref() )
         {
@@ -2742,7 +2742,7 @@ public final class PluginImpl extends Plugin
 
     private Collection<String> readTypes( final String fileName ) throws IOException
     {
-        final Collection<String> types = new LinkedList<String>();
+        final Collection<String> types = new LinkedList<>();
         final BufferedReader reader = new BufferedReader( new FileReader( fileName ) );
         String line;
 
