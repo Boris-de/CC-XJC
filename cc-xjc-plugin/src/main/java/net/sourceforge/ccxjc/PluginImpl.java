@@ -215,8 +215,6 @@ public final class PluginImpl extends Plugin
 
     private static final int TARGET_1_7 = 7;
 
-    private boolean success;
-
     private Options options;
 
     private String visibility = "private";
@@ -478,7 +476,6 @@ public final class PluginImpl extends Plugin
     @Override
     public boolean run( final Outline model, final Options options, final ErrorHandler errorHandler )
     {
-        this.success = true;
         this.options = options;
         this.methodCount = BigInteger.ZERO;
         this.constructorCount = BigInteger.ZERO;
@@ -540,7 +537,7 @@ public final class PluginImpl extends Plugin
         this.log( Level.INFO, "report", this.methodCount, this.constructorCount, this.expressionCount );
 
         this.options = null;
-        return this.success;
+        return true;
     }
 
     private int getVisibilityModifier()
