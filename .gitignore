@@ -1,8 +1,9 @@
-/cc-xjc.ipr
-/cc-xjc.iws
-/cc-xjc.iml
-/target
-/.LICENSE.txt.swp
+*.iml
+*.swp
+.idea
+.classpath
+.settings
+.project
+target
+
 /catalog.xml
-/.settings
-/.project
