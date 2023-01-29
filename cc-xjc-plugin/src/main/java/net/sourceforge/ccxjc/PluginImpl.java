@@ -1510,10 +1510,10 @@ public final class PluginImpl extends Plugin
             }
         }
 
-        Collections.sort( referencedClassInfos, new CClassInfoComparator( field.parent().parent() ) );
-        Collections.sort( referencedElementInfos, new CElementInfoComparator( field.parent().parent(), false ) );
-        Collections.sort( referencedElementInfosWithClass, new CElementInfoComparator( field.parent().parent(), true ) );
-        Collections.sort( referencedTypeInfos, new CTypeInfoComparator( field.parent().parent() ) );
+        referencedClassInfos.sort( new CClassInfoComparator( field.parent().parent() ) );
+        referencedElementInfos.sort( new CElementInfoComparator( field.parent().parent(), false ) );
+        referencedElementInfosWithClass.sort( new CElementInfoComparator( field.parent().parent(), true ) );
+        referencedTypeInfos.sort( new CTypeInfoComparator( field.parent().parent() ) );
         Collections.reverse( referencedClassInfos );
         Collections.reverse( referencedElementInfos );
         Collections.reverse( referencedElementInfosWithClass );
@@ -1803,10 +1803,10 @@ public final class PluginImpl extends Plugin
             }
         }
 
-        Collections.sort( referencedClassInfos, new CClassInfoComparator( field.parent().parent() ) );
-        Collections.sort( referencedElementInfos, new CElementInfoComparator( field.parent().parent(), false ) );
-        Collections.sort( referencedElementInfosWithClass, new CElementInfoComparator( field.parent().parent(), true ) );
-        Collections.sort( referencedTypeInfos, new CTypeInfoComparator( field.parent().parent() ) );
+        referencedClassInfos.sort( new CClassInfoComparator( field.parent().parent() ) );
+        referencedElementInfos.sort( new CElementInfoComparator( field.parent().parent(), false ) );
+        referencedElementInfosWithClass.sort( new CElementInfoComparator( field.parent().parent(), true ) );
+        referencedTypeInfos.sort( new CTypeInfoComparator( field.parent().parent() ) );
         Collections.reverse( referencedClassInfos );
         Collections.reverse( referencedElementInfos );
         Collections.reverse( referencedElementInfosWithClass );
