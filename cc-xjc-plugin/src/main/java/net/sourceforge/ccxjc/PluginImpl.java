@@ -153,8 +153,7 @@ public final class PluginImpl extends Plugin
 
     private static final String ELEMENT_SEPARATOR = ":";
 
-    private static final List<String> DEFAULT_IMMUTABLE_TYPES = Arrays.asList( new String[]
-        {
+    private static final List<String> DEFAULT_IMMUTABLE_TYPES = List.of(
             Boolean.class.getName(),
             Byte.class.getName(),
             Character.class.getName(),
@@ -171,24 +170,22 @@ public final class PluginImpl extends Plugin
             QName.class.getName(),
             Duration.class.getName(),
             Currency.class.getName()
-        } );
+        );
 
-    private static final List<String> DEFAULT_CLONEABLE_TYPES = Arrays.asList( new String[]
-        {
+    private static final List<String> DEFAULT_CLONEABLE_TYPES = List.of(
             XMLGregorianCalendar.class.getName(),
             Date.class.getName(),
             Calendar.class.getName(),
             TimeZone.class.getName(),
             Locale.class.getName()
-        } );
+        );
 
-    private static final List<String> DEFAULT_STRING_TYPES = Arrays.asList( new String[]
-        {
+    private static final List<String> DEFAULT_STRING_TYPES = List.of(
             File.class.getName(),
             URI.class.getName(),
             URL.class.getName(),
             MimeType.class.getName()
-        } );
+        );
 
     private static final Class<?>[] PRIMITIVE_ARRAY_TYPES =
     {
@@ -404,7 +401,7 @@ public final class PluginImpl extends Plugin
                 throw new BadCommandLineException( getMessage( "missingOptionArgument", IMMUTABLE_TYPES_OPTION_NAME ) );
             }
 
-            final Collection<String> types = Arrays.asList( args[i + 1].split( ELEMENT_SEPARATOR ) );
+            final String[] types = args[i + 1].split( ELEMENT_SEPARATOR );
             for ( String type : types )
             {
                 if ( type.startsWith( "@" ) )
@@ -427,7 +424,7 @@ public final class PluginImpl extends Plugin
                 throw new BadCommandLineException( getMessage( "missingOptionArgument", CLONEABLE_TYPES_OPTION_NAME ) );
             }
 
-            final Collection<String> types = Arrays.asList( args[i + 1].split( ELEMENT_SEPARATOR ) );
+            final String[] types = args[i + 1].split( ELEMENT_SEPARATOR );
 
             for ( String type : types )
             {
@@ -451,7 +448,7 @@ public final class PluginImpl extends Plugin
                 throw new BadCommandLineException( getMessage( "missingOptionArgument", STRING_TYPES_OPTION_NAME ) );
             }
 
-            final Collection<String> types = Arrays.asList( args[i + 1].split( ELEMENT_SEPARATOR ) );
+            final String[] types = args[i + 1].split( ELEMENT_SEPARATOR );
 
             for ( String type : types )
             {
@@ -2410,11 +2407,7 @@ public final class PluginImpl extends Plugin
 
                     if ( this.contextExceptions.contains( Exception.class ) )
                     {
-                        this.contextExceptions.retainAll( Arrays.asList( new Class<?>[]
-                            {
-                                Exception.class
-                            } ) );
-
+                        this.contextExceptions.retainAll( List.of( Exception.class ) );
                     }
 
                     for ( Class<?> e : this.contextExceptions )
@@ -2565,11 +2558,7 @@ public final class PluginImpl extends Plugin
 
             if ( this.contextExceptions.contains( Exception.class ) )
             {
-                this.contextExceptions.retainAll( Arrays.asList( new Class<?>[]
-                    {
-                        Exception.class
-                    } ) );
-
+                this.contextExceptions.retainAll( List.of( Exception.class ) );
             }
 
             for ( Class<?> e : this.contextExceptions )
