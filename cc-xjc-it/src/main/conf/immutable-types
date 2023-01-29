@@ -1,4 +1,3 @@
-# $Id$
 java.lang.Boolean
 java.lang.Byte
 java.lang.Character
@@ -15,6 +14,3 @@ java.util.UUID
 javax.xml.namespace.QName
 javax.xml.datatype.Duration
 java.util.Currency
-#
-
-

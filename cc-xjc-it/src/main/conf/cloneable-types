@@ -1,9 +1,5 @@
-# $Id$
 javax.xml.datatype.XMLGregorianCalendar
 java.util.Date
 java.util.Calendar
 java.util.TimeZone
 java.util.Locale
-#
-
-

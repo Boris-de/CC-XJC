@@ -24,8 +24,6 @@
  * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
  * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- * $Id$
  */
 package net.sourceforge.ccxjc.it;
 
@@ -39,7 +37,6 @@ import org.jvnet.jaxb2_commons.locator.ObjectLocator;
  * Class referenced by {@code &lt;jaxb:class ref="net.sourceforge.ccxjc.it.ReferencedClass"&gt;} test customizations.
  *
  * @author <a href="mailto:cs@schulte.it">Christian Schulte</a>
- * @version $Id$
  */
 public class ReferencedClass implements Cloneable
 {

@@ -24,8 +24,6 @@
  * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
  * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- * $Id$
  */
 package net.sourceforge.ccxjc.it;
 
@@ -38,7 +36,6 @@ import org.junit.Test;
  * Tests the {@code ChoiceComplexType} complex type.
  *
  * @author <a href="mailto:cs@schulte.it">Christian Schulte</a>
- * @version $Id$
  */
 public class ChoiceComplexTypeTest
 {
