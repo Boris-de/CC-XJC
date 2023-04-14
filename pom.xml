@@ -36,7 +36,7 @@
   <artifactId>cc-xjc</artifactId>
   <packaging>pom</packaging>
   <name>CC-XJC</name>
-  <version>3.0.1-SNAPSHOT</version>
+  <version>3.0.1</version>
   <description>JAXB 3.0 Schema to Java compiler plugin for adding a copy constructor to schema derived classes.</description>
   <url>https://cc-xjc.wcht.de</url>
   <inceptionYear>2009</inceptionYear>
@@ -77,7 +77,7 @@
     <connection>scm:git:https://github.com/Boris-de/CC-XJC.git</connection>
     <developerConnection>scm:git:git@github.com:Boris-de/CC-XJC.git</developerConnection>
     <url>https://github.com/Boris-de/CC-XJC</url>
-    <tag>HEAD</tag>
+    <tag>v3.0.1</tag>
   </scm>
   <dependencyManagement>
     <dependencies>
