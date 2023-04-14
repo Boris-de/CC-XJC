@@ -5,5 +5,5 @@
 .settings
 .project
 target
-
+/release
 /catalog.xml
