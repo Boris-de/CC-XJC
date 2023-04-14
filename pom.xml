@@ -52,7 +52,7 @@
   </properties>
   <licenses>
     <license>
-      <name>The CC-XJC Project Copyright</name>
+      <name>BSD-2-Clause style license</name>
       <url>LICENSE.txt</url>
       <distribution>repo</distribution>
     </license>
