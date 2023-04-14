@@ -38,7 +38,7 @@
       <jaxb:serializable uid="1"/>
     </jaxb:globalBindings>
     <jaxb:schemaBindings>
-      <jaxb:package name="net.sourceforge.ccxjc.it.model.pub.collections.valueclass.ccxjcit"/>
+      <jaxb:package name="net.sourceforge.ccxjc.it.model.copyable_jaxbbasics.valueclass.ccxjcit"/>
     </jaxb:schemaBindings>
     <jaxb:bindings node=".//xs:complexType[@name='RefClassCustomizationType']">
       <jaxb:class ref="net.sourceforge.ccxjc.it.ReferencedClass"/>

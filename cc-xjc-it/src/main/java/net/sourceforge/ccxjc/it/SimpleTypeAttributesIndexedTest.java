@@ -35,8 +35,8 @@ import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.namespace.QName;
 import net.sourceforge.ccxjc.it.model.priv.indexed.valueclass.ccxjcit.SimpleTypeAttributes;
 import org.apache.commons.lang.SerializationUtils;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 /**
  * Tests the {@code SimpleTypeAttributes} complex type.
@@ -150,22 +150,22 @@ public class SimpleTypeAttributesIndexedTest
 
     public void assertTestBytes( final byte[] bytes )
     {
-        Assert.assertArrayEquals( this.getTestBytes(), bytes );
+        Assertions.assertArrayEquals( this.getTestBytes(), bytes );
     }
 
     public void assertTestEntities( final String[] entities )
     {
-        Assert.assertArrayEquals( this.getTestEntities(), entities );
+        Assertions.assertArrayEquals( this.getTestEntities(), entities );
     }
 
     public void assertTestIdRefs( final Object[] idrefs )
     {
-        Assert.assertArrayEquals( this.getTestIdRefs(), idrefs );
+        Assertions.assertArrayEquals( this.getTestIdRefs(), idrefs );
     }
 
     public void assertTestTokens( final String[] tokens )
     {
-        Assert.assertArrayEquals( this.getTestTokens(), tokens );
+        Assertions.assertArrayEquals( this.getTestTokens(), tokens );
     }
 
     public SimpleTypeAttributes getTestSimpleTypeAttributes() throws DatatypeConfigurationException
@@ -224,51 +224,51 @@ public class SimpleTypeAttributesIndexedTest
 
     public void assertTestSimpleTypeAttributes( final SimpleTypeAttributes a ) throws DatatypeConfigurationException
     {
-        Assert.assertEquals( "any", a.getAnySimpleType() );
-        Assert.assertEquals( "anyURI", a.getAnyURI() );
+        Assertions.assertEquals( "any", a.getAnySimpleType() );
+        Assertions.assertEquals( "anyURI", a.getAnyURI() );
         this.assertTestBytes( a.getBase64Binary() );
-        Assert.assertTrue( a.isBoolean() );
-        Assert.assertEquals( 1, a.getByte() );
-        Assert.assertEquals( this.getTestCalendar(), a.getDate() );
-        Assert.assertEquals( this.getTestCalendar(), a.getDateTime() );
-        Assert.assertEquals( BigDecimal.TEN, a.getDecimal() );
-        Assert.assertEquals(100.0D, a.getDouble(), CommonHelper.DOUBLE_EPSILON );
-        Assert.assertEquals( this.getTestDuration(), a.getDuration() );
+        Assertions.assertTrue( a.isBoolean() );
+        Assertions.assertEquals( 1, a.getByte() );
+        Assertions.assertEquals( this.getTestCalendar(), a.getDate() );
+        Assertions.assertEquals( this.getTestCalendar(), a.getDateTime() );
+        Assertions.assertEquals( BigDecimal.TEN, a.getDecimal() );
+        Assertions.assertEquals(100.0D, a.getDouble(), CommonHelper.DOUBLE_EPSILON );
+        Assertions.assertEquals( this.getTestDuration(), a.getDuration() );
         this.assertTestEntities( a.getENTITIES() );
-        Assert.assertEquals( "ENTITY", a.getENTITY() );
-        Assert.assertEquals(100.0F, a.getFloat(), CommonHelper.FLOAT_EPSILON );
-        Assert.assertEquals( this.getTestCalendar(), a.getGDay() );
-        Assert.assertEquals( this.getTestCalendar(), a.getGMonth() );
-        Assert.assertEquals( this.getTestCalendar(), a.getGMonthDay() );
-        Assert.assertEquals( this.getTestCalendar(), a.getGYear() );
-        Assert.assertEquals( this.getTestCalendar(), a.getGYearMonth() );
+        Assertions.assertEquals( "ENTITY", a.getENTITY() );
+        Assertions.assertEquals(100.0F, a.getFloat(), CommonHelper.FLOAT_EPSILON );
+        Assertions.assertEquals( this.getTestCalendar(), a.getGDay() );
+        Assertions.assertEquals( this.getTestCalendar(), a.getGMonth() );
+        Assertions.assertEquals( this.getTestCalendar(), a.getGMonthDay() );
+        Assertions.assertEquals( this.getTestCalendar(), a.getGYear() );
+        Assertions.assertEquals( this.getTestCalendar(), a.getGYearMonth() );
         this.assertTestBytes( a.getHexBinary() );
-        Assert.assertEquals( "ID", a.getID() );
-        Assert.assertEquals( "ID", a.getIDREF() );
+        Assertions.assertEquals( "ID", a.getID() );
+        Assertions.assertEquals( "ID", a.getIDREF() );
         this.assertTestIdRefs( a.getIDREFS() );
-        Assert.assertEquals( 100, a.getInt() );
-        Assert.assertEquals( BigInteger.TEN, a.getInteger() );
-        Assert.assertEquals( "en", a.getLanguage() );
-        Assert.assertEquals( 100L, a.getLong() );
-        Assert.assertEquals( "NCName", a.getNCName() );
-        Assert.assertEquals( "NMTOKEN", a.getNMTOKEN() );
+        Assertions.assertEquals( 100, a.getInt() );
+        Assertions.assertEquals( BigInteger.TEN, a.getInteger() );
+        Assertions.assertEquals( "en", a.getLanguage() );
+        Assertions.assertEquals( 100L, a.getLong() );
+        Assertions.assertEquals( "NCName", a.getNCName() );
+        Assertions.assertEquals( "NMTOKEN", a.getNMTOKEN() );
         this.assertTestTokens( a.getNMTOKENS() );
-        Assert.assertEquals( this.getTestQName(), a.getNOTATION() );
-        Assert.assertEquals( "name", a.getName() );
-        Assert.assertEquals( BigInteger.valueOf( -100L ), a.getNegativeInteger() );
-        Assert.assertEquals( BigInteger.TEN, a.getNonNegativeInteger() );
-        Assert.assertEquals( BigInteger.valueOf( -100L ), a.getNonPositiveInteger() );
-        Assert.assertEquals( "normalized", a.getNormalizedString() );
-        Assert.assertEquals( BigInteger.TEN, a.getPositiveInteger() );
-        Assert.assertEquals( this.getTestQName(), a.getQName() );
-        Assert.assertEquals( 100, a.getShort() );
-        Assert.assertEquals( "String", a.getString() );
-        Assert.assertEquals( this.getTestCalendar(), a.getTime() );
-        Assert.assertEquals( "Token", a.getToken() );
-        Assert.assertEquals( 100, a.getUnsignedByte() );
-        Assert.assertEquals( 100, a.getUnsignedInt() );
-        Assert.assertEquals( BigInteger.TEN, a.getUnsignedLong() );
-        Assert.assertEquals( 100, a.getUnsignedShort() );
+        Assertions.assertEquals( this.getTestQName(), a.getNOTATION() );
+        Assertions.assertEquals( "name", a.getName() );
+        Assertions.assertEquals( BigInteger.valueOf( -100L ), a.getNegativeInteger() );
+        Assertions.assertEquals( BigInteger.TEN, a.getNonNegativeInteger() );
+        Assertions.assertEquals( BigInteger.valueOf( -100L ), a.getNonPositiveInteger() );
+        Assertions.assertEquals( "normalized", a.getNormalizedString() );
+        Assertions.assertEquals( BigInteger.TEN, a.getPositiveInteger() );
+        Assertions.assertEquals( this.getTestQName(), a.getQName() );
+        Assertions.assertEquals( 100, a.getShort() );
+        Assertions.assertEquals( "String", a.getString() );
+        Assertions.assertEquals( this.getTestCalendar(), a.getTime() );
+        Assertions.assertEquals( "Token", a.getToken() );
+        Assertions.assertEquals( 100, a.getUnsignedByte() );
+        Assertions.assertEquals( 100, a.getUnsignedInt() );
+        Assertions.assertEquals( BigInteger.TEN, a.getUnsignedLong() );
+        Assertions.assertEquals( 100, a.getUnsignedShort() );
     }
 
     @Test public void testSimpleTypeAttributesNull() throws Exception
@@ -346,7 +346,7 @@ public class SimpleTypeAttributesIndexedTest
         System.out.println( "Creating " + runs + " copies using copy constructor took " + copyMillis + "ms. (" +
                             ( 100L * copyMillis / serializableMillis ) + "%)" );
 
-        Assert.assertTrue( copyMillis < serializableMillis );
+        Assertions.assertTrue( copyMillis < serializableMillis );
     }
 
 }

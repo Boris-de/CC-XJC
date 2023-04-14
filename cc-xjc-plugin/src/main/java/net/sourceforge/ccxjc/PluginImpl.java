@@ -151,6 +151,8 @@ public final class PluginImpl extends Plugin
 
     private static final String COPY_NULL_COLLECTION_ELEMENTS_OPTION_NAME = "-cc-null-collection-elements";
 
+    private static final String BASICS_COPYABLE_OPTION_NAME = "-Xcopyable";
+
     private static final String ELEMENT_SEPARATOR = ":";
 
     private static final List<String> DEFAULT_IMMUTABLE_TYPES = List.of(
@@ -281,6 +283,11 @@ public final class PluginImpl extends Plugin
     public int parseArgument( final Options opt, final String[] args, final int i )
         throws BadCommandLineException, IOException
     {
+        if ( args[i].equals( BASICS_COPYABLE_OPTION_NAME ) )
+        {
+            checkCloneableParameterCompatability(args, i);
+        }
+
         final StringBuilder supportedVisibilities = new StringBuilder( 1024 ).append( '[' );
         for ( Iterator<String> it = Arrays.asList( VISIBILITY_ARGUMENTS ).iterator(); it.hasNext(); )
         {
@@ -464,6 +471,22 @@ public final class PluginImpl extends Plugin
         return 0;
     }
 
+    private void checkCloneableParameterCompatability(String[] args, int i) throws BadCommandLineException {
+        final String option = "-" + OPTION_NAME;
+        final int indexOption = Arrays.asList(args).indexOf(option);
+        if ( indexOption >= 0 )
+        {
+            if ( i > indexOption )
+            {
+                throw new BadCommandLineException( getMessage( "cloneMethodArgumentOrder", BASICS_COPYABLE_OPTION_NAME, option ) );
+            }
+            else
+            {
+                this.log( Level.WARNING, "omitCloneMethodMessage", BASICS_COPYABLE_OPTION_NAME, option );
+            }
+        }
+    }
+
     private int parseTargetJdk(String targetArg ) {
         switch ( targetArg ) {
             case "1.5":
@@ -522,20 +545,20 @@ public final class PluginImpl extends Plugin
         {
             this.warnOnReferencedSupertypes( clazz );
 
-            if ( this.getStandardConstructor( clazz ) == null )
+            if ( this.getOrCreateStandardConstructor(clazz) == null )
             {
                 this.log( Level.WARNING, "couldNotAddStdCtor", clazz.implClass.binaryName() );
             }
 
-            if ( this.getCopyConstructor( clazz ) == null )
+            if ( this.getOrCreateCopyConstructor(clazz) == null )
             {
                 this.log( Level.WARNING, "couldNotAddCopyCtor", clazz.implClass.binaryName() );
             }
 
-            /*if ( this.getCloneMethod( clazz ) == null )
+            if ( this.getOrCreateCloneMethod(clazz) == null )
             {
                 this.log( Level.WARNING, "couldNotAddMethod", "clone", clazz.implClass.binaryName() );
-            }*/
+            }
         }
 
         this.log( Level.INFO, "report", this.methodCount, this.constructorCount, this.expressionCount );
@@ -563,7 +586,7 @@ public final class PluginImpl extends Plugin
         return target <= this.targetJdk;
     }
 
-    private JMethod getStandardConstructor( final ClassOutline clazz )
+    private JMethod getOrCreateStandardConstructor(final ClassOutline clazz )
     {
         JMethod ctor = clazz.implClass.getConstructor( NO_ARGS );
         if ( ctor == null )
@@ -578,7 +601,7 @@ public final class PluginImpl extends Plugin
         return ctor;
     }
 
-    private JMethod getCopyConstructor( final ClassOutline clazz )
+    private JMethod getOrCreateCopyConstructor(final ClassOutline clazz )
     {
         JMethod ctor = clazz.implClass.getConstructor( new JType[]
             {
@@ -597,7 +620,7 @@ public final class PluginImpl extends Plugin
         return ctor;
     }
 
-    private JMethod getCloneMethod( final ClassOutline clazz )
+    private JMethod getOrCreateCloneMethod(final ClassOutline clazz )
     {
         JMethod clone = clazz.implClass.getMethod( "clone", NO_ARGS );
         if ( clone == null )

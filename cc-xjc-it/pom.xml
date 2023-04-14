@@ -104,7 +104,6 @@
                   <arg>-XtoString</arg>
                   <arg>-Xequals</arg>
                   <arg>-XhashCode</arg>
-                  <arg>-Xcopyable</arg>
                 </args>
                 <schemaDirectory>src/main/schemas</schemaDirectory>
                 <bindingDirectory>src/main/jaxb</bindingDirectory>
@@ -133,7 +132,6 @@
                   <arg>-XtoString</arg>
                   <arg>-Xequals</arg>
                   <arg>-XhashCode</arg>
-                  <arg>-Xcopyable</arg>
                 </args>
                 <schemaDirectory>src/main/schemas</schemaDirectory>
                 <bindingDirectory>src/main/jaxb</bindingDirectory>
@@ -162,7 +160,6 @@
                   <arg>-XtoString</arg>
                   <arg>-Xequals</arg>
                   <arg>-XhashCode</arg>
-                  <arg>-Xcopyable</arg>
                 </args>
                 <schemaDirectory>src/main/schemas</schemaDirectory>
                 <bindingDirectory>src/main/jaxb</bindingDirectory>
@@ -191,7 +188,6 @@
                   <arg>-XtoString</arg>
                   <arg>-Xequals</arg>
                   <arg>-XhashCode</arg>
-                  <arg>-Xcopyable</arg>
                 </args>
                 <schemaDirectory>src/main/schemas</schemaDirectory>
                 <bindingDirectory>src/main/jaxb</bindingDirectory>
@@ -221,7 +217,6 @@
                   <arg>-XtoString</arg>
                   <arg>-Xequals</arg>
                   <arg>-XhashCode</arg>
-                  <arg>-Xcopyable</arg>
                 </args>
                 <schemaDirectory>src/main/schemas</schemaDirectory>
                 <bindingDirectory>src/main/jaxb</bindingDirectory>
@@ -250,7 +245,6 @@
                   <arg>-XtoString</arg>
                   <arg>-Xequals</arg>
                   <arg>-XhashCode</arg>
-                  <arg>-Xcopyable</arg>
                 </args>
                 <schemaDirectory>src/main/schemas</schemaDirectory>
                 <bindingDirectory>src/main/jaxb</bindingDirectory>
@@ -279,7 +273,6 @@
                   <arg>-XtoString</arg>
                   <arg>-Xequals</arg>
                   <arg>-XhashCode</arg>
-                  <arg>-Xcopyable</arg>
                 </args>
                 <schemaDirectory>src/main/schemas</schemaDirectory>
                 <bindingDirectory>src/main/jaxb</bindingDirectory>
@@ -308,7 +301,6 @@
                   <arg>-XtoString</arg>
                   <arg>-Xequals</arg>
                   <arg>-XhashCode</arg>
-                  <arg>-Xcopyable</arg>
                 </args>
                 <schemaDirectory>src/main/schemas</schemaDirectory>
                 <bindingDirectory>src/main/jaxb</bindingDirectory>
@@ -338,7 +330,6 @@
                   <arg>-XtoString</arg>
                   <arg>-Xequals</arg>
                   <arg>-XhashCode</arg>
-                  <arg>-Xcopyable</arg>
                 </args>
                 <schemaDirectory>src/main/schemas</schemaDirectory>
                 <bindingDirectory>src/main/jaxb</bindingDirectory>
@@ -367,7 +358,6 @@
                   <arg>-XtoString</arg>
                   <arg>-Xequals</arg>
                   <arg>-XhashCode</arg>
-                  <arg>-Xcopyable</arg>
                 </args>
                 <schemaDirectory>src/main/schemas</schemaDirectory>
                 <bindingDirectory>src/main/jaxb</bindingDirectory>
@@ -396,7 +386,6 @@
                   <arg>-XtoString</arg>
                   <arg>-Xequals</arg>
                   <arg>-XhashCode</arg>
-                  <arg>-Xcopyable</arg>
                 </args>
                 <schemaDirectory>src/main/schemas</schemaDirectory>
                 <bindingDirectory>src/main/jaxb</bindingDirectory>
@@ -425,7 +414,6 @@
                   <arg>-XtoString</arg>
                   <arg>-Xequals</arg>
                   <arg>-XhashCode</arg>
-                  <arg>-Xcopyable</arg>
                 </args>
                 <schemaDirectory>src/main/schemas</schemaDirectory>
                 <bindingDirectory>src/main/jaxb</bindingDirectory>
@@ -455,7 +443,6 @@
                   <arg>-XtoString</arg>
                   <arg>-Xequals</arg>
                   <arg>-XhashCode</arg>
-                  <arg>-Xcopyable</arg>
                 </args>
                 <schemaDirectory>src/main/schemas</schemaDirectory>
                 <bindingDirectory>src/main/jaxb</bindingDirectory>
@@ -484,7 +471,6 @@
                   <arg>-XtoString</arg>
                   <arg>-Xequals</arg>
                   <arg>-XhashCode</arg>
-                  <arg>-Xcopyable</arg>
                 </args>
                 <schemaDirectory>src/main/schemas</schemaDirectory>
                 <bindingDirectory>src/main/jaxb</bindingDirectory>
@@ -513,7 +499,6 @@
                   <arg>-XtoString</arg>
                   <arg>-Xequals</arg>
                   <arg>-XhashCode</arg>
-                  <arg>-Xcopyable</arg>
                 </args>
                 <schemaDirectory>src/main/schemas</schemaDirectory>
                 <bindingDirectory>src/main/jaxb</bindingDirectory>
@@ -542,12 +527,41 @@
                   <arg>-XtoString</arg>
                   <arg>-Xequals</arg>
                   <arg>-XhashCode</arg>
-                  <arg>-Xcopyable</arg>
                 </args>
                 <schemaDirectory>src/main/schemas</schemaDirectory>
                 <bindingDirectory>src/main/jaxb</bindingDirectory>
                 <bindingIncludes>
                   <bindingInclude>cc-xjc-it-indexed-no-value-class-public.xjb</bindingInclude>
+                </bindingIncludes>
+                <extension>true</extension>
+                <episode>false</episode>
+                <forceRegenerate>true</forceRegenerate>
+                <verbose>true</verbose>
+              </configuration>
+            </execution>
+            <execution>
+              <!-- a test that combines jaxb-basics' "-Xcopyable" with "-copy-constructor" (ccxjc will not write a second clone()) -->
+              <id>xjc-indexed-collection-type-no-value-class-public-copyable-basics</id>
+              <phase>generate-sources</phase>
+              <goals>
+                <goal>generate</goal>
+              </goals>
+              <configuration>
+                <args>
+                  <arg>-Xcopyable</arg>
+                  <arg>-copy-constructor</arg>
+                  <arg>-cc-visibility</arg>
+                  <arg>public</arg>
+                  <arg>-cc-nullable</arg>
+                  <arg>-cc-hierarchical</arg>
+                  <arg>-XtoString</arg>
+                  <arg>-Xequals</arg>
+                  <arg>-XhashCode</arg>
+                </args>
+                <schemaDirectory>src/main/schemas</schemaDirectory>
+                <bindingDirectory>src/main/jaxb</bindingDirectory>
+                <bindingIncludes>
+                  <bindingInclude>cc-xjc-it-copyable-jaxbbasics.xjb</bindingInclude>
                 </bindingIncludes>
                 <extension>true</extension>
                 <episode>false</episode>
@@ -581,9 +595,9 @@
   </build>
   <dependencies>
     <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>4.13.2</version>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-engine</artifactId>
+      <version>5.8.2</version>
       <scope>compile</scope>
     </dependency>
     <dependency>
