@@ -200,5 +200,17 @@
       <action dev="Boris-de" type="add" issue="9" system="Github">Added option -cc-null-collection-elements</action>
       <action dev="Boris-de" type="update">Update build dependencies</action>
     </release>
+    <release version="3.0.1" date="2023-04-14" description="Fix missing clone methods">
+      <action dev="Boris-de" type="fix" issue="39" system="Github">
+        fix missing clone method on when not using -Xcopyable
+      </action>
+      <action dev="Boris-de" type="fix" issue="16" system="Github">
+        post release documentation fixes
+      </action>
+      <action dev="Boris-de" type="update" issue="8" system="Github">
+        allow build with java 17 (and add java 17 to CI build)
+      </action>
+      <action dev="dependabot" type="update">Update dependencies</action>
+    </release>
   </body>
 </document>
