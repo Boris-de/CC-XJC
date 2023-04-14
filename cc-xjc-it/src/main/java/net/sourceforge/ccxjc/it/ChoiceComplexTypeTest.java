@@ -30,7 +30,7 @@ package net.sourceforge.ccxjc.it;
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBElement;
 import net.sourceforge.ccxjc.it.model.priv.collections.valueclass.ccxjcit.ChoiceComplexType;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * Tests the {@code ChoiceComplexType} complex type.
