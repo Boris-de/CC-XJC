@@ -36,7 +36,7 @@ import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.Duration;
 import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.namespace.QName;
-import net.sourceforge.ccxjc.it.model.priv.collections.valueclass.ccxjcit.SimpleTypeAttributes;
+import net.sourceforge.ccxjc.it.model.copyable_jaxbbasics.valueclass.ccxjcit.SimpleTypeAttributes;
 import org.apache.commons.lang.SerializationUtils;
 import org.junit.Assert;
 import org.junit.Test;

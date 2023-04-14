@@ -151,6 +151,8 @@ public final class PluginImpl extends Plugin
 
     private static final String COPY_NULL_COLLECTION_ELEMENTS_OPTION_NAME = "-cc-null-collection-elements";
 
+    private static final String BASICS_COPYABLE_OPTION_NAME = "-Xcopyable";
+
     private static final String ELEMENT_SEPARATOR = ":";
 
     private static final List<String> DEFAULT_IMMUTABLE_TYPES = List.of(
@@ -281,6 +283,11 @@ public final class PluginImpl extends Plugin
     public int parseArgument( final Options opt, final String[] args, final int i )
         throws BadCommandLineException, IOException
     {
+        if ( args[i].equals( BASICS_COPYABLE_OPTION_NAME ) )
+        {
+            checkCloneableParameterCompatability(args, i);
+        }
+
         final StringBuilder supportedVisibilities = new StringBuilder( 1024 ).append( '[' );
         for ( Iterator<String> it = Arrays.asList( VISIBILITY_ARGUMENTS ).iterator(); it.hasNext(); )
         {
@@ -464,6 +471,22 @@ public final class PluginImpl extends Plugin
         return 0;
     }
 
+    private void checkCloneableParameterCompatability(String[] args, int i) throws BadCommandLineException {
+        final String option = "-" + OPTION_NAME;
+        final int indexOption = Arrays.asList(args).indexOf(option);
+        if ( indexOption >= 0 )
+        {
+            if ( i > indexOption )
+            {
+                throw new BadCommandLineException( getMessage( "cloneMethodArgumentOrder", BASICS_COPYABLE_OPTION_NAME, option ) );
+            }
+            else
+            {
+                this.log( Level.WARNING, "omitCloneMethodMessage", BASICS_COPYABLE_OPTION_NAME, option );
+            }
+        }
+    }
+
     private int parseTargetJdk(String targetArg ) {
         switch ( targetArg ) {
             case "1.5":
@@ -532,10 +555,10 @@ public final class PluginImpl extends Plugin
                 this.log( Level.WARNING, "couldNotAddCopyCtor", clazz.implClass.binaryName() );
             }
 
-            /*if ( this.getOrCreateCloneMethod(clazz) == null )
+            if ( this.getOrCreateCloneMethod(clazz) == null )
             {
                 this.log( Level.WARNING, "couldNotAddMethod", "clone", clazz.implClass.binaryName() );
-            }*/
+            }
         }
 
         this.log( Level.INFO, "report", this.methodCount, this.constructorCount, this.expressionCount );
