@@ -522,17 +522,17 @@ public final class PluginImpl extends Plugin
         {
             this.warnOnReferencedSupertypes( clazz );
 
-            if ( this.getStandardConstructor( clazz ) == null )
+            if ( this.getOrCreateStandardConstructor(clazz) == null )
             {
                 this.log( Level.WARNING, "couldNotAddStdCtor", clazz.implClass.binaryName() );
             }
 
-            if ( this.getCopyConstructor( clazz ) == null )
+            if ( this.getOrCreateCopyConstructor(clazz) == null )
             {
                 this.log( Level.WARNING, "couldNotAddCopyCtor", clazz.implClass.binaryName() );
             }
 
-            /*if ( this.getCloneMethod( clazz ) == null )
+            /*if ( this.getOrCreateCloneMethod(clazz) == null )
             {
                 this.log( Level.WARNING, "couldNotAddMethod", "clone", clazz.implClass.binaryName() );
             }*/
@@ -563,7 +563,7 @@ public final class PluginImpl extends Plugin
         return target <= this.targetJdk;
     }
 
-    private JMethod getStandardConstructor( final ClassOutline clazz )
+    private JMethod getOrCreateStandardConstructor(final ClassOutline clazz )
     {
         JMethod ctor = clazz.implClass.getConstructor( NO_ARGS );
         if ( ctor == null )
@@ -578,7 +578,7 @@ public final class PluginImpl extends Plugin
         return ctor;
     }
 
-    private JMethod getCopyConstructor( final ClassOutline clazz )
+    private JMethod getOrCreateCopyConstructor(final ClassOutline clazz )
     {
         JMethod ctor = clazz.implClass.getConstructor( new JType[]
             {
@@ -597,7 +597,7 @@ public final class PluginImpl extends Plugin
         return ctor;
     }
 
-    private JMethod getCloneMethod( final ClassOutline clazz )
+    private JMethod getOrCreateCloneMethod(final ClassOutline clazz )
     {
         JMethod clone = clazz.implClass.getMethod( "clone", NO_ARGS );
         if ( clone == null )
