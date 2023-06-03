@@ -5,8 +5,10 @@ updates:
     schedule:
       interval: "monthly"
       day: "saturday"
+    open-pull-requests-limit: 15
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
       interval: "monthly"
       day: "saturday"
+    open-pull-requests-limit: 15
