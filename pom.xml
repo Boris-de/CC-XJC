@@ -45,7 +45,7 @@
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <java.version>11</java.version>
     <version.jaxb2_commons-basics>3.0.0</version.jaxb2_commons-basics>
-    <version.jaxb>4.0.3</version.jaxb>
+    <version.jaxb>4.0.4</version.jaxb>
     <buildNumber /><!-- set by build-helper-maven-plugin -->
     <maven.version /><!-- set by build-helper-maven-plugin -->
     <ccxjc.gpg.keyname /><!-- should be set in settings.xml -->
