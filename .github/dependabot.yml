@@ -6,9 +6,14 @@ updates:
       interval: "monthly"
       day: "saturday"
     open-pull-requests-limit: 15
+    groups:
+      all-maven:
+        patterns: [ "*" ]
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
       interval: "monthly"
       day: "saturday"
-    open-pull-requests-limit: 15
+    groups:
+      all-actions:
+        patterns: [ "*" ]
