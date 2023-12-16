@@ -121,7 +121,6 @@
             <source>${java.version}</source>
             <target>${java.version}</target>
             <debug>true</debug>
-            <optimize>true</optimize>
             <showDeprecation>true</showDeprecation>
             <showWarnings>true</showWarnings>
           </configuration>
@@ -293,13 +292,6 @@
           <artifactId>build-helper-maven-plugin</artifactId>
           <version>3.5.0</version>
           <executions>
-            <execution>
-              <id>default-maven-version</id>
-              <phase>initialize</phase>
-              <goals>
-                <goal>maven-version</goal>
-              </goals>
-            </execution>
             <execution>
               <id>default-timestamp-property</id>
               <phase>initialize</phase>
