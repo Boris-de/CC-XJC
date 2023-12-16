@@ -35,7 +35,7 @@ jobs:
       run: mvn -B package verify javadoc:jar source:jar site
 
     - name: Archive installer
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: cc-xjc-plugin.jar
         path: ./cc-xjc-plugin/target/cc-xjc-plugin-*.jar
