@@ -120,6 +120,7 @@
           <configuration>
             <source>${java.version}</source>
             <target>${java.version}</target>
+            <release>${java.version}</release>
             <debug>true</debug>
             <showDeprecation>true</showDeprecation>
             <showWarnings>true</showWarnings>
