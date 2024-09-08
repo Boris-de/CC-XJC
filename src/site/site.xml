@@ -34,8 +34,8 @@
          name="${project.name}">
   <skin>
     <groupId>org.apache.maven.skins</groupId>
-    <artifactId>maven-classic-skin</artifactId>
-    <version>1.0</version>
+    <artifactId>maven-fluido-skin</artifactId>
+    <version>2.0.0-M10</version>
   </skin>
   <body>
     <head>
