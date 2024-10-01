@@ -109,7 +109,7 @@
       <dependency>
         <groupId>org.junit</groupId>
         <artifactId>junit-bom</artifactId>
-        <version>5.11.0</version>
+        <version>5.11.1</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -222,7 +222,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-javadoc-plugin</artifactId>
-          <version>3.10.0</version>
+          <version>3.10.1</version>
           <configuration>
             <bottom><![CDATA[<div>Copyright &#169; {inceptionYear}-{currentYear} {organizationName}. All Rights Reserved. <a href="https://ccxjc.wcht.de">Get CC-XJC</a></div>]]></bottom>
             <breakiterator>true</breakiterator>
@@ -262,7 +262,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-gpg-plugin</artifactId>
-          <version>3.2.5</version>
+          <version>3.2.7</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
