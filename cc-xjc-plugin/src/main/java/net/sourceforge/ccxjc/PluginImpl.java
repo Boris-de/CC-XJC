@@ -537,20 +537,11 @@ public final class PluginImpl extends Plugin
         {
             this.warnOnReferencedSupertypes( clazz );
 
-            if ( this.getOrCreateStandardConstructor(clazz) == null )
-            {
-                this.log( Level.WARNING, "couldNotAddStdCtor", clazz.implClass.binaryName() );
-            }
+            this.getOrCreateStandardConstructor(clazz);
 
-            if ( this.getOrCreateCopyConstructor(clazz) == null )
-            {
-                this.log( Level.WARNING, "couldNotAddCopyCtor", clazz.implClass.binaryName() );
-            }
+            this.getOrCreateCopyConstructor(clazz);
 
-            if ( this.getOrCreateCloneMethod(clazz) == null )
-            {
-                this.log( Level.WARNING, "couldNotAddMethod", "clone", clazz.implClass.binaryName() );
-            }
+            this.getOrCreateCloneMethod(clazz);
         }
 
         this.log( Level.INFO, "report", this.methodCount, this.constructorCount, this.expressionCount );
@@ -579,22 +570,20 @@ public final class PluginImpl extends Plugin
         return target <= this.targetJdk;
     }
 
-    private JMethod getOrCreateStandardConstructor(final ClassOutline clazz )
+    private void getOrCreateStandardConstructor(final ClassOutline clazz )
     {
         JMethod ctor = clazz.implClass.getConstructor( NO_ARGS );
         if ( ctor == null )
         {
-            ctor = this.generateStandardConstructor( clazz );
+            this.generateStandardConstructor(clazz);
         }
         else
         {
             this.log( Level.WARNING, "standardCtorExists", clazz.implClass.binaryName() );
         }
-
-        return ctor;
     }
 
-    private JMethod getOrCreateCopyConstructor(final ClassOutline clazz )
+    private void getOrCreateCopyConstructor(final ClassOutline clazz )
     {
         JMethod ctor = clazz.implClass.getConstructor( new JType[]
             {
@@ -603,29 +592,26 @@ public final class PluginImpl extends Plugin
 
         if ( ctor == null )
         {
-            ctor = this.generateCopyConstructor( clazz );
+            this.generateCopyConstructor(clazz);
         }
         else
         {
             this.log( Level.WARNING, "copyCtorExists", clazz.implClass.binaryName() );
         }
 
-        return ctor;
     }
 
-    private JMethod getOrCreateCloneMethod(final ClassOutline clazz )
+    private void getOrCreateCloneMethod(final ClassOutline clazz )
     {
         JMethod clone = clazz.implClass.getMethod( "clone", NO_ARGS );
         if ( clone == null )
         {
-            clone = this.generateCloneMethod( clazz );
+            this.generateCloneMethod(clazz);
         }
         else
         {
             this.log( Level.WARNING, "methodExists", "clone", clazz.implClass.binaryName() );
         }
-
-        return clone;
     }
 
     private JMethod getPropertyGetter( final FieldOutline f )
@@ -2283,17 +2269,16 @@ public final class PluginImpl extends Plugin
         return JExpr.cast( jType, this.getCopyOfObjectInvocation( fieldOutline.parent() ).arg( source ) );
     }
 
-    private JMethod generateStandardConstructor( final ClassOutline clazz )
+    private void generateStandardConstructor(final ClassOutline clazz )
     {
         final JMethod ctor = clazz.implClass.constructor( JMod.PUBLIC );
         ctor.body().directStatement( "// " + getMessage( "title" ) );
         ctor.body().invoke( "super" );
         ctor.javadoc().add( "Creates a new {@code " + clazz.implClass.name() + "} instance." );
         this.constructorCount = this.constructorCount.add( BigInteger.ONE );
-        return ctor;
     }
 
-    private JMethod generateCopyConstructor( final ClassOutline clazz )
+    private void generateCopyConstructor(final ClassOutline clazz )
     {
         final JMethod ctor = clazz.implClass.constructor( JMod.PUBLIC );
         final JClass paramClass = this.hierarchical ? this.getSupertype( clazz.implClass ) : clazz.implClass;
@@ -2444,7 +2429,6 @@ public final class PluginImpl extends Plugin
         }
 
         this.constructorCount = this.constructorCount.add( BigInteger.ONE );
-        return ctor;
     }
 
     private void warnOnReferencedSupertypes( final ClassOutline clazz )
@@ -2489,7 +2473,7 @@ public final class PluginImpl extends Plugin
         return clazz;
     }
 
-    private JMethod generateCloneMethod( final ClassOutline clazz )
+    private void generateCloneMethod(final ClassOutline clazz )
     {
         final JMethod cloneMethod = clazz.implClass.method( JMod.PUBLIC, clazz.implClass, "clone" );
         cloneMethod.annotate( Override.class );
@@ -2582,7 +2566,6 @@ public final class PluginImpl extends Plugin
         }
 
         this.methodCount = this.methodCount.add( BigInteger.ONE );
-        return cloneMethod;
     }
 
     private void generateCopyOfProperty( final FieldOutline field, final JExpression targetExpr,
