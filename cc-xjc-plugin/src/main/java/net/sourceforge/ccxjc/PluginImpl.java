@@ -49,23 +49,19 @@ import com.sun.tools.xjc.BadCommandLineException;
 import com.sun.tools.xjc.Options;
 import com.sun.tools.xjc.Plugin;
 import com.sun.tools.xjc.generator.bean.ImplStructureStrategy;
-import com.sun.tools.xjc.model.CAdapter;
 import com.sun.tools.xjc.model.CArrayInfo;
 import com.sun.tools.xjc.model.CBuiltinLeafInfo;
 import com.sun.tools.xjc.model.CClassInfo;
-import com.sun.tools.xjc.model.CCustomizations;
 import com.sun.tools.xjc.model.CElementInfo;
 import com.sun.tools.xjc.model.CEnumLeafInfo;
 import com.sun.tools.xjc.model.CNonElement;
 import com.sun.tools.xjc.model.CTypeInfo;
 import com.sun.tools.xjc.model.CWildcardTypeInfo;
-import com.sun.tools.xjc.model.nav.NType;
 import com.sun.tools.xjc.outline.Aspect;
 import com.sun.tools.xjc.outline.ClassOutline;
 import com.sun.tools.xjc.outline.FieldOutline;
 import com.sun.tools.xjc.outline.Outline;
-import com.sun.xml.xsom.XSComponent;
-import com.sun.xml.xsom.XmlString;
+
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -91,7 +87,6 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Currency;
 import java.util.Date;
 import java.util.HashSet;
@@ -108,12 +103,8 @@ import javax.xml.datatype.Duration;
 import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.namespace.QName;
 
-import org.glassfish.jaxb.core.v2.model.annotation.Locatable;
-import org.glassfish.jaxb.core.v2.model.core.ID;
-import org.glassfish.jaxb.core.v2.runtime.Location;
 import org.w3c.dom.Element;
 import org.xml.sax.ErrorHandler;
-import org.xml.sax.Locator;
 
 import jakarta.activation.MimeType;
 import jakarta.xml.bind.JAXBElement;
@@ -2811,215 +2802,6 @@ public final class PluginImpl extends Plugin
                 System.err.println( b );
             }
         }
-    }
-
-}
-
-class CClassInfoComparator implements Comparator<CClassInfo>
-{
-
-    private final Outline outline;
-
-    CClassInfoComparator( final Outline outline )
-    {
-        this.outline = outline;
-    }
-
-    public int compare( final CClassInfo o1, final CClassInfo o2 )
-    {
-        final JClass javaClass1 = o1.toType( this.outline, Aspect.IMPLEMENTATION );
-        final JClass javaClass2 = o2.toType( this.outline, Aspect.IMPLEMENTATION );
-
-        int ret = 0;
-
-        if ( !javaClass1.binaryName().equals( javaClass2.binaryName() ) )
-        {
-            if ( javaClass1.isAssignableFrom( javaClass2 ) )
-            {
-                ret = -1;
-            }
-            else if ( javaClass2.isAssignableFrom( javaClass1 ) )
-            {
-                ret = 1;
-            }
-        }
-
-        return ret;
-    }
-
-}
-
-class CElementInfoComparator implements Comparator<CElementInfo>
-{
-
-    private final Outline outline;
-
-    private final boolean hasClass;
-
-    CElementInfoComparator( final Outline outline, final boolean hasClass )
-    {
-        this.outline = outline;
-        this.hasClass = hasClass;
-    }
-
-    public int compare( final CElementInfo o1, final CElementInfo o2 )
-    {
-        final JClass javaClass1;
-        final JClass javaClass2;
-
-        if ( this.hasClass )
-        {
-            javaClass1 = (JClass) o1.toType( this.outline, Aspect.IMPLEMENTATION );
-            javaClass2 = (JClass) o2.toType( this.outline, Aspect.IMPLEMENTATION );
-        }
-        else
-        {
-            javaClass1 = (JClass) o1.getContentType().toType( this.outline, Aspect.IMPLEMENTATION );
-            javaClass2 = (JClass) o2.getContentType().toType( this.outline, Aspect.IMPLEMENTATION );
-        }
-
-        int ret = 0;
-
-        if ( !javaClass1.binaryName().equals( javaClass2.binaryName() ) )
-        {
-            if ( javaClass1.isAssignableFrom( javaClass2 ) )
-            {
-                ret = -1;
-            }
-            else if ( javaClass2.isAssignableFrom( javaClass1 ) )
-            {
-                ret = 1;
-            }
-        }
-
-        return ret;
-    }
-
-}
-
-class CTypeInfoComparator implements Comparator<CTypeInfo>
-{
-
-    private final Outline outline;
-
-    CTypeInfoComparator( final Outline outline )
-    {
-        this.outline = outline;
-    }
-
-    public int compare( final CTypeInfo o1, final CTypeInfo o2 )
-    {
-        final JType javaType1 = o1.toType( this.outline, Aspect.IMPLEMENTATION );
-        final JType javaType2 = o2.toType( this.outline, Aspect.IMPLEMENTATION );
-
-        int ret = 0;
-
-        if ( !javaType1.binaryName().equals( javaType2.binaryName() ) && javaType1 instanceof JClass
-             && javaType2 instanceof JClass )
-        {
-            if ( ( (JClass) javaType1 ).isAssignableFrom( (JClass) javaType2 ) )
-            {
-                ret = -1;
-            }
-            else if ( ( (JClass) javaType2 ).isAssignableFrom( (JClass) javaType1 ) )
-            {
-                ret = 1;
-            }
-        }
-
-        return ret;
-    }
-
-}
-
-class CAdapterInfo implements CTypeInfo
-{
-
-    private final CAdapter adapter;
-
-    CAdapterInfo( final CAdapter adapter )
-    {
-        this.adapter = adapter;
-    }
-
-    public JType toType( final Outline o, final Aspect aspect )
-    {
-        return this.adapter.customType.toType( o, aspect );
-    }
-
-    public NType getType()
-    {
-        return this.adapter.customType;
-    }
-
-    public boolean canBeReferencedByIDREF()
-    {
-        return false;
-    }
-
-    public Locatable getUpstream()
-    {
-        return null;
-    }
-
-    public Location getLocation()
-    {
-        return null;
-    }
-
-    public CCustomizations getCustomizations()
-    {
-        return null;
-    }
-
-    public Locator getLocator()
-    {
-        return null;
-    }
-
-    public XSComponent getSchemaComponent()
-    {
-        return null;
-    }
-
-    public QName getTypeName()
-    {
-        throw new UnsupportedOperationException( "Not supported yet." );
-    }
-
-    public boolean isSimpleType()
-    {
-        throw new UnsupportedOperationException( "Not supported yet." );
-    }
-
-    public boolean isCollection()
-    {
-        return false;
-    }
-
-    public CAdapter getAdapterUse()
-    {
-        return this.adapter;
-    }
-
-    public CTypeInfo getInfo()
-    {
-        return this;
-    }
-
-    public ID idUse()
-    {
-        return null;
-    }
-
-    public MimeType getExpectedMimeType()
-    {
-        return null;
-    }
-
-    public JExpression createConstant( Outline outline, XmlString lexical )
-    {
-        return null;
     }
 
 }
