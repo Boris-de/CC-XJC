@@ -88,6 +88,7 @@ import javax.xml.datatype.Duration;
 import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.namespace.QName;
 
+import org.jspecify.annotations.Nullable;
 import org.w3c.dom.Element;
 import org.xml.sax.ErrorHandler;
 
@@ -195,7 +196,7 @@ public final class PluginImpl extends Plugin
 
     private static final int DEFAULT_TARGET_JDK = TARGET_1_5;
 
-    private Options options;
+    private @Nullable Options options;
 
     private String visibility = "private";
 
@@ -213,11 +214,11 @@ public final class PluginImpl extends Plugin
 
     private final List<String> stringTypes = new ArrayList<>( 64 );
 
-    private BigInteger methodCount;
+    private BigInteger methodCount = BigInteger.ZERO;
 
-    private BigInteger constructorCount;
+    private BigInteger constructorCount = BigInteger.ZERO;
 
-    private BigInteger expressionCount;
+    private BigInteger expressionCount = BigInteger.ZERO;
 
     private final Set<Class<?>> contextExceptions = new HashSet<>();
 
@@ -599,7 +600,7 @@ public final class PluginImpl extends Plugin
         }
     }
 
-    private JMethod getPropertyGetter( final FieldOutline f )
+    private @Nullable JMethod getPropertyGetter( final FieldOutline f )
     {
         final JDefinedClass clazz = f.parent().implClass;
         final String name = f.getPropertyInfo().getName( true );
@@ -613,7 +614,7 @@ public final class PluginImpl extends Plugin
         return getter;
     }
 
-    private FieldOutline getFieldOutline( final ClassOutline clazz, final String fieldName )
+    private @Nullable FieldOutline getFieldOutline( final ClassOutline clazz, final String fieldName )
     {
         for ( FieldOutline f : clazz.getDeclaredFields() )
         {
@@ -2014,7 +2015,7 @@ public final class PluginImpl extends Plugin
       return typeCheckExpr;
     }
 
-    private JExpression getCopyExpressionForCollection(final FieldOutline field, final JVar next,
+    private @Nullable JExpression getCopyExpressionForCollection(final FieldOutline field, final JVar next,
         CTypeInfo classInfo, final JType javaType, final JConditional ifInstanceOf) {
       JExpression copyExpr = this.getCopyExpression(
           field, classInfo, ifInstanceOf._then(), JExpr.cast( javaType, next ), false );
@@ -2026,7 +2027,7 @@ public final class PluginImpl extends Plugin
       return copyExpr;
     }
 
-    private JExpression getCopyExpression( final FieldOutline fieldOutline, final CTypeInfo type,
+    private @Nullable JExpression getCopyExpression( final FieldOutline fieldOutline, final CTypeInfo type,
                                            final JBlock block, final JExpression sourceExpr,
                                            final boolean sourceMaybeNull )
     {

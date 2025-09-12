@@ -10,8 +10,10 @@ import com.sun.tools.xjc.outline.Outline;
 import com.sun.xml.xsom.XSComponent;
 import org.glassfish.jaxb.core.v2.model.annotation.Locatable;
 import org.glassfish.jaxb.core.v2.runtime.Location;
+import org.jspecify.annotations.NullUnmarked;
 import org.xml.sax.Locator;
 
+@NullUnmarked
 class CAdapterInfo implements CTypeInfo {
 
     private final CAdapter adapter;
