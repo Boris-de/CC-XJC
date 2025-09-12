@@ -249,6 +249,7 @@ public final class PluginImpl extends Plugin
     {
         final String n = System.getProperty( "line.separator", "\n" );
 
+        //noinspection StringBufferReplaceableByString
         return new StringBuilder( 1024 ).append( "  -" ).append( OPTION_NAME ).append( "  :  " ).
             append( getMessage( "usage" ) ).append( n ).
             append( "  " ).append( VISIBILITY_OPTION_NAME ).append( "     :  " ).
@@ -395,7 +396,7 @@ public final class PluginImpl extends Plugin
                 {
                     this.immutableTypes.addAll( this.readTypes( type.substring( 1 ) ) );
                 }
-                else if ( type.trim().length() > 0 )
+                else if ( !type.trim().isEmpty() )
                 {
                     this.immutableTypes.add( type );
                 }
@@ -419,7 +420,7 @@ public final class PluginImpl extends Plugin
                 {
                     this.cloneableTypes.addAll( this.readTypes( type.substring( 1 ) ) );
                 }
-                else if ( type.trim().length() > 0 )
+                else if ( !type.trim().isEmpty() )
                 {
                     this.cloneableTypes.add( type );
                 }
@@ -443,7 +444,7 @@ public final class PluginImpl extends Plugin
                 {
                     this.stringTypes.addAll( this.readTypes( type.substring( 1 ) ) );
                 }
-                else if ( type.trim().length() > 0 )
+                else if ( !type.trim().isEmpty() )
                 {
                     this.stringTypes.add( type );
                 }
@@ -572,6 +573,7 @@ public final class PluginImpl extends Plugin
         }
     }
 
+    @SuppressWarnings("SameParameterValue")
     private boolean isTargetSupported( final int target )
     {
         return target <= this.targetJdk;
@@ -1272,6 +1274,7 @@ public final class PluginImpl extends Plugin
                 JExpr.cast( element.getContentType().toType( fieldOutline.parent().parent(), Aspect.IMPLEMENTATION ),
                             JExpr.invoke( e, "getValue" ) ), true ) );
 
+            //noinspection ConstantValue
             needsToCatchException = needsToCatchException || this.tryCatchCopyExpression;
         }
         else
@@ -1391,6 +1394,7 @@ public final class PluginImpl extends Plugin
         final JExpression copyExpr = this.getCopyExpression(
             fieldOutline, array.getItemType(), forEachItem.body(), a.component( i ), true );
 
+        //noinspection ConstantValue
         needsToCatchException = needsToCatchException || this.tryCatchCopyExpression;
 
         forEachItem.body().assign( copy.component( i ), copyExpr );
@@ -1456,9 +1460,6 @@ public final class PluginImpl extends Plugin
         body.directStatement( "// " + getMessage( "title" ) );
 
         final JConditional sourceNotNull = body._if( source.ne( JExpr._null() ) );
-
-//        m.body()._if( source.eq( JExpr._null() ) )._then()._throw( JExpr._new( nullPointerException ).arg( "source" ) );
-//        m.body()._if( target.eq( JExpr._null() ) )._then()._throw( JExpr._new( nullPointerException ).arg( "target" ) );
 
         final List<CClassInfo> referencedClassInfos =
           new ArrayList<>( field.getPropertyInfo().ref().size() );
@@ -1737,9 +1738,6 @@ public final class PluginImpl extends Plugin
         {
             m.javadoc().addParam( target ).append( "The target to copy {@code source} to." );
             m.javadoc().addThrows( nullPointerException ).append( "if {@code target} is {@code null}." );
-//            m.body()._if( target.eq( JExpr._null() ) )._then()._throw(
-//                JExpr._new( nullPointerException ).arg( "target" ) );
-
         }
         else
         {
@@ -1749,9 +1747,6 @@ public final class PluginImpl extends Plugin
         m.annotate( SuppressWarnings.class ).param( "value", "unchecked" );
 
         final JBlock body = new JBlock( false, false );
-
-//        m.body()._if( source.eq( JExpr._null() ) )._then()._throw( JExpr._new( nullPointerException ).arg( "source" ) );
-//        m.body()._if( target.eq( JExpr._null() ) )._then()._throw( JExpr._new( nullPointerException ).arg( "target" ) );
 
         final List<CClassInfo> referencedClassInfos =
           new ArrayList<>( field.getPropertyInfo().ref().size() );
@@ -2669,6 +2664,7 @@ public final class PluginImpl extends Plugin
                         : JExpr.cast( javaType, JExpr.invoke( sourceExpr, getter ) );
 
                     copyExpr = this.getCopyExpression( field, typeInfo, block, source, true );
+                    //noinspection ConstantValue
                     needsToCatchException = needsToCatchException || this.tryCatchCopyExpression;
                 }
 
@@ -2764,7 +2760,7 @@ public final class PluginImpl extends Plugin
                 continue;
             }
 
-            if ( line.trim().length() > 0 )
+            if ( !line.trim().isEmpty() )
             {
                 types.add( line.trim() );
             }
