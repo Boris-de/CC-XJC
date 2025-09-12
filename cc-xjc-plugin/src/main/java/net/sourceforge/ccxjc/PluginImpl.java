@@ -82,22 +82,7 @@ import java.math.BigInteger;
 import java.net.URI;
 import java.net.URL;
 import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Currency;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Locale;
-import java.util.ResourceBundle;
-import java.util.Set;
-import java.util.TimeZone;
-import java.util.UUID;
+import java.util.*;
 import java.util.logging.Level;
 import javax.xml.datatype.Duration;
 import javax.xml.datatype.XMLGregorianCalendar;
@@ -1664,7 +1649,8 @@ public final class PluginImpl extends Plugin
         final String methodName;
         final JType[] signature;
 
-        if ( field.getRawType().isArray() )
+        boolean isArray = field.getRawType().isArray();
+        if (isArray)
         {
             methodName = "copyOf" + field.getPropertyInfo().getName( true );
             signature = new JType[]
@@ -1699,7 +1685,7 @@ public final class PluginImpl extends Plugin
         final JClass assertionError = field.parent().parent().getCodeModel().ref( AssertionError.class );
 
         final JMethod m;
-        if ( field.getRawType().isArray() )
+        if (isArray)
         {
             m = field.parent().implClass.method( this.getVisibilityModifier() | JMod.STATIC, field.getRawType(),
                                                  methodName );
@@ -1711,7 +1697,7 @@ public final class PluginImpl extends Plugin
         }
 
         final JVar source = m.param( JMod.FINAL, field.getRawType(), "source" );
-        final JVar target = field.getRawType().isArray() ? null : m.param( JMod.FINAL, field.getRawType(), "target" );
+        final JVar target = isArray ? null : m.param( JMod.FINAL, field.getRawType(), "target" );
 
         m.body().directStatement( "// " + getMessage( "title" ) );
 
@@ -1720,7 +1706,7 @@ public final class PluginImpl extends Plugin
 
         m.javadoc().addParam( source ).append( "The source to copy from." );
 
-        if ( !field.getRawType().isArray() )
+        if ( !isArray)
         {
             m.javadoc().addParam( target ).append( "The target to copy {@code source} to." );
             m.javadoc().addThrows( nullPointerException ).append( "if {@code target} is {@code null}." );
@@ -1815,7 +1801,7 @@ public final class PluginImpl extends Plugin
         final JVar copy;
         final JConditional sourceNotEmpty;
 
-        if ( field.getRawType().isArray() )
+        if (isArray)
         {
             sourceNotEmpty = body._if( source.ne( JExpr._null() ).cand( source.ref( "length" ).gt( JExpr.lit( 0 ) ) ) );
             copy = sourceNotEmpty._then().decl( JMod.FINAL, source.type(), "copy", JExpr.cast(
@@ -1865,7 +1851,7 @@ public final class PluginImpl extends Plugin
                     }
                     else
                     {
-                        if ( field.getRawType().isArray() )
+                        if (isArray)
                         {
                             ifInstanceOf._then().assign( copy.component( it ), copyExpr );
                         }
@@ -1906,7 +1892,7 @@ public final class PluginImpl extends Plugin
                     }
                     else
                     {
-                        if ( field.getRawType().isArray() )
+                        if (isArray)
                         {
                             ifInstanceOf._then().assign( copy.component( it ), copyExpr );
                         }
@@ -1943,7 +1929,7 @@ public final class PluginImpl extends Plugin
             }
             else
             {
-                if ( field.getRawType().isArray() )
+                if (isArray)
                 {
                     ifInstanceOf._then().assign( copy.component( it ), copyExpr );
                 }
@@ -1973,7 +1959,7 @@ public final class PluginImpl extends Plugin
             }
             else
             {
-                if ( field.getRawType().isArray() )
+                if (isArray)
                 {
                     ifInstanceOf._then().assign( copy.component( it ), copyExpr );
                 }
@@ -1991,7 +1977,7 @@ public final class PluginImpl extends Plugin
             next ).plus( JExpr.lit( "' for property '" + field.getPropertyInfo().getName( true ) + "' of class '"
                                     + field.parent().implClass.binaryName() + "'." ) ) ) );
 
-        if ( field.getRawType().isArray() )
+        if (isArray)
         {
             sourceNotEmpty._then()._return( copy );
             body._return( JExpr._null() );
