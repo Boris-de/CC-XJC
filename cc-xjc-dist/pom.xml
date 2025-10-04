@@ -97,6 +97,10 @@
                   <descriptor>src/main/assembly/bin.xml</descriptor>
                 </descriptors>
                 <finalName>cc-xjc-${project.version}</finalName>
+                <overrideUid>0</overrideUid>
+                <overrideUserName>root</overrideUserName>
+                <overrideGid>0</overrideGid>
+                <overrideGroupName>root</overrideGroupName>
               </configuration>
             </execution>
           </executions>
