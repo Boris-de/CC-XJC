@@ -30,7 +30,7 @@ jobs:
       run: mvn --batch-mode clean package verify javadoc:jar source:jar site
 
     - name: Archive plugin jar
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v5
       with:
         path: ./cc-xjc-dist/target/cc-xjc-*
 
