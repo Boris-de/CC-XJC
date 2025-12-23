@@ -17,7 +17,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v5
+    - uses: actions/checkout@v6
 
     - name: Set up JDK
       uses: actions/setup-java@v5
@@ -30,7 +30,7 @@ jobs:
       run: mvn --batch-mode clean package verify javadoc:jar source:jar site
 
     - name: Archive plugin jar
-      uses: actions/upload-artifact@v5
+      uses: actions/upload-artifact@v6
       with:
         path: ./cc-xjc-dist/target/cc-xjc-*
 
@@ -42,7 +42,7 @@ jobs:
         java: [ '11', '17', '21', '25' ]
 
     steps:
-    - uses: actions/checkout@v5
+    - uses: actions/checkout@v6
 
     - name: Set up JDK
       uses: actions/setup-java@v5
