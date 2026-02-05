@@ -30,6 +30,7 @@
 package net.sourceforge.ccxjc;
 
 import com.sun.codemodel.JBlock;
+import com.sun.codemodel.JCast;
 import com.sun.codemodel.JCatchBlock;
 import com.sun.codemodel.JClass;
 import com.sun.codemodel.JConditional;
@@ -1184,6 +1185,7 @@ public final class PluginImpl extends Plugin
         };
 
         final String methodName;
+        CNonElement elementContentType = element.getContentType();
         if ( element.hasClass() )
         {
             methodName = "copyOf" + element.shortName();
@@ -1191,7 +1193,7 @@ public final class PluginImpl extends Plugin
         else
         {
             methodName = "copyOf" + this.getMethodNamePart(
-                element.getContentType().toType( fieldOutline.parent().parent(), Aspect.IMPLEMENTATION ) ) + "Element";
+                elementContentType.toType( fieldOutline.parent().parent(), Aspect.IMPLEMENTATION ) ) + "Element";
 
         }
 
@@ -1239,12 +1241,13 @@ public final class PluginImpl extends Plugin
         final JConditional elementNotNull = body._if( e.ne( JExpr._null() ) );
 
         final JExpression newElement;
+        JInvocation getValueInvocation = JExpr.invoke(e, "getValue");
         if ( element.hasClass() )
         {
-            newElement = JExpr._new( elementType ).arg( this.getCopyExpression(
-                fieldOutline, element.getContentType(), elementNotNull._then(),
-                JExpr.cast( element.getContentType().toType( fieldOutline.parent().parent(), Aspect.IMPLEMENTATION ),
-                            JExpr.invoke( e, "getValue" ) ), true ) );
+            JCast cast = JExpr.cast(elementContentType.toType(fieldOutline.parent().parent(), Aspect.IMPLEMENTATION), getValueInvocation);
+            JExpression copyExpression = this.getCopyExpression(fieldOutline, elementContentType, elementNotNull._then(), cast, true);
+            Objects.requireNonNull(copyExpression, () -> "Could not get copy expression for " + elementContentType);
+            newElement = JExpr._new( elementType ).arg(copyExpression);
 
             //noinspection ConstantValue
             needsToCatchException = needsToCatchException || this.tryCatchCopyExpression;
@@ -1255,7 +1258,7 @@ public final class PluginImpl extends Plugin
                 arg( JExpr.invoke( e, "getName" ) ).
                 arg( JExpr.invoke( e, "getDeclaredType" ) ).
                 arg( JExpr.invoke( e, "getScope" ) ).
-                arg( JExpr.invoke( e, "getValue" ) );
+                arg(getValueInvocation);
 
         }
 
@@ -1264,10 +1267,12 @@ public final class PluginImpl extends Plugin
 
         if ( !element.hasClass() )
         {
-            elementNotNull._then().add( copy.invoke( "setValue" ).arg( this.getCopyExpression(
-                fieldOutline, element.getContentType(), elementNotNull._then(),
-                JExpr.cast( element.getContentType().toType( fieldOutline.parent().parent(), Aspect.IMPLEMENTATION ),
-                            copy.invoke( "getValue" ) ), true ) ) );
+            JInvocation setCopyValueExpression = copy.invoke("setValue");
+            JInvocation getCopyValueExpression = copy.invoke("getValue");
+            JCast castExpression = JExpr.cast(elementContentType.toType(fieldOutline.parent().parent(), Aspect.IMPLEMENTATION), getCopyValueExpression);
+            JExpression copyExpression = this.getCopyExpression(fieldOutline, elementContentType, elementNotNull._then(), castExpression, true);
+            Objects.requireNonNull(copyExpression, () -> "Could not find copy expression for " + elementContentType);
+            elementNotNull._then().add( setCopyValueExpression.arg(copyExpression) );
 
             needsToCatchException = needsToCatchException || this.tryCatchCopyExpression;
         }
@@ -2083,9 +2088,9 @@ public final class PluginImpl extends Plugin
         return expr;
     }
 
-    private JExpression getBuiltinCopyExpression( final FieldOutline fieldOutline, final CBuiltinLeafInfo type,
-                                                  final JBlock block, final JExpression sourceExpr,
-                                                  final boolean sourceMaybeNull )
+    private @Nullable JExpression getBuiltinCopyExpression(final FieldOutline fieldOutline, final CBuiltinLeafInfo type,
+                                                           final JBlock block, final JExpression sourceExpr,
+                                                           final boolean sourceMaybeNull)
     {
         JExpression expr = null;
 
@@ -2705,7 +2710,7 @@ public final class PluginImpl extends Plugin
 
     }
 
-    private Class<?> getClass( final String binaryName )
+    private @Nullable Class<?> getClass( final String binaryName )
     {
         try
         {
