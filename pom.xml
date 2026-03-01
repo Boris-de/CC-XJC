@@ -109,7 +109,7 @@
       <dependency>
         <groupId>org.junit</groupId>
         <artifactId>junit-bom</artifactId>
-        <version>5.14.2</version>
+        <version>5.14.3</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -178,7 +178,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-surefire-plugin</artifactId>
-          <version>3.5.4</version>
+          <version>3.5.5</version>
           <configuration>
             <redirectTestOutputToFile>true</redirectTestOutputToFile>
           </configuration>
@@ -252,7 +252,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-dependency-plugin</artifactId>
-          <version>3.9.0</version>
+          <version>3.10.0</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
